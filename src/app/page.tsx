@@ -1,4 +1,5 @@
 import { GeometricBackground } from "@/components/GeometricBackground";
+import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
@@ -9,6 +10,9 @@ import StorySection from "@/components/story/StorySection";
 export default function Home() {
   return (
     <main className="relative bg-black text-white">
+      {/* Header with logo */}
+      <Header />
+      
       {/* Fixed geometric background */}
       <GeometricBackground />
       
