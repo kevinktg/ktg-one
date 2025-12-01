@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Syne, Ubuntu_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import { ReactLenis } from "@/libs/lenis";
+import { ClientLayout } from "@/components/ClientLayout";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -31,12 +31,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${syne.variable} ${ubuntuMono.variable} antialiased bg-black text-white overflow-x-hidden`}>
-        <ReactLenis root>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${syne.variable} ${ubuntuMono.variable} antialiased bg-black text-white overflow-x-hidden`} suppressHydrationWarning>
+        <ClientLayout>
           {children}
-        </ReactLenis>
-        <SpeedInsights />
+          <SpeedInsights />
+        </ClientLayout>
       </body>
     </html>
   );
