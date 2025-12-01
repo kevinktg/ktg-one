@@ -59,6 +59,6 @@ dist/
 # Story files (Make.com workflow files)
 *.make
 
-# Old/unused directories
-components/
-styles/
+# Old/unused directories (only top-level)
+/components/
+/styles/
