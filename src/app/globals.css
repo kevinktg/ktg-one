@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Ubuntu:wght@300;400;500;700&family=Iosevka+Term:wght@300;400;500;600&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 @layer base {
   :root {
@@ -11,7 +9,8 @@
   }
 
   body {
-    @apply bg-black text-white;
+    background-color: #000000;
+    color: #ffffff;
     font-family: 'Ubuntu', 'Iosevka Term', monospace;
     overflow-x: hidden;
   }

@@ -1,15 +1,24 @@
+"use client";
+
+import { useState } from "react";
 import { GeometricBackground } from "@/components/GeometricBackground";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
+import { PromptPortfolio } from "@/components/PromptPortfolio";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import StorySection from "@/components/story/StorySection";
+import { Intro } from "@/components/Intro";
 
 export default function Home() {
+  const [introComplete, setIntroComplete] = useState(false);
+
   return (
-    <main className="relative bg-black text-white">
+    <>
+      {!introComplete && <Intro onComplete={() => setIntroComplete(true)} />}
+      <main className="relative bg-black text-white">
       {/* Header with logo */}
       <Header />
       
@@ -52,6 +61,7 @@ export default function Home() {
         </div>
       </div>
     </main>
+    </>
   );
 }
 

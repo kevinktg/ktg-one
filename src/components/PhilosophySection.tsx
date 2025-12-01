@@ -94,7 +94,9 @@ export function PhilosophySection() {
           {quotes.map((quote, index) => (
             <div
               key={index}
-              ref={(el) => (quoteRefs.current[index] = el)}
+              ref={(el) => {
+                quoteRefs.current[index] = el;
+              }}
               className="relative group"
             >
               <div className="border-l-2 border-white/20 pl-8 py-4 group-hover:border-white/60 transition-colors duration-500">

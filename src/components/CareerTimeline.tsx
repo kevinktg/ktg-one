@@ -113,7 +113,9 @@ export function CareerTimeline() {
             return (
               <div
                 key={career.id}
-                ref={(el) => (careerRefs.current[index] = el)}
+                ref={(el) => {
+                  careerRefs.current[index] = el;
+                }}
                 className="relative group cursor-pointer"
               >
                 {/* Geometric border */}

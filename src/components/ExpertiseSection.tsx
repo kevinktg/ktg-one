@@ -104,7 +104,9 @@ export function ExpertiseSection() {
           {expertise.map((area, index) => (
             <div
               key={area.category}
-              ref={(el) => (columnRefs.current[index] = el)}
+              ref={(el) => {
+                columnRefs.current[index] = el;
+              }}
               className="relative"
             >
               {/* Category header */}
