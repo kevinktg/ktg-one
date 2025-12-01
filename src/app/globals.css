@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Ubuntu:wght@300;400;500;700&family=Iosevka+Term:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+  }
+
+  body {
+    @apply bg-black text-white;
+    font-family: 'Ubuntu', 'Iosevka Term', monospace;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+    text-transform: lowercase;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 800;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+  }
+
+  p {
+    font-family: 'Ubuntu', sans-serif;
+    line-height: 1.6;
+  }
+
+  code, .monospace {
+    font-family: 'Iosevka Term', monospace;
+  }
+}
+
+@layer utilities {
+  .geometric-pattern {
+    background-image: 
+      linear-gradient(45deg, transparent 48%, white 48%, white 52%, transparent 52%),
+      linear-gradient(-45deg, transparent 48%, white 48%, white 52%, transparent 52%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+    opacity: 0.12;
+  }
+
+  .diagonal-lines {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      white 10px,
+      white 11px
+    );
+    opacity: 0.15;
+  }
+
+  .grid-pattern {
+    background-image: 
+      linear-gradient(white 1px, transparent 1px),
+      linear-gradient(90deg, white 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.1;
+  }
+}
+

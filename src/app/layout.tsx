@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import { Syne, Ubuntu_Mono } from "next/font/google";
+import "./globals.css";
+import { ReactLenis } from "@/libs/lenis";
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  display: "swap",
+});
+
+const ubuntuMono = Ubuntu_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: ".ktg | Top 0.1% Prompt Engineer",
+  description: "Portfolio of a top 0.1% prompt engineer. Cross-world reasoning across 7 careers.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${syne.variable} ${ubuntuMono.variable} antialiased bg-black text-white overflow-x-hidden`}>
+        <ReactLenis root>
+          {children}
+        </ReactLenis>
+      </body>
+    </html>
+  );
+}
+
