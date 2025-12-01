@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Syne, Ubuntu_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ReactLenis } from "@/libs/lenis";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
         <ReactLenis root>
           {children}
         </ReactLenis>
+        <SpeedInsights />
       </body>
     </html>
   );
