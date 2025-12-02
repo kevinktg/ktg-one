@@ -1,16 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-interface IntroProps {
-  onComplete: () => void;
-}
-
-export function Intro({ onComplete }: IntroProps) {
-  const [isVisible, setIsVisible] = useState(true);
+export function Intro() {
   const containerRef = useRef<HTMLDivElement>(null);
   const shapesRef = useRef<HTMLDivElement>(null);
 
@@ -27,13 +22,6 @@ export function Intro({ onComplete }: IntroProps) {
         end: "+=2000", // Pin for 2000px of scroll
         pin: true,
         scrub: 1,
-        onLeave: () => {
-          setIsVisible(false);
-          setTimeout(onComplete, 300);
-        },
-        onLeaveBack: () => {
-          setIsVisible(true);
-        },
       });
 
       const tl = gsap.timeline({
@@ -104,9 +92,19 @@ export function Intro({ onComplete }: IntroProps) {
         })
         // Fade out container
         .to(containerRef.current, {
-          opacity: 0,
+          autoAlpha: 0, // Handles opacity: 0 and visibility: hidden
           duration: 0.4,
           ease: "power2.inOut",
+          onComplete: () => {
+             if (containerRef.current) {
+               containerRef.current.style.pointerEvents = "none";
+             }
+          },
+          onReverseComplete: () => {
+             if (containerRef.current) {
+               containerRef.current.style.pointerEvents = "auto";
+             }
+          }
         });
 
       return () => {
@@ -116,8 +114,6 @@ export function Intro({ onComplete }: IntroProps) {
     },
     { scope: containerRef, dependencies: [] }
   );
-
-  if (!isVisible) return null;
 
   return (
     <div
@@ -144,7 +140,7 @@ export function Intro({ onComplete }: IntroProps) {
       {/* Text */}
       <div className="intro-text text-center relative z-10">
         <h1 className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-white">
-          Go
+          ktg
         </h1>
       </div>
     </div>
