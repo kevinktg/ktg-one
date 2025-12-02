@@ -9,7 +9,7 @@ export function Header() {
         {/* Logo - Typography using Syne */}
         <Link href="/" className="hover:opacity-80 transition-opacity">
           <span className="font-syne text-2xl md:text-3xl font-bold tracking-tight lowercase">
-            Go
+            ktg
           </span>
         </Link>
 
