@@ -6,16 +6,61 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
-  title: "Blog | .ktg",
-  description: "Blog posts and articles",
+  title: "Blog | .ktg - AI Anthropology & Prompt Engineering Insights",
+  description: "Thoughts, insights, and updates on AI anthropology, prompt engineering, LLM optimization, and the future of human-AI collaboration. Top 0.01% prompt engineer's perspective.",
+  keywords: ["AI anthropology", "prompt engineering", "LLM optimization", "AI insights", "machine learning", "artificial intelligence"],
+  openGraph: {
+    title: "Blog | .ktg - AI Anthropology & Prompt Engineering",
+    description: "Thoughts, insights, and updates on AI anthropology and prompt engineering from a top 0.01% prompt engineer.",
+    type: "website",
+    siteName: ".ktg",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog | .ktg",
+    description: "AI Anthropology & Prompt Engineering Insights",
+  },
 };
+
+// Force dynamic rendering to avoid build-time API failures
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function BlogPage() {
   const posts = await getPosts();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktg.one';
+
+  // Structured data for blog listing
+  const blogJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: ".ktg Blog",
+    description: "AI Anthropology & Prompt Engineering Insights",
+    url: `${siteUrl}/blog`,
+    publisher: {
+      "@type": "Organization",
+      name: ".ktg",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/assets/ktg-one.svg`,
+      },
+    },
+    blogPost: posts.map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title.rendered,
+      url: `${siteUrl}/blog/${post.slug}`,
+      datePublished: new Date(post.date).toISOString(),
+      image: getFeaturedImage(post) || `${siteUrl}/assets/ktg-one.svg`,
+    })),
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
+      />
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase">
@@ -44,10 +89,13 @@ export default async function BlogPage() {
                   <article
                     key={post.id}
                     className="border-b border-white/10 pb-12 last:border-0"
+                    itemScope
+                    itemType="https://schema.org/BlogPosting"
                   >
                     <Link
                       href={`/blog/${post.slug}`}
                       className="group block"
+                      itemProp="url"
                     >
                       {featuredImage && (
                         <div className="mb-6 overflow-hidden rounded-lg">
@@ -60,12 +108,14 @@ export default async function BlogPage() {
                           />
                         </div>
                       )}
-                      <h2 className="font-syne text-3xl md:text-4xl font-bold mb-3 group-hover:text-white/80 transition-colors lowercase">
+                      <h2 className="font-syne text-3xl md:text-4xl font-bold mb-3 group-hover:text-white/80 transition-colors lowercase" itemProp="headline">
                         {post.title.rendered}
                       </h2>
-                      <p className="text-white/40 text-sm font-mono mb-4">
-                        {formatDate(post.date)}
-                      </p>
+                      <div className="text-white/40 text-sm font-mono mb-4">
+                        <time dateTime={new Date(post.date).toISOString()} itemProp="datePublished">
+                          {formatDate(post.date)}
+                        </time>
+                      </div>
                       <div
                         className="text-white/70 prose prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: excerpt }}

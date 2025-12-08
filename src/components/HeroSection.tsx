@@ -4,27 +4,39 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, forwardRef } from "react";
 import { SplitText } from "./SplitText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function HeroSection() {
+export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
   const heroRef = useRef<HTMLDivElement>(null);
+  const internalRef = ref || heroRef;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // Initial entrance animation
+    // 1. FLOATING SHAPES ANIMATION (Matches NarrativeIntro)
+    gsap.to(".hero-shape", {
+        y: "random(-20, 20)",
+        x: "random(-10, 10)",
+        rotation: "random(-5, 5)",
+        duration: "random(3, 6)",
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+        stagger: 0.1
+    });
+
+    // 2. ENTRANCE ANIMATION (Text & Image)
     const tl = gsap.timeline();
     
-    // Target words inside the SplitText components for Title
+    // Animate Title Words
     const titleWords = titleRef.current?.querySelectorAll(".split-word");
-    
     if (titleWords?.length) {
         tl.from(titleWords, {
-          y: 80, // Increased distance for more drama
+          y: 80,
           opacity: 0,
           duration: 1.0,
           stagger: 0.15,
@@ -32,19 +44,19 @@ export function HeroSection() {
         });
     }
     
-    // Target words inside the SplitText components for Subtitle
+    // Animate Subtitle Words
     const subtitleWords = subtitleRef.current?.querySelectorAll(".split-word");
-
     if (subtitleWords?.length) {
       tl.from(subtitleWords, {
         y: 20,
         opacity: 0,
         duration: 1.5,
-        stagger: 0.05, // Faster ripple effect
+        stagger: 0.05,
         ease: "power2.out",
-      }, "-=0.8"); // Start sooner
+      }, "-=0.8");
     }
 
+    // Animate Image
     if (imageRef.current) {
         tl.from(imageRef.current, {
           scale: 0.8,
@@ -54,18 +66,17 @@ export function HeroSection() {
         }, "-=1.0");
     }
 
-    // Scroll Exit Animation
-    // When user scrolls down, this section fades out gracefully
+    // 3. SCROLL EXIT ANIMATION
     gsap.to(heroRef.current, {
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
         end: "bottom top",
-        scrub: true, // Smooth scrubbing instead of toggleActions
+        scrub: true,
       },
       opacity: 0,
       y: -100,
-      ease: "none" // Linear ease for scrub
+      ease: "none"
     });
 
     // Parallax Image Effect
@@ -76,7 +87,7 @@ export function HeroSection() {
         end: "bottom top",
         scrub: true,
       },
-      y: 100, // Move image down slightly (parallax)
+      y: 100, 
       rotation: 5,
       ease: "none"
     });
@@ -84,9 +95,15 @@ export function HeroSection() {
   }, { scope: heroRef });
 
   return (
-    <section ref={heroRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20">
-      {/* Large geometric accent */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border-4 border-white opacity-5 rotate-45 pointer-events-none" />
+    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
+      
+      {/* 🌟 Floating Background Shapes */}
+      <div className="absolute inset-0 pointer-events-none opacity-60">
+         <div className="hero-shape absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
+         <div className="hero-shape absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10" />
+         <div className="hero-shape absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full" />
+         <div className="hero-shape absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12" />
+      </div>
       
       <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* Text content */}
@@ -112,7 +129,7 @@ export function HeroSection() {
         {/* Profile image */}
         <div ref={imageRef} className="flex justify-center md:justify-end">
           <div className="relative">
-            {/* Geometric frame */}
+            {/* FIX: Ensure these lines are complete single lines */}
             <div className="absolute -inset-8 border-2 border-white/20 rotate-6" />
             <div className="absolute -inset-12 border border-white/10 -rotate-3" />
             
@@ -131,4 +148,6 @@ export function HeroSection() {
       </div>
     </section>
   );
-}
+});
+
+HeroSection.displayName = "HeroSection";

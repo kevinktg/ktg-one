@@ -1,5 +1,5 @@
 // WordPress REST API client
-const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://ktg.one';
+const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com';
 
 export interface WordPressPost {
   id: number;
@@ -44,21 +44,55 @@ export async function testWordPressConnection(): Promise<boolean> {
 // Fetch all blog posts
 export async function getPosts(page: number = 1, perPage: number = 10): Promise<WordPressPost[]> {
   try {
-    const response = await fetch(
-      `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`,
-      {
-        next: { revalidate: 3600 }, // Revalidate every hour
-      }
-    );
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
+    
+    const response = await fetch(url, {
+      next: { revalidate: 3600 }, // Revalidate every hour
+      headers: {
+        'User-Agent': 'Next.js WordPress Client',
+        'Accept': 'application/json',
+        'Referer': WORDPRESS_URL,
+      },
+    });
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
       console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
-      throw new Error(`WordPress API error: ${response.status}`);
+      console.error(`URL: ${url}`);
+      console.error(`Response: ${errorText.substring(0, 200)}`);
+      
+      // Try without _embed if 403
+      if (response.status === 403) {
+        console.warn('Attempting fetch without _embed parameter...');
+        const fallbackResponse = await fetch(
+          `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
+          {
+            next: { revalidate: 3600 },
+            headers: {
+              'User-Agent': 'Next.js WordPress Client',
+              'Accept': 'application/json',
+              'Referer': WORDPRESS_URL,
+            },
+          }
+        );
+        
+        if (fallbackResponse.ok) {
+          return await fallbackResponse.json();
+        }
+      }
+      
+      return [];
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`Successfully fetched ${data.length} posts from WordPress`);
+    return data;
   } catch (error) {
     console.error('Error fetching WordPress posts:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return [];
   }
 }
@@ -66,22 +100,54 @@ export async function getPosts(page: number = 1, perPage: number = 10): Promise<
 // Fetch a single post by slug
 export async function getPostBySlug(slug: string): Promise<WordPressPost | null> {
   try {
-    const response = await fetch(
-      `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`,
-      {
-        next: { revalidate: 3600 },
-      }
-    );
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
+    
+    const response = await fetch(url, {
+      next: { revalidate: 3600 },
+      headers: {
+        'User-Agent': 'Next.js WordPress Client',
+        'Accept': 'application/json',
+        'Referer': WORDPRESS_URL,
+      },
+    });
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
       console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
-      throw new Error(`WordPress API error: ${response.status}`);
+      console.error(`URL: ${url}`);
+      console.error(`Response: ${errorText.substring(0, 200)}`);
+      
+      // Try without _embed if 403
+      if (response.status === 403) {
+        console.warn('Attempting fetch without _embed parameter...');
+        const fallbackResponse = await fetch(
+          `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
+          {
+            next: { revalidate: 3600 },
+            headers: {
+              'User-Agent': 'Next.js WordPress Client',
+              'Accept': 'application/json',
+              'Referer': WORDPRESS_URL,
+            },
+          }
+        );
+        
+        if (fallbackResponse.ok) {
+          const posts = await fallbackResponse.json();
+          return posts.length > 0 ? posts[0] : null;
+        }
+      }
+      
+      return null;
     }
 
     const posts = await response.json();
     return posts.length > 0 ? posts[0] : null;
   } catch (error) {
     console.error('Error fetching WordPress post:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+    }
     return null;
   }
 }

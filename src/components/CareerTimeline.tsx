@@ -141,34 +141,50 @@ export function CareerTimeline() {
       gsap.set(dotRefs.current[index], { scale: 0.5, opacity: 0.5 });
 
       if (isLastCard) {
-          // ============================================
-          // 🌟 PIN & ZOOM FOR AI ENGINEER 🌟
-          // ============================================
-          ScrollTrigger.create({
-            trigger: card,
-            start: "center center", 
-            end: "+=2000",          
-            pin: true,              
-            pinSpacing: true,       
-            scrub: true,
-            onUpdate: (self) => {
-                const p = self.progress;
-                
-                // Massive Zoom
-                gsap.to(card, {
-                    opacity: 1, 
-                    scale: 1 + (p * 3), 
-                    filter: "blur(0px)",
-                    duration: 0.1,
-                    overwrite: true
-                });
+// ============================================
+// 🌟 REVISED AI ENGINEER PIN & ZOOM 🌟
+// ============================================
 
-                // Fade out the center line
-                if (lineRef.current) {
-                    gsap.to(lineRef.current, { opacity: 1 - p, duration: 0.1, overwrite: true });
-                }
-            }
+// Inside the isLastCard block:
+ScrollTrigger.create({
+  trigger: card,
+  start: "center center", 
+  end: "+=2000",          
+  pin: true,              
+  pinSpacing: true,       
+  scrub: 1, // Use scrub to control smoothness
+  onUpdate: (self) => {
+      const p = self.progress;
+      
+      // 1. Zoom to final state (1.2x) in the first 10% of the pin, then hold.
+      const scaleValue = p < 0.1 ? 1 + (p * 2) : 1.2;
+      
+      gsap.to(card, {
+          opacity: 1, 
+          scale: scaleValue, 
+          filter: "blur(0px)",
+          duration: 0.1,
+          overwrite: true
+      });
+
+      // 2. Fade out the card entirely during the last 30% of the pin duration (1.7x to 0)
+      const fadeStart = 0.7; // Start fading out at 70% progress
+      const fadeDuration = 0.3; // Fade out lasts for 30% of progress
+
+      if (p >= fadeStart) {
+          gsap.to(card, {
+              opacity: 1 - ((p - fadeStart) / fadeDuration), // Smooth fade down to 0
+              duration: 0.1,
+              overwrite: true
           });
+      }
+
+      // 3. Keep the line fade out smooth
+      if (lineRef.current) {
+          gsap.to(lineRef.current, { opacity: 1 - p, duration: 0.1, overwrite: true });
+      }
+  }
+});
 
       } else {
           // ============================================

@@ -43,7 +43,7 @@ export function PhilosophySection() {
 
   const quotes = [
     {
-      text: "Evaluate - then collaborate.",
+      text: "Don't just evaluate... collaborate.",
       label: "PRINCIPLE 01",
     },
     {
@@ -51,8 +51,8 @@ export function PhilosophySection() {
       label: "PRINCIPLE 02",
     },
     {
-      text: "'Individualism and patterned emotions are real' - April 2024",
-      label: "PRINCIPLE 02",
+      text: "'Each LLM is wildly unique with patterned traits & features' - April 2024",
+      label: "PRINCIPLE 03",
     },
   ];
 
@@ -74,12 +74,12 @@ export function PhilosophySection() {
             </div>
             <div className="space-y-6 text-white/70 text-lg">
               <p>
-                Seven careers aren't seven separate lives. They're seven lenses on the same problem: 
+                Seven careers aren't seven separate lives. They're seven lenses on the same problem:
                 how to synthesize complexity into clarity.
               </p>
               <p>
-                From the precision of a pilot to the creativity of sound engineering, 
-                from market dynamics to human teaching—each domain taught a different dimension 
+                From the precision of a pilot to the creativity of sound engineering,
+                from market dynamics to human teaching—each domain taught a different dimension
                 of problem-solving.
               </p>
               <p className="monospace text-white/90">
@@ -115,12 +115,22 @@ export function PhilosophySection() {
         </div>
 
         {/* Closing statement */}
-        <div className="mt-32 text-center">
+        <div className="mt-32 text-center space-y-8">
           <div className="inline-block relative">
             <div className="absolute -inset-8 border border-white/10" />
             <div className="relative monospace text-2xl md:text-3xl px-12 py-8 tracking-wide">
               CONTEXT • CONTINUATION • SOLVE
             </div>
+          </div>
+          
+          {/* Blog link for SEO */}
+          <div className="pt-8">
+            <a 
+              href="/blog" 
+              className="monospace text-sm text-white/60 hover:text-white transition-colors underline underline-offset-4"
+            >
+              read insights →
+            </a>
           </div>
         </div>
       </div>

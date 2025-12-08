@@ -4,128 +4,123 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function ScrollTransition() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
+// =========================================
+// CONFIGURATION
+// =========================================
 
-  // Select a few art images for the transition
-  const artImages = [
-    "/assets/art/Colours-of-Haki-1.webp",
-    "/assets/art/Colours-of-Haki-3.webp",
-    "/assets/art/Colours-of-Haki-6.webp",
-    "/assets/art/Colours-of-Haki-9.webp",
-  ];
+// 1. DATA: 14 Haki Images
+const hakiImages = Array.from({ length: 14 }, (_, i) => ({
+  src: `/assets/art/Colours-of-Haki-${i + 1}.webp`, 
+  title: `Synthesia_0${i + 1}`
+}));
+
+// 2. ANIMATION STYLE: "explorations"
+// This matches the "Lennox Montgomery / Explorations" demo
+type AnimationStyle = "explorations" | "scatter" | "deck";
+const CURRENT_STYLE: AnimationStyle = "explorations"; 
+
+export function GalleryFormation() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (!sectionRef.current || !bgRef.current) return;
+    if (!gridRef.current) return;
 
-    // NO PINNING - just animate as you scroll through the section
-    // Each image gets its own ScrollTrigger with calculated positions
-    const totalImages = artImages.length;
-    const imageScrollDistance = 1000; // 1000px of scroll per image
-    const sectionHeight = totalImages * imageScrollDistance;
+    const items = gsap.utils.toArray(gridRef.current.children);
 
-    artImages.forEach((src, index) => {
-      const imageElement = bgRef.current?.children[index] as HTMLElement;
-      if (!imageElement) return;
+    // ==================================================
+    // STYLE: EXPLORATIONS
+    // Behavior: Large scattered float -> Snaps to 3-column Portrait Grid
+    // ==================================================
+    if (CURRENT_STYLE === "explorations") {
+        
+        // 1. Set Initial "Floating" State (Chaos)
+        gsap.set(items, {
+            x: () => Math.random() * 1500 - 750, // Wide horizontal scatter
+            y: () => Math.random() * 2000 - 1000, // Deep vertical scatter
+            z: () => Math.random() * 500 - 250,   // Random depth
+            rotation: () => Math.random() * 90 - 45, // Dramatic tilt
+            opacity: 0,
+            scale: 0.6
+        });
 
-      // Calculate scroll positions: each image gets its own range within the section
-      const imageStart = index * imageScrollDistance;
-      const imageEnd = (index + 1) * imageScrollDistance;
-
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top top", // Start when section top hits viewport top
-        end: "bottom top", // End when section bottom hits viewport top
-        scrub: 1,
-        onUpdate: (self) => {
-          // Calculate which image should be visible based on scroll progress through section
-          const sectionProgress = self.progress; // 0 to 1 as we scroll through the section
-          const imageStartProgress = index / totalImages; // e.g., 0, 0.25, 0.5, 0.75
-          const imageEndProgress = (index + 1) / totalImages; // e.g., 0.25, 0.5, 0.75, 1.0
-          
-          // Only animate this image if we're in its range
-          if (sectionProgress >= imageStartProgress && sectionProgress <= imageEndProgress) {
-            // Local progress within this image's range (0 to 1)
-            const localProgress = (sectionProgress - imageStartProgress) / (imageEndProgress - imageStartProgress);
-            
-            // Fade in (first 20%), hold (middle 60%), fade out (last 20%)
-            let opacity = 0;
-            let scale = 2;
-            let blur = 30;
-            
-            if (localProgress < 0.2) {
-              // Fade in
-              const fadeProgress = localProgress / 0.2;
-              opacity = fadeProgress * 0.8;
-              scale = 2 - fadeProgress;
-              blur = 30 - fadeProgress * 30;
-            } else if (localProgress > 0.8) {
-              // Fade out
-              const fadeProgress = (localProgress - 0.8) / 0.2;
-              opacity = 0.8 - fadeProgress * 0.8;
-              scale = 1 + fadeProgress;
-              blur = fadeProgress * 30;
-            } else {
-              // Hold at peak visibility
-              opacity = 0.8;
-              scale = 1;
-              blur = 0;
+        // 2. The Formation (Order)
+        gsap.to(items, {
+            x: 0, 
+            y: 0, 
+            z: 0,
+            rotation: 0, 
+            opacity: 1, 
+            scale: 1,
+            stagger: {
+                amount: 1.5,
+                from: "random", // They come in organically, not in order
+                grid: "auto"
+            },
+            duration: 2,
+            ease: "expo.out", // The "Snap" feel at the end
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top top",
+                end: "+=2500", // Slower scroll to enjoy the formation
+                pin: true,     // Pin the container so we watch them form
+                scrub: 1,
             }
+        });
+    }
 
-            gsap.set(imageElement, {
-              opacity,
-              scale,
-              filter: `blur(${blur}px)`,
-            });
-          } else {
-            // Hide image outside its range
-            gsap.set(imageElement, {
-              opacity: 0,
-              scale: sectionProgress < imageStartProgress ? 2 : 2,
-              filter: "blur(30px)",
-            });
-          }
-        },
-      });
-    });
-  }, { scope: sectionRef });
+  }, { scope: containerRef });
 
   return (
-    <section ref={sectionRef} className="scroll-transition-section bg-black" style={{ height: `${artImages.length * 1000}px`, position: "relative" }}>
-      {/* Fixed background container */}
-      <div ref={bgRef} className="scroll-transition-bg">
-        {artImages.map((src, index) => (
-          <div
-            key={index}
-            className="scroll-transition-image"
-            style={{
-              backgroundImage: `url(${src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              position: "absolute",
-              inset: 0,
-              opacity: 0,
-              transform: "scale(2)",
-              filter: "blur(30px)",
-            }}
-          />
-        ))}
-      </div>
+    <section ref={containerRef} className="relative h-screen bg-black text-white overflow-hidden z-30">
       
-      {/* Content overlay - Centered animation */}
-      <div className="scroll-transition-content absolute inset-0 flex items-center justify-center z-10">
-        <div className="text-center">
-          <div className="w-32 h-32 md:w-48 md:h-48 border-4 border-white/30 rotate-45 animate-spin-slow">
-            <div className="absolute inset-4 border-2 border-white/20 -rotate-45" />
-          </div>
+      {/* Header */}
+      <div className="absolute top-10 left-0 w-full text-center z-10 pointer-events-none mix-blend-difference">
+        <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter">
+          explorations
+        </h2>
+        <p className="font-mono text-xs opacity-50 mt-2 tracking-[0.5em] uppercase">
+          Nothing left unseen
+        </p>
+      </div>
+
+      <div className="relative h-full w-full flex items-center justify-center">
+        
+        {/* THE GRID: 3 Columns (Portrait Mode) */}
+        <div 
+            ref={gridRef}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-6 md:px-12"
+            style={{ perspective: "1000px" }} // Adds 3D depth for the fly-in
+        >
+            {hakiImages.map((item, index) => (
+                <div 
+                    key={index} 
+                    // aspect-[3/4] is the crucial "Explorations" shape
+                    className="relative aspect-[3/4] w-full bg-[#111] overflow-hidden border border-white/10 group rounded-sm"
+                >
+                    <Image
+                        src={item.src}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    
+                    {/* Minimal Hover Label */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <span className="font-mono text-[10px] tracking-widest uppercase bg-black/80 text-white px-2 py-1">
+                            {item.title}
+                        </span>
+                    </div>
+                </div>
+            ))}
         </div>
+
       </div>
     </section>
   );
 }
-
