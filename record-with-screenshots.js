@@ -9,7 +9,7 @@
   
   async function scrollAndCapture() {
     const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollDuration = 10000; // 10 seconds each direction
+    const scrollDuration = 5000; // 5 seconds each direction
     
     // Scroll down
     console.log('Scrolling down...');
@@ -41,18 +41,18 @@
         const currentScroll = start + (end - start) * easeInOut;
         window.scrollTo(0, currentScroll);
         
-        // Log every second for screenshot timing
-        if (elapsed - lastScreenshot >= 1000) {
+        // Log every 0.5 second for screenshot timing
+        if (elapsed - lastScreenshot >= 500) {
           lastScreenshot = elapsed;
           screenshotIndex++;
           screenshots.push({
             index: screenshotIndex,
-            time: Math.floor(elapsed / 1000),
+            time: (elapsed / 1000).toFixed(1),
             scrollY: Math.round(currentScroll),
             progress: (currentScroll / totalHeight * 100).toFixed(1) + '%',
             direction: isDown ? 'down' : 'up'
           });
-          console.log(`[${isDown ? 'DOWN' : 'UP'}] ${screenshotIndex}s: scrollY=${Math.round(currentScroll)}, progress=${(currentScroll / totalHeight * 100).toFixed(1)}%`);
+          console.log(`[${isDown ? 'DOWN' : 'UP'}] ${screenshotIndex}: time=${(elapsed / 1000).toFixed(1)}s, scrollY=${Math.round(currentScroll)}`);
         }
         
         if (progress < 1) {

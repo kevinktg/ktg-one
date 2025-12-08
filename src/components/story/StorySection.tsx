@@ -54,12 +54,12 @@ export default function StorySection({
           y: 0,
           scrollTrigger: {
             trigger: element,
-            start: "top 80%",
+            start: "top 85%",
             end: "top 50%",
             scrub: pin ? 1 : false,
             toggleActions: pin ? "play none none reverse" : "play none none reverse",
           },
-          duration: pin ? 1 : 0.8,
+          duration: pin ? 1.5 : 1.2,
           ease: "power2.out",
         }
       );

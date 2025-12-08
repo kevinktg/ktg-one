@@ -18,7 +18,7 @@ const promptExamples = [
   },
   {
     id: 2,
-    title: "Business Plan Visualization",
+    title: "Triplexity, Tri-distilled Triumvirate",
     category: "Perplexity Spaces",
     description: "Transforms business plan text into investor-ready visuals: financial charts, market analysis graphics, operational diagrams, performance metrics.",
     techniques: ["Mixture of Experts", "RAG Integration", "Tree-of-Thought", "CoD Optimization"],

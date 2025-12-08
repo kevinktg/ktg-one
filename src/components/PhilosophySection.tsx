@@ -43,16 +43,16 @@ export function PhilosophySection() {
 
   const quotes = [
     {
-      text: "Every career is a framework. Every framework is transferable.",
+      text: "Evaluate - then collaborate.",
       label: "PRINCIPLE 01",
     },
     {
-      text: "Context is everything. Continuation is an art.",
+      text: "Ideation. Brainstorm. Implement. Test. Evaluate. Feedback. Iterate",
       label: "PRINCIPLE 02",
     },
     {
-      text: "Top 0.1% is not about being better. It's about seeing differently.",
-      label: "PRINCIPLE 03",
+      text: "'Individualism and patterned emotions are real' - April 2024",
+      label: "PRINCIPLE 02",
     },
   ];
 
@@ -78,7 +78,7 @@ export function PhilosophySection() {
                 how to synthesize complexity into clarity.
               </p>
               <p>
-                From the precision of a fighter pilot to the creativity of sound engineering, 
+                From the precision of a pilot to the creativity of sound engineering, 
                 from market dynamics to human teaching—each domain taught a different dimension 
                 of problem-solving.
               </p>
