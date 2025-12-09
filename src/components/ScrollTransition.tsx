@@ -66,7 +66,7 @@ export function GalleryFormation() {
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top top",
-                end: "+=2500", // Slower scroll to enjoy the formation
+                end: "+=400", // Much shorter - 400px instead of 2500px
                 pin: true,     // Pin the container so we watch them form
                 scrub: 1,
             }

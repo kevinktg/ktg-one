@@ -24,9 +24,8 @@ export function ValidationSection() {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        // ⬇️ EDIT: INCREASE THIS NUMBER TO SLOW DOWN SCROLL ⬇️
-        // +3000 means you have to scroll 3000px vertically to move the horizontal content
-        end: `+=${scrollWidth + 3000}`,
+        // Much shorter scroll distance
+        end: `+=${scrollWidth + 400}`, // 400px instead of 3000px
         pin: true,
         scrub: 1, // Adds a little weight/momentum
         invalidateOnRefresh: true,

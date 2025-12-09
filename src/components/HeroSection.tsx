@@ -17,7 +17,7 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
   const imageRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // 1. FLOATING SHAPES ANIMATION (Matches NarrativeIntro)
+    // 1. FLOATING SHAPES ANIMATION (Subtle, always running)
     gsap.to(".hero-shape", {
         y: "random(-20, 20)",
         x: "random(-10, 10)",
@@ -29,66 +29,53 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
         stagger: 0.1
     });
 
-    // 2. ENTRANCE ANIMATION (Text & Image)
+    // 2. ENTRANCE ANIMATION (Text & Image) - Quick entrance
     const tl = gsap.timeline();
     
-    // Animate Title Words
+    // Animate Title Words - Faster
     const titleWords = titleRef.current?.querySelectorAll(".split-word");
     if (titleWords?.length) {
         tl.from(titleWords, {
-          y: 80,
+          y: 40,
           opacity: 0,
-          duration: 1.0,
-          stagger: 0.15,
-          ease: "power4.out",
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power2.out",
         });
     }
     
-    // Animate Subtitle Words
+    // Animate Subtitle Words - Faster
     const subtitleWords = subtitleRef.current?.querySelectorAll(".split-word");
     if (subtitleWords?.length) {
       tl.from(subtitleWords, {
         y: 20,
         opacity: 0,
-        duration: 1.5,
-        stagger: 0.05,
+        duration: 0.8,
+        stagger: 0.03,
         ease: "power2.out",
-      }, "-=0.8");
+      }, "-=0.4");
     }
 
-    // Animate Image
+    // Animate Image - Faster
     if (imageRef.current) {
         tl.from(imageRef.current, {
-          scale: 0.8,
+          scale: 0.9,
           opacity: 0,
-          duration: 1.5,
-          ease: "power4.out",
-        }, "-=1.0");
+          duration: 0.8,
+          ease: "power2.out",
+        }, "-=0.6");
     }
 
-    // 3. SCROLL EXIT ANIMATION
+    // 3. SCROLL EXIT ANIMATION - Shorter scroll distance
     gsap.to(heroRef.current, {
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
-        end: "bottom top",
+        end: "top 20%", // Exit much sooner
         scrub: true,
       },
-      opacity: 0,
-      y: -100,
-      ease: "none"
-    });
-
-    // Parallax Image Effect
-    gsap.to(imageRef.current, {
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      },
-      y: 100, 
-      rotation: 5,
+      opacity: 0.3,
+      y: -50,
       ease: "none"
     });
 

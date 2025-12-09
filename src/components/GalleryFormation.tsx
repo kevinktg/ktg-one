@@ -23,37 +23,33 @@ export function GalleryFormation() {
 
     const items = gsap.utils.toArray(gridRef.current.children);
 
-    // 1. Set Initial "Floating" State
+    // Start with items visible but slightly offset (less dramatic)
     gsap.set(items, {
-        x: () => Math.random() * 2000 - 1000, 
-        y: () => Math.random() * 1500 - 750, 
-        z: () => Math.random() * 500 - 250,
-        rotation: () => Math.random() * 45 - 22.5,
-        opacity: 0,
-        scale: 0.5
+        x: () => Math.random() * 100 - 50, 
+        y: () => Math.random() * 100 - 50, 
+        opacity: 0.3,
+        scale: 0.9
     });
 
-    // 2. The Formation Animation
+    // Quick formation animation - shorter scroll distance
     gsap.to(items, {
         x: 0, 
         y: 0, 
-        z: 0,
-        rotation: 0, 
         opacity: 1, 
         scale: 1,
         stagger: {
-            amount: 1.5,
-            from: "random",
+            amount: 0.8, // Much faster
+            from: "start",
             grid: "auto"
         },
-        duration: 2,
-        ease: "expo.out", 
+        duration: 1,
+        ease: "power2.out", 
         scrollTrigger: {
             trigger: containerRef.current,
-            start: "top top",
-            end: "+=2500", 
-            pin: true,
-            scrub: 1,
+            start: "top 80%", // Start when section is 80% down viewport
+            end: "top 20%", // End much sooner
+            scrub: 0.5, // Faster scrub
+            pin: false, // No pinning - just animate on scroll
         }
     });
 

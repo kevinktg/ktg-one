@@ -149,15 +149,15 @@ export function CareerTimeline() {
 ScrollTrigger.create({
   trigger: card,
   start: "center center", 
-  end: "+=2000",          
-  pin: true,              
-  pinSpacing: true,       
+  end: "+=400",          // Much shorter - 400px instead of 2000px
+  pin: true,              
+  pinSpacing: true,       
   scrub: 1, // Use scrub to control smoothness
   onUpdate: (self) => {
       const p = self.progress;
       
-      // 1. Zoom to final state (1.2x) in the first 10% of the pin, then hold.
-      const scaleValue = p < 0.1 ? 1 + (p * 2) : 1.2;
+      // 1. Subtle zoom - much less dramatic
+      const scaleValue = p < 0.2 ? 1 + (p * 0.1) : 1.05; // Max 1.05x instead of 1.2x
       
       gsap.to(card, {
           opacity: 1, 
@@ -183,6 +183,14 @@ ScrollTrigger.create({
       if (lineRef.current) {
           gsap.to(lineRef.current, { opacity: 1 - p, duration: 0.1, overwrite: true });
       }
+  },
+  onLeave: () => {
+      // Reset scale when leaving the pin zone
+      gsap.to(card, {
+          scale: 1,
+          duration: 0.3,
+          ease: "power2.out"
+      });
   }
 });
 
