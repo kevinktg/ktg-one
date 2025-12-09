@@ -24,7 +24,7 @@ export const metadata = {
 
 // Force dynamic rendering to avoid build-time API failures
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 0; // No caching - always fresh
 
 export default async function BlogPage() {
   const posts = await getPosts();
