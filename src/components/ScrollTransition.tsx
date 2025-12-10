@@ -10,14 +10,14 @@ const hakiImages = Array.from({ length: 14 }, (_, i) => ({
 
 export function GalleryFormation() {
   return (
-    <section className="relative py-8 bg-black text-white z-30">
+    <section className="relative py-20 bg-black text-white z-30">
 
       {/* Header */}
-      <div className="w-full text-center mb-6">
-        <h2 className="text-3xl md:text-4xl font-syne font-bold lowercase tracking-tighter">
+      <div className="w-full text-center mb-12">
+        <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter">
           explorations
         </h2>
-        <p className="font-mono text-[10px] opacity-50 mt-1 tracking-[0.5em] uppercase">
+        <p className="font-mono text-xs opacity-50 mt-2 tracking-[0.5em] uppercase">
           Nothing left unseen
         </p>
       </div>
@@ -26,7 +26,7 @@ export function GalleryFormation() {
 
         {/* THE GRID: 3 Columns (Portrait Mode) */}
         <div
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-6xl px-4 md:px-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-6 md:px-12"
         >
             {hakiImages.map((item, index) => (
                 <div
