@@ -1,6 +1,12 @@
 "use client";
 
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef } from "react";
 import Image from "next/image";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // 14 Haki Images
 const hakiImages = Array.from({ length: 14 }, (_, i) => ({
@@ -9,24 +15,60 @@ const hakiImages = Array.from({ length: 14 }, (_, i) => ({
 }));
 
 export function GalleryFormation() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (!gridRef.current) return;
+
+    const items = gsap.utils.toArray(gridRef.current.children);
+
+    // Set Initial "Floating" State (Chaos)
+    gsap.set(items, {
+        x: () => Math.random() * 1500 - 750,
+        y: () => Math.random() * 2000 - 1000,
+        z: () => Math.random() * 500 - 250,
+        rotation: () => Math.random() * 90 - 45,
+        opacity: 0,
+        scale: 0.6
+    });
+
+    // The Formation (Order)
+    gsap.to(items, {
+        x: 0,
+        y: 0,
+        z: 0,
+        rotation: 0,
+        opacity: 1,
+        scale: 1,
+        stagger: {
+            amount: 1.5,
+            from: "random",
+            grid: "auto"
+        },
+        duration: 2,
+        ease: "expo.out",
+        scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top top",
+            end: "+=400",
+            pin: true,
+            scrub: 1,
+        }
+    });
+
+  }, { scope: containerRef });
+
   return (
-    <section className="relative py-20 bg-black text-white z-30">
+    <section ref={containerRef} className="relative h-screen bg-black text-white overflow-hidden z-30">
 
-      {/* Header */}
-      <div className="w-full text-center mb-12">
-        <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter">
-          explorations
-        </h2>
-        <p className="font-mono text-xs opacity-50 mt-2 tracking-[0.5em] uppercase">
-          Nothing left unseen
-        </p>
-      </div>
-
-      <div className="relative w-full flex items-center justify-center">
+      <div className="relative h-full w-full flex items-center justify-center">
 
         {/* THE GRID: 3 Columns (Portrait Mode) */}
         <div
+            ref={gridRef}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-6 md:px-12"
+            style={{ perspective: "1000px" }}
         >
             {hakiImages.map((item, index) => (
                 <div
