@@ -141,59 +141,37 @@ export function CareerTimeline() {
       gsap.set(dotRefs.current[index], { scale: 0.5, opacity: 0.5 });
 
       if (isLastCard) {
-// ============================================
-// 🌟 REVISED AI ENGINEER PIN & ZOOM 🌟
-// ============================================
+          // ============================================
+          // LAST CARD - STANDARD FOCUS (NO PIN)
+          // ============================================
+          ScrollTrigger.create({
+            trigger: card,
+            start: "top center+=150",
+            end: "bottom center-=150",
+            scrub: true,
+            onUpdate: (self) => {
+                 const progress = self.progress;
+                 const intensity = Math.sin(progress * Math.PI);
 
-// Inside the isLastCard block:
-ScrollTrigger.create({
-  trigger: card,
-  start: "center center", 
-  end: "+=400",          // Much shorter - 400px instead of 2000px
-  pin: true,              
-  pinSpacing: true,       
-  scrub: 1, // Use scrub to control smoothness
-  onUpdate: (self) => {
-      const p = self.progress;
-      
-      // 1. Subtle zoom - much less dramatic
-      const scaleValue = p < 0.2 ? 1 + (p * 0.1) : 1.05; // Max 1.05x instead of 1.2x
-      
-      gsap.to(card, {
-          opacity: 1, 
-          scale: scaleValue, 
-          filter: "blur(0px)",
-          duration: 0.1,
-          overwrite: true
-      });
+                 gsap.to(card, {
+                     opacity: 0.1 + (intensity * 0.9),
+                     scale: 0.8 + (intensity * 0.2),
+                     filter: `blur(${10 - (intensity * 10)}px)`,
+                     duration: 0.1,
+                     overwrite: true
+                 });
 
-      // 2. Fade out the card entirely during the last 30% of the pin duration (1.7x to 0)
-      const fadeStart = 0.7; // Start fading out at 70% progress
-      const fadeDuration = 0.3; // Fade out lasts for 30% of progress
-
-      if (p >= fadeStart) {
-          gsap.to(card, {
-              opacity: 1 - ((p - fadeStart) / fadeDuration), // Smooth fade down to 0
-              duration: 0.1,
-              overwrite: true
+                 if(dotRefs.current[index]) {
+                     gsap.to(dotRefs.current[index], {
+                         scale: 0.5 + (intensity * 0.8),
+                         opacity: 0.5 + (intensity * 0.5),
+                         boxShadow: `0 0 ${intensity * 30}px rgba(255,255,255,${intensity})`,
+                         duration: 0.1,
+                         overwrite: true
+                     });
+                 }
+            }
           });
-      }
-
-      // 3. Keep the line fade out smooth
-      if (lineRef.current) {
-          gsap.to(lineRef.current, { opacity: 1 - p, duration: 0.1, overwrite: true });
-      }
-  },
-  onLeave: () => {
-      // Reset scale when leaving the pin zone
-      gsap.to(card, {
-          scale: 1,
-          duration: 0.3,
-          ease: "power2.out"
-      });
-  }
-});
-
       } else {
           // ============================================
           // STANDARD FOCUS EFFECT
@@ -231,7 +209,7 @@ ScrollTrigger.create({
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative min-h-[450vh] pt-40 pb-[100vh] overflow-hidden bg-black z-10">
+    <section ref={containerRef} className="relative min-h-[200vh] pt-40 pb-20 overflow-hidden bg-black z-10">
       
       {/* CENTRAL LINE */}
       <div className="absolute inset-0 pointer-events-none z-0 flex justify-center">
@@ -249,7 +227,7 @@ ScrollTrigger.create({
         </h2>
 
         {/* SPACING */}
-        <div className="flex flex-col space-y-[60vh]">
+        <div className="flex flex-col space-y-[30vh]">
           {careers.map((career, index) => {
             const isCenter = career.side === "center";
             const isLeft = career.side === "left";
