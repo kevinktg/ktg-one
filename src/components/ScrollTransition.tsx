@@ -79,7 +79,7 @@ export function GalleryFormation() {
                         src={item.src}
                         alt={item.title}
                         fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 768px) 100vw, 33vw"
                     />
 
