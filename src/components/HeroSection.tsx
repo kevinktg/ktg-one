@@ -121,12 +121,12 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
             <div className="absolute -inset-12 border border-white/10 -rotate-3" />
             
             <div className="relative w-80 h-80 md:w-96 md:h-96">
-              <Image 
-                src="/assets/7d041e6f392514bea854c5ccc9f806bf8656635e.png" 
-                alt="Profile" 
+              <Image
+                src="/assets/ktg.svg"
+                alt="Profile"
                 width={384}
                 height={384}
-                className="w-full h-full object-contain filter brightness-110 contrast-125 grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-contain filter brightness-110 contrast-125"
                 priority
               />
             </div>

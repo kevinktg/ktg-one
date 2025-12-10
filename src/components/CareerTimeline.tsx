@@ -142,34 +142,42 @@ export function CareerTimeline() {
 
       if (isLastCard) {
           // ============================================
-          // LAST CARD - STANDARD FOCUS (NO PIN)
+          // AI ENGINEER PIN & ZOOM
           // ============================================
           ScrollTrigger.create({
             trigger: card,
-            start: "top center+=150",
-            end: "bottom center-=150",
-            scrub: true,
+            start: "center center",
+            end: "+=800",
+            pin: true,
+            pinSpacing: true,
+            scrub: 1,
             onUpdate: (self) => {
-                 const progress = self.progress;
-                 const intensity = Math.sin(progress * Math.PI);
+                const p = self.progress;
 
-                 gsap.to(card, {
-                     opacity: 0.1 + (intensity * 0.9),
-                     scale: 0.8 + (intensity * 0.2),
-                     filter: `blur(${10 - (intensity * 10)}px)`,
-                     duration: 0.1,
-                     overwrite: true
-                 });
+                // Zoom effect
+                const scaleValue = 1 + (p * 0.2); // 1.0x to 1.2x
 
-                 if(dotRefs.current[index]) {
-                     gsap.to(dotRefs.current[index], {
-                         scale: 0.5 + (intensity * 0.8),
-                         opacity: 0.5 + (intensity * 0.5),
-                         boxShadow: `0 0 ${intensity * 30}px rgba(255,255,255,${intensity})`,
-                         duration: 0.1,
-                         overwrite: true
-                     });
-                 }
+                gsap.to(card, {
+                    opacity: 1,
+                    scale: scaleValue,
+                    filter: "blur(0px)",
+                    duration: 0.1,
+                    overwrite: true
+                });
+
+                // Fade out in last 30%
+                if (p >= 0.7) {
+                    gsap.to(card, {
+                        opacity: 1 - ((p - 0.7) / 0.3),
+                        duration: 0.1,
+                        overwrite: true
+                    });
+                }
+
+                // Fade out the line
+                if (lineRef.current) {
+                    gsap.to(lineRef.current, { opacity: 1 - p, duration: 0.1, overwrite: true });
+                }
             }
           });
       } else {
