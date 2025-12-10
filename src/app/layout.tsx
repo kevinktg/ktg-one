@@ -3,6 +3,7 @@ import { Syne, Ubuntu_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${syne.variable} ${ubuntuMono.variable} antialiased bg-black text-white overflow-x-hidden`} suppressHydrationWarning>
+        <GeometricBackground />
         <ClientLayout>
           {children}
           <SpeedInsights />
