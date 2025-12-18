@@ -31,7 +31,7 @@ export function Footer() {
         <div className="grid md:grid-cols-2 gap-16 mb-16">
           {/* Left column */}
           <div>
-            <h3 className="mb-6">let's build something</h3>
+            <h3 className="mb-6 typography-geometric">let's build something</h3>
             <p className="text-white/60 mb-8 text-lg leading-relaxed">
               Whether it's context continuation, framework development, or Arxiv-ready research—
               let's push the boundaries of what's possible with AI.
@@ -49,7 +49,7 @@ export function Footer() {
                 return (
                   <button
                     key={index}
-                    className="group relative w-12 h-12 border border-white/20 hover:border-white/60 transition-colors duration-300"
+                    className="group relative w-12 h-12 border border-white/20 hover:border-white/60 transition-colors duration-300 gradient-border"
                     aria-label={item.label}
                   >
                     <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
@@ -102,7 +102,7 @@ export function Footer() {
         </div>
 
         {/* Geometric accent */}
-        <div className="absolute bottom-0 right-0 w-64 h-64 border border-white/5 rotate-45 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 border border-white/5 rotate-45 pointer-events-none animate-pulse-slow" />
       </div>
     </footer>
   );

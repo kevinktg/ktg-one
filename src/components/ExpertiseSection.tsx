@@ -132,14 +132,14 @@ export function ExpertiseSection() {
 
             <div className="grid md:grid-cols-3 gap-12">
               {expertise.map((area, index) => (
-                <div key={area.category} className="expertise-item relative group">
+                <div key={area.category} className="expertise-item relative group card-hover">
                   {/* Hover Box Effect */}
                   <div className="absolute -inset-6 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 rounded-lg -z-10" />
                   
                   {/* Category Header */}
                   <div className="mb-8 relative">
                     <div className="absolute -left-4 top-0 w-1 h-full bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
-                    <h3 className="monospace tracking-wider font-bold text-lg">{area.category}</h3>
+                    <h3 className="monospace tracking-wider font-bold text-lg typography-geometric">{area.category}</h3>
                     <div className="mt-2 w-12 h-0.5 bg-black group-hover:w-full transition-all duration-700 ease-out" />
                   </div>
 

@@ -4,6 +4,17 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
+    --border: 220 13% 91%;
+    --primary: 222.2 84% 4.9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 212.7 26.8% 83.9%;
+    --radius: 0.5rem;
   }
 
   body {
@@ -23,16 +34,20 @@
     font-weight: 700;
     line-height: 1.1;
     text-transform: lowercase;
+    position: relative;
+    z-index: 10;
   }
 
   h1 {
     font-size: clamp(3rem, 10vw, 8rem);
     font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   h2 {
     font-size: clamp(2rem, 6vw, 5rem);
     font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   h3 {
@@ -43,6 +58,8 @@
   p {
     font-family: "Ubuntu", sans-serif;
     line-height: 1.6;
+    position: relative;
+    z-index: 10;
   }
 
   code,
@@ -88,6 +105,144 @@
       linear-gradient(90deg, white 1px, transparent 1px);
     background-size: 50px 50px;
     opacity: 0.1;
+  }
+
+  /* Enhanced geometric animations */
+  .animate-move-diagonal-1 {
+    animation: moveDiagonal1 20s infinite linear;
+  }
+  
+  .animate-move-diagonal-2 {
+    animation: moveDiagonal2 25s infinite linear;
+  }
+  
+  .animate-move-diagonal-3 {
+    animation: moveDiagonal3 30s infinite linear;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulseSlow 8s infinite ease-in-out;
+  }
+  
+  .animate-float-1 {
+    animation: floatEffect 18s infinite ease-in-out;
+  }
+  
+  .animate-float-2 {
+    animation: floatEffect 22s infinite ease-in-out reverse;
+  }
+  
+  .animate-float-3 {
+    animation: floatEffect 16s infinite ease-in-out;
+  }
+  
+  .animate-slide-diagonal-1 {
+    animation: slideDiagonal1 40s infinite linear;
+  }
+  
+  .animate-slide-diagonal-2 {
+    animation: slideDiagonal2 40s infinite linear reverse;
+  }
+
+  @keyframes moveDiagonal1 {
+    0%, 100% { transform: translate(0, 0) rotate(45deg); }
+    25% { transform: translate(-20px, 20px) rotate(45deg); }
+    50% { transform: translate(-40px, 40px) rotate(45deg); }
+    75% { transform: translate(-20px, 60px) rotate(45deg); }
+  }
+  
+  @keyframes moveDiagonal2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(30px, -10px) rotate(0deg); }
+    50% { transform: translate(60px, -30px) rotate(0deg); }
+    75% { transform: translate(30px, -60px) rotate(0deg); }
+  }
+  
+  @keyframes moveDiagonal3 {
+    0%, 100% { transform: translate(0, 0) rotate(12deg); }
+    25% { transform: translate(15px, 15px) rotate(12deg); }
+    50% { transform: translate(30px, 30px) rotate(12deg); }
+    75% { transform: translate(15px, 45px) rotate(12deg); }
+  }
+  
+  @keyframes pulseSlow {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.10; }
+    50% { transform: scale(1.05) rotate(5deg); opacity: 0.15; }
+  }
+  
+  @keyframes floatEffect {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, -10px) rotate(5deg); }
+    50% { transform: translate(0, -20px) rotate(0deg); }
+    75% { transform: translate(-10px, -10px) rotate(-5deg); }
+  }
+  
+  @keyframes slideDiagonal1 {
+    0%, 100% { transform: translate(0, 0) skew(0deg, 0deg); opacity: 0.15; }
+    25% { transform: translate(-30px, 30px) skew(-2deg, -2deg); opacity: 0.20; }
+    50% { transform: translate(-60px, 60px) skew(-4deg, -4deg); opacity: 0.18; }
+    75% { transform: translate(-30px, 90px) skew(-2deg, -2deg); opacity: 0.22; }
+  }
+  
+  @keyframes slideDiagonal2 {
+    0%, 100% { transform: translate(0, 0) skew(0deg, 0deg); opacity: 0.15; }
+    25% { transform: translate(30px, -30px) skew(2deg, 2deg); opacity: 0.20; }
+    50% { transform: translate(60px, -60px) skew(4deg, 4deg); opacity: 0.18; }
+    75% { transform: translate(30px, -90px) skew(2deg, 2deg); opacity: 0.22; }
+  }
+
+  /* Particle field effect */
+  .particle-field::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 40% 10%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 60% 90%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 10% 50%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 90% 20%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 200px 200px;
+    animation: particleMove 35s infinite linear;
+  }
+
+  @keyframes particleMove {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-100px, -50px); }
+    50% { transform: translate(-200px, 0); }
+    75% { transform: translate(-100px, 100px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* Glitch effect overlay */
+  .glitch-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      linear-gradient(
+        0deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.03) 2%, 
+        transparent 3%
+      );
+    animation: glitchEffect 8s infinite;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  @keyframes glitchEffect {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-2px); }
+    40% { transform: translateX(2px); }
+    60% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
   }
 
   /* Scroll Transition Section */
@@ -163,5 +318,116 @@
     position: relative;
     z-index: 2;
     min-height: 100vh;
+  }
+
+  /* Professional card hover effects */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Text shimmer effect */
+  .text-shimmer {
+    background: linear-gradient(90deg, #fff 0%, #ccc 50%, #fff 100%);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Gradient border effect */
+  .gradient-border {
+    position: relative;
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ffffff, #cccccc, #ffffff, #cccccc);
+    border-radius: calc(var(--radius) + 2px);
+    z-index: -1;
+    animation: gradientRotate 4s linear infinite;
+  }
+
+  @keyframes gradientRotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Enhanced typography with geometric styling */
+  .typography-geometric {
+    position: relative;
+  }
+  
+  .typography-geometric::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: white;
+    transition: width 0.3s ease;
+  }
+  
+  .typography-geometric:hover::after {
+    width: 100%;
+  }
+
+  /* Professional button styles */
+  .btn-geometric {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-geometric::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transition: 0.5s;
+  }
+  
+  .btn-geometric:hover::before {
+    left: 100%;
+  }
+  
+  .btn-geometric:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
   }
 }
