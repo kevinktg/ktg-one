@@ -95,7 +95,7 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
       <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* Text content */}
         <div className="hero__title-wrapper space-y-6">
-          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase">
+          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase text-shimmer">
             <span className="block"><SplitText>top 0.01%</SplitText></span>
             <span className="block mt-2 text-white/80"><SplitText>prompt</SplitText></span>
             <span className="block mt-2"><SplitText>engineer</SplitText></span>
@@ -117,7 +117,7 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
         <div ref={imageRef} className="flex justify-center md:justify-end">
           <div className="relative">
             {/* FIX: Ensure these lines are complete single lines */}
-            <div className="absolute -inset-8 border-2 border-white/20 rotate-6" />
+            <div className="absolute -inset-8 border-2 border-white/20 rotate-6 gradient-border" />
             <div className="absolute -inset-12 border border-white/10 -rotate-3" />
             
             <div className="relative w-80 h-80 md:w-96 md:h-96">

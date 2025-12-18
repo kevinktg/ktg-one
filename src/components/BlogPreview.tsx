@@ -62,25 +62,31 @@ export function BlogPreview({ posts }: BlogPreviewProps) {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden">
-      {/* Geometric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      {/* Enhanced Geometric Background */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Grid pattern overlay */}
         <div className="absolute inset-0 grid-pattern" />
         
-        {/* Floating geometric shapes */}
-        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white opacity-15 rotate-45" />
-        <div className="absolute top-1/4 left-10 w-48 h-48 border-2 border-white opacity-12" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white opacity-15 rounded-full" />
-        <div className="absolute bottom-20 left-20 w-56 h-56 border-2 border-white opacity-12 rotate-12" />
+        {/* Animated floating geometric shapes */}
+        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white opacity-10 rotate-45 animate-move-diagonal-1" />
+        <div className="absolute top-1/4 left-10 w-48 h-48 border-2 border-white opacity-8 animate-move-diagonal-2" />
+        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white opacity-10 rounded-full animate-pulse-slow" />
+        <div className="absolute bottom-20 left-20 w-56 h-56 border-2 border-white opacity-8 rotate-12 animate-move-diagonal-3" />
         
-        {/* Additional circles */}
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 border border-white opacity-8 rounded-full" />
-        <div className="absolute bottom-1/3 left-1/3 w-40 h-40 border-2 border-white opacity-10 rounded-full" />
-        <div className="absolute top-2/3 right-1/2 w-32 h-32 border border-white opacity-8 rounded-full" />
+        {/* Additional animated circles */}
+        <div className="absolute top-1/3 right-1/4 w-72 h-72 border border-white opacity-5 rounded-full animate-float-1" />
+        <div className="absolute bottom-1/3 left-1/3 w-40 h-40 border-2 border-white opacity-6 rounded-full animate-float-2" />
+        <div className="absolute top-2/3 right-1/2 w-32 h-32 border border-white opacity-5 rounded-full animate-float-3" />
         
-        {/* Diagonal lines */}
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 diagonal-lines" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 diagonal-lines" />
+        {/* Animated diagonal lines */}
+        <div className="absolute top-0 right-0 w-1/2 h-1/2 diagonal-lines animate-slide-diagonal-1" />
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 diagonal-lines animate-slide-diagonal-2" />
+        
+        {/* Subtle particle effect */}
+        <div className="absolute inset-0 particle-field" />
+        
+        {/* Glitch effect overlay */}
+        <div className="absolute inset-0 glitch-overlay" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -111,7 +117,7 @@ export function BlogPreview({ posts }: BlogPreviewProps) {
                 href={`/blog/${post.slug}`}
                 className="blog-card group block"
               >
-                <article className="h-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10">
+                <article className="h-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10 card-hover">
                   {featuredImage && (
                     <div className="relative w-full h-48 overflow-hidden">
                       <Image
@@ -146,7 +152,7 @@ export function BlogPreview({ posts }: BlogPreviewProps) {
         <div className="text-center">
           <Link
             href="/blog"
-            className="inline-block monospace text-sm border border-white/20 hover:border-white/40 px-8 py-4 transition-all duration-300 hover:bg-white/5"
+            className="inline-block monospace text-sm border border-white/20 hover:border-white/40 px-8 py-4 transition-all duration-300 hover:bg-white/5 btn-geometric"
           >
             view all posts
           </Link>

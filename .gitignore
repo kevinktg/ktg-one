@@ -1,40 +1,46 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+```
+# Dependencies
+node_modules/
+.yarn/
+.pnpm-store/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+public/build/
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
+# Environment variable files
 .env
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
 
 # IDE
 .vscode/
@@ -44,82 +50,19 @@ next-env.d.ts
 *~
 
 # OS
-Thumbs.db
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
 # Temporary files
 *.tmp
 *.temp
-*.log
-
-# Build artifacts
-dist/
-.cache/
-
-# Story files (Make.com workflow files)
-*.make
-
-# Old/unused directories (only top-level)
-/components/
-/styles/
-
-
-# In Memoria
-in-memoria.db
-.in-memoria/cache/
-.in-memoria/.env
-
-# Claude Flow generated files
-.claude/settings.local.json
-.mcp.json
-claude-flow.config.json
-.swarm/
-.hive-mind/
-.claude-flow/
-memory/
-coordination/
-memory/claude-flow-data.json
-memory/sessions/*
-!memory/sessions/README.md
-memory/agents/*
-!memory/agents/README.md
-coordination/memory_bank/*
-coordination/subtasks/*
-coordination/orchestration/*
-*.db
-*.db-journal
-*.db-wal
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-claude-flow
-# Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
-
-# OpenMemory - IDE/Assistant specific rules
-.cursor\rules\openmemory.mdc
-CLAUDE.md
-
-# Screenshot and recording folders
-capsule-screenshots/
-capsule-scroll-record/
-screenshots/
-
-# Build logs
-build_log.txt
-
-# Database folders
-in-memoria-vectors.db/
-ktg-one/
-
-# IDE config files
-claude_desktop_config.json
-claude-flow.cmd
-.agent/
-.claude/
-.cursor/
-
-# Development scripts and tools
-record-scroll.js
-record-with-screenshots.js
-scripts/
+.DS_Store
+```

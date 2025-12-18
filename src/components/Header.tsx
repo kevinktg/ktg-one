@@ -42,7 +42,7 @@ export function Header() {
     >
       {/* LOGO: Matches ktg.png style */}
       <Link href="/" className="group">
-        <span className="font-syne font-bold text-4xl md:text-5xl lowercase tracking-tighter leading-none group-hover:opacity-70 transition-opacity">
+        <span className="font-syne font-bold text-4xl md:text-5xl lowercase tracking-tighter leading-none group-hover:opacity-70 transition-opacity text-shimmer">
           ktg.
         </span>
       </Link>
@@ -52,7 +52,7 @@ export function Header() {
         <Link href="/blog" className="group flex items-center gap-2">
           {/* Animated dot on hover */}
           <span className="w-1.5 h-1.5 bg-white rounded-full scale-0 group-hover:scale-100 transition-transform duration-300" />
-          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70 group-hover:opacity-100 transition-opacity">
+          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70 group-hover:opacity-100 transition-opacity btn-geometric">
             blog
           </span>
         </Link>
