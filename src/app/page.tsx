@@ -1,67 +1,59 @@
 "use client";
 
 
-import { GeometricBackground } from "@/components/GeometricBackground";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
-import { PromptPortfolio } from "@/components/PromptPortfolio";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
-import StorySection from "@/components/story/StorySection";
-import { Intro } from "@/components/Intro";
+import { ValidationSection } from "@/components/ValidationSection";
+import { NarrativeIntro } from "@/components/NarrativeIntro";
+import { GalleryFormation } from "@/components/ScrollTransition";
+import { BlogPreview } from "@/components/BlogPreview";
+import { useRef, useState, useEffect } from "react";
+import { getPosts, WordPressPost } from "@/lib/wordpress";
 
 export default function Home() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [blogPosts, setBlogPosts] = useState<WordPressPost[]>([]);
 
+  // Fetch blog posts on mount
+  useEffect(() => {
+    getPosts(1, 6).then(setBlogPosts).catch(console.error);
+  }, []);
 
   return (
-    <>
-      <Intro />
-      <main className="relative bg-black text-white">
-      {/* Header with logo */}
+    <div>
       <Header />
-      
-      {/* Fixed geometric background */}
-      <GeometricBackground />
-      
-      {/* Main content with long-form storytelling */}
-      <div className="relative z-10">
-        {/* Hero - Extended scroll duration for storytelling */}
-        <StorySection scrollDuration={3000} pin={true} id="hero">
-          <HeroSection />
-        </StorySection>
 
-        {/* Career Timeline - Extended scroll */}
-        <StorySection scrollDuration={2500} pin={true} id="careers">
+      <main className="relative bg-transparent text-white">
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <HeroSection ref={heroRef} />
+
+          {/* Gallery Formation */}
+          <GalleryFormation />
+
+          {/* Career Timeline */}
           <CareerTimeline />
-        </StorySection>
 
-        {/* Expertise - Extended scroll */}
-        <StorySection scrollDuration={2500} pin={true} id="expertise">
+          {/* Expertise Section */}
           <ExpertiseSection />
-        </StorySection>
 
-        {/* Philosophy - Extended scroll */}
-        <StorySection scrollDuration={2500} pin={true} id="philosophy">
+          {/* Validation Section */}
+          <ValidationSection />
+
+          {/* Philosophy Section */}
           <PhilosophySection />
-        </StorySection>
 
-        {/* Footer */}
-        <Footer />
-      </div>
+          {/* Blog Preview */}
+          <BlogPreview posts={blogPosts} />
 
-      {/* Scroll indicator */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-bounce">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-white/50 rounded-full" />
-          </div>
-          <span className="monospace text-xs text-white/30 tracking-widest">SCROLL</span>
+          {/* Footer */}
+          <Footer />
         </div>
-      </div>
-    </main>
-    </>
+      </main>
+    </div>
   );
 }
-

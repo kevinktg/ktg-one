@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
+import Link from "next/link";
 import { useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -63,6 +64,19 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-8">
             <div>
               <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
+                NAVIGATION
+              </div>
+              <ul className="space-y-2 text-white/60">
+                <li>
+                  <a href="/" className="hover:text-white transition-colors">Home</a>
+                </li>
+                <li>
+                  <a href="/blog" className="hover:text-white transition-colors">Blog</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
                 SPECIALTIES
               </div>
               <ul className="space-y-2 text-white/60">
@@ -70,17 +84,6 @@ export function Footer() {
                 <li>Framework Design</li>
                 <li>Research Papers</li>
                 <li>Context Optimization</li>
-              </ul>
-            </div>
-            <div>
-              <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
-                BACKGROUND
-              </div>
-              <ul className="space-y-2 text-white/60">
-                <li>Aviation</li>
-                <li>Finance</li>
-                <li>Audio Engineering</li>
-                <li>Event Management</li>
               </ul>
             </div>
           </div>

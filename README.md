@@ -1,11 +1,14 @@
 # KTG One - Portfolio
 
-Portfolio site for top 0.1% prompt engineer. Built with Next.js, GSAP, and long-form storytelling.
+Portfolio site for **Vertex AI Top 0.01%** prompt engineer. Built with Next.js, GSAP, and long-form storytelling.
+
+## Status: SOTA // VERIFIED
 
 ## Features
 
+- **Vertex AI Audit:** "Reverse-engineered the engine" narrative
 - Long-form storytelling with pinned scroll sections
-- GSAP ScrollTrigger animations
+- GSAP ScrollTrigger animations (60fps optimized)
 - Lenis smooth scroll
 - Responsive design
 - SEO optimized

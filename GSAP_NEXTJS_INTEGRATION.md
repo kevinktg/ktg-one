@@ -5,6 +5,16 @@ This guide covers best practices for integrating GSAP ScrollTrigger, Lenis smoot
 
 ---
 
+> [!IMPORTANT]
+> **SOTA PERFORMANCE STANDARDS (Vertex AI Audit Requirement)**
+> To maintain the "Top 0.01%" ranking, all animations MUST adhere to:
+> 1.  **Zero Layout Shift:** Use `transform` and `opacity` only.
+> 2.  **60fps Minimum:** No jank allowed. Use `will-change` sparingly but effectively.
+> 3.  **Strict Cleanup:** `gsap.context()` is non-negotiable.
+> 4.  **Lenis Sync:** GSAP Ticker must drive Lenis.
+
+---
+
 ## 1. Lenis + GSAP Integration (Recommended Setup)
 
 ### Basic Setup with ReactLenis

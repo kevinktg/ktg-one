@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ktg.one",
       },
+      {
+        protocol: "https",
+        hostname: "lawngreen-mallard-558077.hostingersite.com",
+      },
     ],
   },
 };

@@ -1,0 +1,173 @@
+// WordPress REST API client
+const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com';
+
+export interface WordPressPost {
+  id: number;
+  date: string;
+  slug: string;
+  title: {
+    rendered: string;
+  };
+  content: {
+    rendered: string;
+  };
+  excerpt: {
+    rendered: string;
+  };
+  featured_media: number;
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      source_url: string;
+      alt_text: string;
+    }>;
+  };
+}
+
+export interface WordPressMedia {
+  source_url: string;
+  alt_text: string;
+}
+
+// Test WordPress connection
+export async function testWordPressConnection(): Promise<boolean> {
+  try {
+    const response = await fetch(`${WORDPRESS_URL}/wp-json/wp/v2`, {
+      next: { revalidate: 0 },
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('WordPress connection test failed:', error);
+    return false;
+  }
+}
+
+// Fetch all blog posts
+export async function getPosts(page: number = 1, perPage: number = 10): Promise<WordPressPost[]> {
+  try {
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
+    
+    const response = await fetch(url, {
+      next: { revalidate: 0 }, // No caching - always fresh
+      headers: {
+        'User-Agent': 'Next.js WordPress Client',
+        'Accept': 'application/json',
+        'Referer': WORDPRESS_URL,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
+      console.error(`URL: ${url}`);
+      console.error(`Response: ${errorText.substring(0, 200)}`);
+      
+      // Try without _embed if 403
+      if (response.status === 403) {
+        console.warn('Attempting fetch without _embed parameter...');
+        const fallbackResponse = await fetch(
+          `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
+          {
+            next: { revalidate: 0 },
+            headers: {
+              'User-Agent': 'Next.js WordPress Client',
+              'Accept': 'application/json',
+              'Referer': WORDPRESS_URL,
+            },
+          }
+        );
+        
+        if (fallbackResponse.ok) {
+          return await fallbackResponse.json();
+        }
+      }
+      
+      return [];
+    }
+
+    const data = await response.json();
+    console.log(`Successfully fetched ${data.length} posts from WordPress`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching WordPress posts:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    return [];
+  }
+}
+
+// Fetch a single post by slug
+export async function getPostBySlug(slug: string): Promise<WordPressPost | null> {
+  try {
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
+    
+    const response = await fetch(url, {
+      next: { revalidate: 0 },
+      headers: {
+        'User-Agent': 'Next.js WordPress Client',
+        'Accept': 'application/json',
+        'Referer': WORDPRESS_URL,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
+      console.error(`URL: ${url}`);
+      console.error(`Response: ${errorText.substring(0, 200)}`);
+      
+      // Try without _embed if 403
+      if (response.status === 403) {
+        console.warn('Attempting fetch without _embed parameter...');
+        const fallbackResponse = await fetch(
+          `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
+          {
+            next: { revalidate: 0 },
+            headers: {
+              'User-Agent': 'Next.js WordPress Client',
+              'Accept': 'application/json',
+              'Referer': WORDPRESS_URL,
+            },
+          }
+        );
+        
+        if (fallbackResponse.ok) {
+          const posts = await fallbackResponse.json();
+          return posts.length > 0 ? posts[0] : null;
+        }
+      }
+      
+      return null;
+    }
+
+    const posts = await response.json();
+    return posts.length > 0 ? posts[0] : null;
+  } catch (error) {
+    console.error('Error fetching WordPress post:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+    }
+    return null;
+  }
+}
+
+// Get featured image URL
+export function getFeaturedImage(post: WordPressPost): string | null {
+  if (post._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+    return post._embedded['wp:featuredmedia'][0].source_url;
+  }
+  return null;
+}
+
+// Format date
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+

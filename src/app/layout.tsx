@@ -18,7 +18,7 @@ const ubuntuMono = Ubuntu_Mono({
 });
 
 export const metadata: Metadata = {
-  title: ".ktg | Top 0.1% Prompt Engineer",
+  title: ".ktg | Top 0.01% Prompt Engineer",
   description: "Portfolio of a top 0.1% prompt engineer. Cross-world reasoning across 7 careers.",
   icons: {
     icon: "/assets/Logo-dark-favicon.jpg",
