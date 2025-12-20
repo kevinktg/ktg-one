@@ -1,11 +1,6 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useEffect, useState } from "react";
 
 // ==========================================
 // 1. SVG SHAPES
@@ -106,8 +101,9 @@ export function CareerTimeline() {
   const lineRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  useGSAP(() => {
+  useEffect(() => {
     if (!containerRef.current || !lineRef.current) return;
 
     // 1. DRAW THE MAIN LINE

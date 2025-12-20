@@ -17,19 +17,7 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
   const imageRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    // 1. FLOATING SHAPES ANIMATION (Subtle, always running)
-    gsap.to(".hero-shape", {
-        y: "random(-20, 20)",
-        x: "random(-10, 10)",
-        rotation: "random(-5, 5)",
-        duration: "random(3, 6)",
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.1
-    });
-
-    // 2. ENTRANCE ANIMATION (Text & Image) - Quick entrance
+    // Simple fade-in animation instead of complex GSAP timeline
     const tl = gsap.timeline();
     
     // Animate Title Words - Faster
@@ -38,7 +26,7 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
         tl.from(titleWords, {
           y: 40,
           opacity: 0,
-          duration: 0.6,
+          duration: 0.8,
           stagger: 0.1,
           ease: "power2.out",
         });
@@ -66,31 +54,10 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
         }, "-=0.6");
     }
 
-    // 3. SCROLL EXIT ANIMATION - Shorter scroll distance
-    gsap.to(heroRef.current, {
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "top 20%", // Exit much sooner
-        scrub: true,
-      },
-      opacity: 0.3,
-      y: -50,
-      ease: "none"
-    });
-
   }, { scope: heroRef });
 
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
-      
-      {/* 🌟 Floating Background Shapes */}
-      <div className="absolute inset-0 pointer-events-none opacity-60">
-         <div className="hero-shape absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
-         <div className="hero-shape absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10" />
-         <div className="hero-shape absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full" />
-         <div className="hero-shape absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12" />
-      </div>
       
       <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* Text content */}
