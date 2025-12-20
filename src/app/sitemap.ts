@@ -1,6 +1,12 @@
 import { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/wordpress';
 
+// This route fetches from WordPress at request-time.
+// Without forcing dynamic rendering, Next may attempt to pre-render the sitemap
+// during `next build`, which fails on Vercel when the sitemap performs uncached fetches.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktg.one';
   
