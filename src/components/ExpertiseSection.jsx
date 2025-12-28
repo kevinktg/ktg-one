@@ -46,53 +46,70 @@ export function ExpertiseSection() {
   const shutterRef = useRef(null);
 
   useGSAP(() => {
+    // Phase 1: Pin and animate entry (expertise section fully visible)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top top", // When section hits top of viewport
-        end: "+=500",     // Slightly longer for smoother transition
-        pin: true,        // 🔒 Lock the screen
-        scrub: 1,         // Smooth scrubbing
-        pinSpacing: false, // Prevent overlap with other sections
+        start: "top top",
+        end: "+=800", // Longer pin to ensure full visibility before transition
+        pin: true,
+        scrub: 1,
+        pinSpacing: false,
       }
     });
 
-    // 1. THE SHUTTER REVEAL (High Contrast Wipe)
-    // The bars slide UP to reveal the white content underneath
+    // 1. THE SHUTTER REVEAL - White content revealed
     if (shutterRef.current) {
         const bars = shutterRef.current.children;
         tl.to(bars, {
             height: 0,
-            duration: 2,
-            stagger: 0.1, // Wave effect
+            duration: 1.5,
+            stagger: 0.1,
             ease: "power3.inOut"
         });
     }
 
-    // 2. CONTENT ENTRY (While shutters are opening)
+    // 2. CONTENT ENTRY
     tl.from(contentRef.current, {
-        scale: 1.1, // Subtle zoom out effect
-        opacity: 0.5,
-        duration: 2,
-        ease: "power2.out"
-    }, "<"); // Start at same time
-
-    // 3. TEXT STAGGER (Geometric precision)
-    tl.from(".expertise-item", {
-        y: 50,
+        scale: 1.05,
         opacity: 0,
         duration: 1,
-        stagger: 0.05,
-        ease: "back.out(1.7)"
-    }, "-=1.0"); // Overlap slightly
+        ease: "power2.out"
+    }, "<");
 
-    // 4. STATS COUNT UP (Visual flair)
+    // 3. TEXT STAGGER
+    tl.from(".expertise-item", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.04,
+        ease: "back.out(1.7)"
+    }, "-=0.5");
+
+    // 4. STATS COUNT UP
     tl.from(".stat-value", {
         textContent: "0",
-        duration: 2,
+        duration: 1.5,
         snap: { textContent: 1 },
-        stagger: 0.2,
-    }, "-=1.5");
+        stagger: 0.15,
+    }, "-=1");
+
+    // Phase 2: Fade OUT expertise when transitioning to validation (black)
+    // This happens AFTER the pin duration is complete
+    const fadeOutTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "+=800", // Start fading when pin ends
+        end: "+=1200", // Complete fade out
+        scrub: true,
+      }
+    });
+
+    fadeOutTl.to(containerRef.current, {
+      opacity: 0,
+      y: -100,
+      ease: "power2.inOut"
+    });
 
   }, { scope: containerRef });
 

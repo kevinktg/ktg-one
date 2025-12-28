@@ -99,20 +99,20 @@ export const HeroSection = forwardRef((props, ref) => {
     }
 
     // 3. SCROLL TRANSITION TO EXPERTISE SECTION
-    // Fade out and scale up smoothly as you scroll toward the next section
+    // Fade out completely as you scroll toward expertise (white)
     const tl2 = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
-        end: "bottom 10%", // Fade out more slowly to connect with next section
+        end: "bottom 20%", // Fade out early to let white section show
         scrub: true,
       }
     });
 
     tl2.to(heroRef.current, {
       opacity: 0,
-      scale: 1.2,
-      y: -50,
+      scale: 1.3,
+      y: -80,
       ease: "power2.inOut"
     });
 
