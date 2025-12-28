@@ -11,6 +11,19 @@
     color: #ffffff;
     font-family: "Ubuntu", "Iosevka Term", monospace;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   h1,

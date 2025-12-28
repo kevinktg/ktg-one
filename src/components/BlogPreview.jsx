@@ -57,9 +57,9 @@ export function BlogPreview({ posts }) {
   if (posts.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden" style={{ contain: "layout paint" }}>
       {/* Geometric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-0" style={{ contain: "strict layout paint" }}>
         {/* Grid pattern overlay */}
         <div className="absolute inset-0 grid-pattern" />
         
@@ -109,12 +109,13 @@ export function BlogPreview({ posts }) {
               >
                 <article className="h-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10">
                   {featuredImage && (
-                    <div className="relative w-full h-48 overflow-hidden">
+                    <div className="mb-6 overflow-hidden rounded-lg" style={{ aspectRatio: "2/1", contain: "layout paint" }}>
                       <Image
                         src={featuredImage}
-                        alt={post.title.rendered}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        alt={post.title?.rendered || post.title || 'Blog post'}
+                        width={800}
+                        height={400}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                   )}

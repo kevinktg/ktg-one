@@ -6,14 +6,14 @@ import { ClientLayout } from "@/components/ClientLayout";
 const syne = Syne({
   subsets: ["latin"],
   variable: "--font-syne",
-  display: "swap",
+  display: "optional",
 });
 
 const ubuntuMono = Ubuntu_Mono({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-mono",
-  display: "swap",
+  display: "optional",
 });
 
 export const metadata = {
@@ -21,6 +21,11 @@ export const metadata = {
   description: "Portfolio of a top 0.1% prompt engineer. Cross-world reasoning across 7 careers.",
   icons: {
     icon: "/assets/Logo-dark-favicon.jpg",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
   },
 };
 

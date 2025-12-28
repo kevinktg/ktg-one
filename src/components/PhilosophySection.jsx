@@ -58,10 +58,10 @@ export function PhilosophySection() {
   ];
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6" style={{ contain: "layout paint" }}>
       {/* Geometric Background */}
       <GeometricBackground />
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10" style={{ contain: "layout" }}>
         {/* Main statement */}
         <div ref={textRef} className="mb-32">
           <div className="grid md:grid-cols-2 gap-16 items-start">

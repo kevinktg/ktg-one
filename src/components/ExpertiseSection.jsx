@@ -96,13 +96,13 @@ export function ExpertiseSection() {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden">
-      
+    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden" style={{ contain: "strict" }}>
+
       {/* ============================================ */}
       {/* THE SHUTTERS (Transition Layer)              */}
       {/* These start full height (Black) and shrink   */}
       {/* ============================================ */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none">
+      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none" style={{ contain: "strict layout paint" }}>
          <div className="w-1/5 h-full bg-black border-r border-white/10" />
          <div className="w-1/5 h-full bg-black border-r border-white/10" />
          <div className="w-1/5 h-full bg-black border-r border-white/10" />

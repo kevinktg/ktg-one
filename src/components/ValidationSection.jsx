@@ -52,7 +52,7 @@ export function ValidationSection() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40">
+    <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40" style={{ contain: "strict" }}>
 
       {/* Geometric Background */}
       <GeometricBackground />

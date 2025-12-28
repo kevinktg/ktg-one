@@ -83,10 +83,10 @@ export const HeroSection = forwardRef((props, ref) => {
   }, { scope: heroRef });
 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-white">
-      
+    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-white" style={{ contain: "layout paint" }}>
+
       {/* 🌟 Floating Background Shapes */}
-      <div className="absolute inset-0 pointer-events-none opacity-60">
+      <div className="absolute inset-0 pointer-events-none opacity-60" style={{ contain: "strict" }}>
          <div className="hero-shape absolute top-20 right-20 w-64 h-64 border-2 border-black/20 rotate-45" />
          <div className="hero-shape absolute top-1/4 left-10 w-48 h-48 border-2 border-black/10" />
          <div className="hero-shape absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-black/20 rounded-full" />
@@ -96,13 +96,13 @@ export const HeroSection = forwardRef((props, ref) => {
       <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         {/* Text content */}
         <div className="hero__title-wrapper space-y-6">
-          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase">
+          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase" style={{ contain: "layout" }}>
             <span className="block"><SplitText>top 0.01%</SplitText></span>
             <span className="block mt-2 text-black/80"><SplitText>prompt</SplitText></span>
             <span className="block mt-2"><SplitText>engineer</SplitText></span>
           </h1>
 
-          <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-black/70 tracking-wide font-light">
+          <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-black/70 tracking-wide font-light" style={{ contain: "layout" }}>
             <SplitText>context continuation solve.</SplitText><br />
             <SplitText>frameworks. arxiv-ready papers.</SplitText>
           </p>
@@ -116,15 +116,14 @@ export const HeroSection = forwardRef((props, ref) => {
 
         {/* Profile image */}
         <div ref={imageRef} className="flex justify-center md:justify-end">
-          <div className="relative">
-            {/* FIX: Ensure these lines are complete single lines */}
-            <div className="absolute -inset-8 border-2 border-black/20 rotate-6" />
-            <div className="absolute -inset-12 border border-black/10 -rotate-3" />
-            
-            <div className="relative w-80 h-80 md:w-96 md:h-96">
-              <Image 
-                src="/assets/7d041e6f392514bea854c5ccc9f806bf8656635e.png" 
-                alt="Profile" 
+          <div className="relative" style={{ contain: "layout paint" }}>
+            <div className="absolute -inset-8 border-2 border-black/20 rotate-6" style={{ position: "absolute" }} />
+            <div className="absolute -inset-12 border border-black/10 -rotate-3" style={{ position: "absolute" }} />
+
+            <div className="relative w-80 h-80 md:w-96 md:h-96" style={{ aspectRatio: "1/1" }}>
+              <Image
+                src="/assets/7d041e6f392514bea854c5ccc9f806bf8656635e.png"
+                alt="Profile"
                 width={384}
                 height={384}
                 className="w-full h-full object-contain filter brightness-110 contrast-125 grayscale hover:grayscale-0 transition-all duration-700"
