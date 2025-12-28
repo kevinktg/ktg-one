@@ -121,6 +121,15 @@ export const HeroSection = forwardRef((props, ref) => {
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
 
+      {/* Brand Logo - Top Left */}
+      <div className="absolute top-8 left-6 md:left-12 z-20">
+        <svg className="w-16 h-16 md:w-20 md:h-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="50" y="70" textAnchor="middle" fontSize="28" fontWeight="bold" fill="white" fontFamily="sans-serif">
+            ktg
+          </text>
+        </svg>
+      </div>
+
       {/* Interactive Floating Background Shapes - White on Black */}
       <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
          <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
