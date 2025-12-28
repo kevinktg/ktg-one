@@ -46,80 +46,61 @@ export function ExpertiseSection() {
   const shutterRef = useRef(null);
 
   useGSAP(() => {
-    // Phase 1: Pin and animate entry (expertise section fully visible)
+    // Phase 1: Pin section naturally (no forced pinning)
+    // Shutter reveal happens on scroll, section continues scrolling after
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=1000", // Full screen pin duration
-        pin: true,
-        scrub: 1,
-        pinSpacing: false, // No spacing, fully cover content behind
+        end: "bottom top",
       }
     });
 
-    // 1. THE SHUTTER REVEAL - White content revealed
+    // 1. SHUTTER REVEAL - Black bars slide UP to reveal white
     if (shutterRef.current) {
-        const bars = shutterRef.current.children;
-        tl.to(bars, {
-            height: 0,
-            duration: 2,
-            stagger: 0.1,
-            ease: "power3.inOut"
-        });
+      const bars = shutterRef.current.children;
+      tl.to(bars, {
+        height: 0,
+        duration: 2,
+        stagger: 0.1,
+        ease: "power3.inOut"
+      });
     }
 
-    // 2. CONTENT ENTRY - No scaling, full size
+    // 2. CONTENT ENTRY - Full opacity (no scaling)
     tl.from(contentRef.current, {
-        opacity: 0,
-        duration: 1.5,
-        ease: "power2.out"
+      opacity: 0,
+      duration: 1.5,
+      ease: "power2.out"
     }, "<");
 
     // 3. TEXT STAGGER
     tl.from(".expertise-item", {
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.05,
-        ease: "back.out(1.7)"
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.04,
+      ease: "back.out(1.7)"
     }, "-=0.5");
 
     // 4. STATS COUNT UP
     tl.from(".stat-value", {
-        textContent: "0",
-        duration: 2,
-        snap: { textContent: 1 },
-        stagger: 0.2,
+      textContent: "0",
+      duration: 1.5,
+      snap: { textContent: 1 },
+      stagger: 0.2,
     }, "-=1");
-
-    // Phase 2: Fade OUT expertise when transitioning to validation (black)
-    // This happens AFTER the pin duration is complete
-    const fadeOutTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "+=1000", // Start fading when pin ends
-        end: "+=1500", // Complete fade out
-        scrub: true,
-      }
-    });
-
-    fadeOutTl.to(containerRef.current, {
-      opacity: 0,
-      y: -100,
-      ease: "power2.inOut"
-    });
 
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden" style={{ contain: "strict" }}>
+    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden">
 
       {/* ============================================ */}
       {/* THE SHUTTERS (Transition Layer)              */}
-      {/* These start full height (Black) and shrink   */}
+      {/* Black bars that slide UP to reveal white content */}
       {/* ============================================ */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none" style={{ contain: "strict layout paint" }}>
+      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none">
          <div className="w-1/5 h-full bg-black border-r border-white/10" />
          <div className="w-1/5 h-full bg-black border-r border-white/10" />
          <div className="w-1/5 h-full bg-black border-r border-white/10" />
@@ -127,23 +108,20 @@ export function ExpertiseSection() {
          <div className="w-1/5 h-full bg-black" />
       </div>
 
-      {/* ============================================ */}
-      {/* MAIN CONTENT                                 */}
-      {/* ============================================ */}
-      <div ref={contentRef} className="relative w-full h-full flex flex-col justify-center py-20 px-6">
+      {/* Background Decor (Visible vectors on white) */}
+      <div className="absolute inset-0 pointer-events-none z-10">
+         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/15 rotate-45" />
+         <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/10" />
+         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/15 rounded-full" />
+         <div className="absolute bottom-1/3 left-1/4 w-72 h-72 border border-black/10 rotate-12" />
+         {/* Grid Texture */}
+         <div className="absolute inset-0 opacity-[0.05]"
+              style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+         />
+      </div>
 
-          {/* Background Decor (More visible vectors) */}
-          <div className="absolute inset-0 pointer-events-none">
-             <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/15 rotate-45" />
-             <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/10" />
-             <div className="absolute bottom-20 left-20 w-96 h-96 border border-black/15 rounded-full" />
-             <div className="absolute bottom-1/3 left-1/4 w-72 h-72 border border-black/10 rotate-12" />
-             {/* Grid Texture */}
-             <div className="absolute inset-0 opacity-[0.05]"
-                  style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
-             />
-          </div>
-
+      {/* Main Content */}
+      <div ref={contentRef} className="relative z-20 w-full min-h-screen flex flex-col justify-center py-20 px-6">
           <div className="relative z-10 max-w-7xl mx-auto w-full">
             <h2 className="expertise-item mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter">
               expertise_matrix
@@ -199,4 +177,3 @@ export function ExpertiseSection() {
     </section>
   );
 }
-
