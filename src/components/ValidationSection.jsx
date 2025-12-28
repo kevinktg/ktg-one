@@ -19,6 +19,16 @@ export function ValidationSection() {
     // Calculate how far to move
     const scrollWidth = container.scrollWidth - window.innerWidth;
 
+    // Transition from white (expertise) to black (validation)
+    const tl = gsap.timeline();
+
+    // White overlay fades out to reveal black section
+    tl.fromTo(sectionRef.current.querySelector(".transition-overlay"),
+      { opacity: 1 },
+      { opacity: 0, duration: 1.5, ease: "power2.inOut" }
+    );
+
+    // Horizontal scroll
     gsap.to(container, {
       x: -scrollWidth,
       ease: "none",
@@ -53,6 +63,12 @@ export function ValidationSection() {
 
   return (
     <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40" style={{ contain: "strict" }}>
+
+      {/* White transition overlay - fades out to reveal black section */}
+      <div className="transition-overlay absolute inset-0 bg-white pointer-events-none z-50" />
+
+      {/* Geometric Background */}
+      <GeometricBackground />
 
       {/* Geometric Background */}
       <GeometricBackground />
