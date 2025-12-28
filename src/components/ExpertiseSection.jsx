@@ -51,10 +51,10 @@ export function ExpertiseSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=800", // Longer pin to ensure full visibility before transition
+        end: "+=1000", // Full screen pin duration
         pin: true,
         scrub: 1,
-        pinSpacing: false,
+        pinSpacing: false, // No spacing, fully cover content behind
       }
     });
 
@@ -63,35 +63,34 @@ export function ExpertiseSection() {
         const bars = shutterRef.current.children;
         tl.to(bars, {
             height: 0,
-            duration: 1.5,
+            duration: 2,
             stagger: 0.1,
             ease: "power3.inOut"
         });
     }
 
-    // 2. CONTENT ENTRY
+    // 2. CONTENT ENTRY - No scaling, full size
     tl.from(contentRef.current, {
-        scale: 1.05,
         opacity: 0,
-        duration: 1,
+        duration: 1.5,
         ease: "power2.out"
     }, "<");
 
     // 3. TEXT STAGGER
     tl.from(".expertise-item", {
-        y: 30,
+        y: 40,
         opacity: 0,
-        duration: 0.8,
-        stagger: 0.04,
+        duration: 1,
+        stagger: 0.05,
         ease: "back.out(1.7)"
     }, "-=0.5");
 
     // 4. STATS COUNT UP
     tl.from(".stat-value", {
         textContent: "0",
-        duration: 1.5,
+        duration: 2,
         snap: { textContent: 1 },
-        stagger: 0.15,
+        stagger: 0.2,
     }, "-=1");
 
     // Phase 2: Fade OUT expertise when transitioning to validation (black)
@@ -99,8 +98,8 @@ export function ExpertiseSection() {
     const fadeOutTl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "+=800", // Start fading when pin ends
-        end: "+=1200", // Complete fade out
+        start: "+=1000", // Start fading when pin ends
+        end: "+=1500", // Complete fade out
         scrub: true,
       }
     });

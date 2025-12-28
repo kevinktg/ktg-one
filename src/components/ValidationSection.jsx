@@ -65,6 +65,12 @@ export function ValidationSection() {
     <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40" style={{ contain: "strict" }}>
 
       {/* White transition overlay - fades out to reveal black section */}
+      <div className="transition-overlay absolute inset-0 bg-white pointer-events-none z-50" style={{ opacity: 1 }} />
+
+      {/* Geometric Background */}
+      <GeometricBackground />
+
+      {/* White transition overlay - fades out to reveal black section */}
       <div className="transition-overlay absolute inset-0 bg-white pointer-events-none z-50" />
 
       {/* Geometric Background */}
