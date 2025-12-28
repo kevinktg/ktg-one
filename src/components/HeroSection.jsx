@@ -14,6 +14,7 @@ export const HeroSection = forwardRef((props, ref) => {
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const imageRef = useRef(null);
+  const maskRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -161,9 +162,16 @@ export const HeroSection = forwardRef((props, ref) => {
           </div>
         </div>
 
-        {/* Placeholder for logo layer (next task) */}
-        <div className="flex justify-center md:justify-end">
-          <div className="text-white/50">Logo layer coming next...</div>
+        {/* Layer 2: Logo Mask (will be clipped by blob cursor) */}
+        <div ref={maskRef} className="absolute inset-0 z-30 flex items-center justify-center">
+          <Image
+            src="/assets/ktg.svg"
+            alt="ktg logo"
+            width={800}
+            height={800}
+            className="w-auto h-[80vh] object-contain"
+            priority
+          />
         </div>
       </div>
     </section>
