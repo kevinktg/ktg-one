@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 // 1. SVG SHAPES
 // ==========================================
 const CAREER_SHAPES = {
-  shape1: (className: string) => (
+  shape1: (className) => (
     <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)" />
       <rect x="30" y="30" width="40" height="40" transform="rotate(45 50 50)" className="opacity-70"/>
@@ -21,7 +21,7 @@ const CAREER_SHAPES = {
       <path d="M50 90 Q 50 100 10 100" className="opacity-20" />
     </svg>
   ),
-  shape2: (className: string) => (
+  shape2: (className) => (
     <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <rect x="15" y="15" width="70" height="70" transform="rotate(45 50 50)" />
       <rect x="25" y="25" width="50" height="50" transform="rotate(45 50 50)" className="opacity-70"/>
@@ -33,7 +33,7 @@ const CAREER_SHAPES = {
       <circle cx="50" cy="50" r="8" className="opacity-50"/>
     </svg>
   ),
-  shape3: (className: string) => (
+  shape3: (className) => (
     <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
       <rect x="25" y="25" width="50" height="50" transform="rotate(45 50 50)" />
       <rect x="35" y="35" width="30" height="30" transform="rotate(45 50 50)" className="opacity-50"/>
@@ -102,10 +102,10 @@ const careers = [
 ];
 
 export function CareerTimeline() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef(null);
+  const lineRef = useRef(null);
+  const cardRefs = useRef([]);
+  const dotRefs = useRef([]);
 
   useGSAP(() => {
     if (!containerRef.current || !lineRef.current) return;
@@ -304,7 +304,7 @@ export function CareerTimeline() {
 }
 
 // Sub-component
-function CareerCard({ career, index, cardRefs, align }: any) {
+function CareerCard({ career, index, cardRefs, align }) {
     const isCenter = align === "center";
 
     return (
@@ -355,3 +355,4 @@ function CareerCard({ career, index, cardRefs, align }: any) {
       </div>
     )
 }
+

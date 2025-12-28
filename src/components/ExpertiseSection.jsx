@@ -41,9 +41,9 @@ const expertise = [
 ];
 
 export function ExpertiseSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const shutterRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
+  const contentRef = useRef(null);
+  const shutterRef = useRef(null);
 
   useGSAP(() => {
     const tl = gsap.timeline({
@@ -180,3 +180,4 @@ export function ExpertiseSection() {
     </section>
   );
 }
+

@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -13,7 +12,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Fix workspace root warning
+  turbopack: {
+    root: __dirname,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
 

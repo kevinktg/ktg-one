@@ -1,38 +1,11 @@
 // WordPress REST API client
 const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com';
 
-export interface WordPressPost {
-  id: number;
-  date: string;
-  slug: string;
-  title: {
-    rendered: string;
-  };
-  content: {
-    rendered: string;
-  };
-  excerpt: {
-    rendered: string;
-  };
-  featured_media: number;
-  _embedded?: {
-    'wp:featuredmedia'?: Array<{
-      source_url: string;
-      alt_text: string;
-    }>;
-  };
-}
-
-export interface WordPressMedia {
-  source_url: string;
-  alt_text: string;
-}
-
 // Test WordPress connection
-export async function testWordPressConnection(): Promise<boolean> {
+export async function testWordPressConnection() {
   try {
     const response = await fetch(`${WORDPRESS_URL}/wp-json/wp/v2`, {
-      next: { revalidate: 0 },
+      cache: 'no-store',
     });
     return response.ok;
   } catch (error) {
@@ -42,12 +15,12 @@ export async function testWordPressConnection(): Promise<boolean> {
 }
 
 // Fetch all blog posts
-export async function getPosts(page: number = 1, perPage: number = 10): Promise<WordPressPost[]> {
+export async function getPosts(page = 1, perPage = 10) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
     
     const response = await fetch(url, {
-      next: { revalidate: 0 }, // No caching - always fresh
+      cache: 'no-store', // No caching - always fresh (Next.js 16 compatible)
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -67,7 +40,7 @@ export async function getPosts(page: number = 1, perPage: number = 10): Promise<
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
           {
-            next: { revalidate: 0 },
+            cache: 'no-store',
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
@@ -98,12 +71,12 @@ export async function getPosts(page: number = 1, perPage: number = 10): Promise<
 }
 
 // Fetch a single post by slug
-export async function getPostBySlug(slug: string): Promise<WordPressPost | null> {
+export async function getPostBySlug(slug) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
     
     const response = await fetch(url, {
-      next: { revalidate: 0 },
+      cache: 'no-store',
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -123,7 +96,7 @@ export async function getPostBySlug(slug: string): Promise<WordPressPost | null>
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
           {
-            next: { revalidate: 0 },
+            cache: 'no-store',
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
@@ -153,7 +126,7 @@ export async function getPostBySlug(slug: string): Promise<WordPressPost | null>
 }
 
 // Get featured image URL
-export function getFeaturedImage(post: WordPressPost): string | null {
+export function getFeaturedImage(post) {
   if (post._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
     return post._embedded['wp:featuredmedia'][0].source_url;
   }
@@ -161,13 +134,19 @@ export function getFeaturedImage(post: WordPressPost): string | null {
 }
 
 // Format date
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+export function formatDate(dateString) {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
 }
-
 

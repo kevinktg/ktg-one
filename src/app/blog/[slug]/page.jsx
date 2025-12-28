@@ -5,15 +5,11 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
-interface BlogPostPageProps {
-  params: Promise<{ slug: string }>;
-}
-
 // Force dynamic rendering to avoid build-time API failures
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // No caching - always fresh
 
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata({ params }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
 
@@ -64,9 +60,16 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
   };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage({ params }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  let post = null;
+  
+  try {
+    post = await getPostBySlug(slug);
+  } catch (error) {
+    console.error('Error loading blog post:', error);
+    notFound();
+  }
 
   if (!post) {
     notFound();
@@ -185,5 +188,4 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     </div>
   );
 }
-
 

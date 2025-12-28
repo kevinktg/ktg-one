@@ -9,19 +9,14 @@ export function ReactLenis({
   options,
   children,
   ...props
-}: {
-  root?: boolean;
-  options?: any;
-  children: React.ReactNode;
-  [key: string]: any;
 }) {
-  const lenisRef = useRef<any>(null);
+  const lenisRef = useRef(null);
 
   useEffect(() => {
     // 1. THE BRIDGE: Sync Lenis with GSAP's internal clock (Ticker)
     // Why? GSAP updates animations on every frame. Lenis updates scroll on every frame.
     // If they aren't synced, your scroll-based animations will jitter or lag.
-    function update(time: number) {
+    function update(time) {
       // "raf" stands for Request Animation Frame. 
       // We manually tell Lenis to update exactly when GSAP updates.
       lenisRef.current?.lenis?.raf(time * 1000);
@@ -35,7 +30,7 @@ export function ReactLenis({
     // Use a small delay to ensure lenis instance is ready
     const exposeLenis = () => {
       if (lenisRef.current?.lenis) {
-        (window as any).lenis = lenisRef.current.lenis;
+        window.lenis = lenisRef.current.lenis;
       }
     };
     
@@ -47,8 +42,8 @@ export function ReactLenis({
     return () => {
       clearTimeout(timeoutId);
       gsap.ticker.remove(update);
-      if ((window as any).lenis === lenisRef.current?.lenis) {
-        delete (window as any).lenis;
+      if (window.lenis === lenisRef.current?.lenis) {
+        delete window.lenis;
       }
     };
   }, []);
@@ -59,7 +54,7 @@ export function ReactLenis({
       root={root}
       options={{
         duration: 1.2,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: "vertical",
         gestureOrientation: "vertical",
         smoothWheel: true,

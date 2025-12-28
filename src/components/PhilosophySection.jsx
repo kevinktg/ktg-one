@@ -8,9 +8,9 @@ import { useRef } from "react";
 gsap.registerPlugin(ScrollTrigger);
 
 export function PhilosophySection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const quoteRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef(null);
+  const textRef = useRef(null);
+  const quoteRefs = useRef([]);
 
   useGSAP(() => {
     // Main text parallax

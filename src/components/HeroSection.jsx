@@ -9,12 +9,12 @@ import { SplitText } from "./SplitText";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
-  const heroRef = useRef<HTMLDivElement>(null);
+export const HeroSection = forwardRef((props, ref) => {
+  const heroRef = useRef(null);
   const internalRef = ref || heroRef;
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
+  const imageRef = useRef(null);
 
   useGSAP(() => {
     // 1. FLOATING SHAPES ANIMATION (Subtle, always running)
@@ -66,17 +66,18 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
         }, "-=0.6");
     }
 
-    // 3. SCROLL EXIT ANIMATION - Shorter scroll distance
+    // 3. SCROLL EXIT ANIMATION - Transition to white background
     gsap.to(heroRef.current, {
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
-        end: "top 20%", // Exit much sooner
+        end: "top 30%",
         scrub: true,
       },
-      opacity: 0.3,
-      y: -50,
-      ease: "none"
+      opacity: 0,
+      scale: 1.05,
+      y: -100,
+      ease: "power2.inOut"
     });
 
   }, { scope: heroRef });
@@ -138,3 +139,4 @@ export const HeroSection = forwardRef<HTMLDivElement>((props, ref) => {
 });
 
 HeroSection.displayName = "HeroSection";
+

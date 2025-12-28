@@ -10,7 +10,7 @@ import { useRef } from "react";
 gsap.registerPlugin(ScrollTrigger);
 
 export function Footer() {
-  const footerRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef(null);
 
   useGSAP(() => {
     gsap.from(footerRef.current, {

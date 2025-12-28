@@ -15,8 +15,8 @@ const hakiImages = Array.from({ length: 14 }, (_, i) => ({
 }));
 
 export function GalleryFormation() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
+  const gridRef = useRef(null);
 
   useGSAP(() => {
     if (!gridRef.current) return;
@@ -97,3 +97,4 @@ export function GalleryFormation() {
     </section>
   );
 }
+

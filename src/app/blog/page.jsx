@@ -27,7 +27,20 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0; // No caching - always fresh
 
 export default async function BlogPage() {
-  const posts = await getPosts();
+  let posts = [];
+  let error = null;
+  
+  try {
+    posts = await getPosts();
+    if (!Array.isArray(posts)) {
+      posts = [];
+    }
+  } catch (err) {
+    console.error('Error loading blog posts:', err);
+    error = err instanceof Error ? err.message : 'Unknown error';
+    posts = [];
+  }
+  
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktg.one';
 
   // Structured data for blog listing
@@ -45,11 +58,11 @@ export default async function BlogPage() {
         url: `${siteUrl}/assets/ktg-one.svg`,
       },
     },
-    blogPost: posts.map((post) => ({
+    blogPost: posts.filter(post => post && post.title).map((post) => ({
       "@type": "BlogPosting",
-      headline: post.title.rendered,
-      url: `${siteUrl}/blog/${post.slug}`,
-      datePublished: new Date(post.date).toISOString(),
+      headline: post.title?.rendered || post.title || 'Untitled',
+      url: `${siteUrl}/blog/${post.slug || post.id}`,
+      datePublished: post.date ? new Date(post.date).toISOString() : new Date().toISOString(),
       image: getFeaturedImage(post) || `${siteUrl}/assets/ktg-one.svg`,
     })),
   };
@@ -73,15 +86,21 @@ export default async function BlogPage() {
           {posts.length === 0 ? (
             <div className="py-20 text-center">
               <p className="text-white/40 mb-4">No posts found.</p>
+              {error && (
+                <p className="text-red-400/60 text-sm mb-2">Error: {error}</p>
+              )}
               <p className="text-white/30 text-sm">
-                Make sure NEXT_PUBLIC_WORDPRESS_URL is set correctly in your environment variables.
+                {error ? 'There was an error loading posts.' : 'Make sure NEXT_PUBLIC_WORDPRESS_URL is set correctly in your environment variables.'}
               </p>
             </div>
           ) : (
             <div className="space-y-12">
               {posts.map((post) => {
+                if (!post || !post.title || !post.excerpt) {
+                  return null;
+                }
                 const featuredImage = getFeaturedImage(post);
-                const excerpt = post.excerpt.rendered
+                const excerpt = (post.excerpt?.rendered || post.excerpt || '')
                   .replace(/<[^>]*>/g, "")
                   .substring(0, 150) + "...";
 
@@ -101,7 +120,7 @@ export default async function BlogPage() {
                         <div className="mb-6 overflow-hidden rounded-lg">
                           <Image
                             src={featuredImage}
-                            alt={post.title.rendered}
+                            alt={post.title?.rendered || post.title || 'Blog post'}
                             width={800}
                             height={400}
                             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
@@ -109,13 +128,15 @@ export default async function BlogPage() {
                         </div>
                       )}
                       <h2 className="font-syne text-3xl md:text-4xl font-bold mb-3 group-hover:text-white/80 transition-colors lowercase" itemProp="headline">
-                        {post.title.rendered}
+                        {post.title?.rendered || post.title || 'Untitled'}
                       </h2>
-                      <div className="text-white/40 text-sm font-mono mb-4">
-                        <time dateTime={new Date(post.date).toISOString()} itemProp="datePublished">
-                          {formatDate(post.date)}
-                        </time>
-                      </div>
+                      {post.date && (
+                        <div className="text-white/40 text-sm font-mono mb-4">
+                          <time dateTime={new Date(post.date).toISOString()} itemProp="datePublished">
+                            {formatDate(post.date)}
+                          </time>
+                        </div>
+                      )}
                       <div
                         className="text-white/70 prose prose-invert max-w-none"
                         dangerouslySetInnerHTML={{ __html: excerpt }}
@@ -135,5 +156,4 @@ export default async function BlogPage() {
     </div>
   );
 }
-
 

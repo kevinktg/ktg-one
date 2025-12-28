@@ -123,3 +123,5 @@ claude-flow.cmd
 record-scroll.js
 record-with-screenshots.js
 scripts/
+.cursor\rules\openmemory.mdc
+CLAUDE.md

@@ -33,17 +33,17 @@ const AVATARS = [
 ];
 
 export function NarrativeIntro() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
   
   // Refs
-  const reflectionRef = useRef<HTMLDivElement>(null);        
-  const contextRef = useRef<HTMLDivElement>(null);          
-  const shiftRef = useRef<HTMLDivElement>(null);            
-  const originRef = useRef<HTMLDivElement>(null);           
-  const evolutionRef = useRef<HTMLDivElement>(null);        
-  const avatarRef = useRef<HTMLDivElement>(null);           
-  const teamLogoRef = useRef<HTMLDivElement>(null);         
-  const shapesRef = useRef<HTMLDivElement>(null);
+  const reflectionRef = useRef(null);        
+  const contextRef = useRef(null);          
+  const shiftRef = useRef(null);            
+  const originRef = useRef(null);           
+  const evolutionRef = useRef(null);        
+  const avatarRef = useRef(null);           
+  const teamLogoRef = useRef(null);         
+  const shapesRef = useRef(null);
 
   useGSAP(() => {
     if (!containerRef.current) return;
@@ -286,3 +286,4 @@ export function NarrativeIntro() {
     </div>
   );
 }
+

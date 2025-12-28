@@ -6,18 +6,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
-import { formatDate, getFeaturedImage, WordPressPost } from "@/lib/wordpress";
+import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import { GeometricBackground } from "@/components/GeometricBackground";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface BlogPreviewProps {
-  posts: WordPressPost[];
-}
-
-export function BlogPreview({ posts }: BlogPreviewProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
+export function BlogPreview({ posts }) {
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
 
   useGSAP(() => {
     // Animate title
@@ -37,7 +33,7 @@ export function BlogPreview({ posts }: BlogPreviewProps) {
     }
 
     // Animate blog cards
-    const cards = gsap.utils.toArray<HTMLElement>(
+    const cards = gsap.utils.toArray(
       sectionRef.current?.querySelectorAll(".blog-card") || []
     );
 

@@ -8,8 +8,8 @@ import { useRef } from "react";
 gsap.registerPlugin(ScrollTrigger);
 
 export function ValidationSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef(null);
+  const containerRef = useRef(null);
 
   useGSAP(() => {
     const container = containerRef.current;
@@ -33,7 +33,7 @@ export function ValidationSection() {
     });
 
     // Text Reveal Logic
-    gsap.utils.toArray(".digital-text").forEach((text: any) => {
+    gsap.utils.toArray(".digital-text").forEach((text) => {
         gsap.from(text, {
             scrollTrigger: {
                 trigger: text,
@@ -203,3 +203,4 @@ export function ValidationSection() {
     </section>
   );
 }
+

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger"; // <<< ADDED IMPORT
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger); // <<< ADDED REGISTRATION
+gsap.registerPlugin(ScrollTrigger);
 
 export function Header() {
-  const headerRef = useRef<HTMLElement>(null);
+  const headerRef = useRef(null);
 
   useGSAP(() => {
     // --- 1. INITIAL ANIMATE IN (Existing) ---
@@ -60,3 +60,4 @@ export function Header() {
     </header>
   );
 }
+

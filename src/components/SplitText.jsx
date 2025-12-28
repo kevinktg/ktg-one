@@ -1,18 +1,9 @@
-import React from "react";
-
-interface SplitTextProps {
-  children: string;
-  className?: string;
-  wordClass?: string;
-  charClass?: string;
-}
-
 export function SplitText({ 
   children, 
   className = "", 
   wordClass = "split-word", 
   charClass = "split-char" 
-}: SplitTextProps) {
+}) {
   
   // 1. Split the string into words
   const words = children.split(" ");
@@ -40,3 +31,4 @@ export function SplitText({
     </span>
   );
 }
+
