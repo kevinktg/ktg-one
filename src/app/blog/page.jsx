@@ -4,6 +4,7 @@ import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 export const metadata = {
   title: "Blog | .ktg - AI Anthropology & Prompt Engineering Insights",
@@ -69,6 +70,7 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <GeometricBackground />
       <Header />
       <script
         type="application/ld+json"

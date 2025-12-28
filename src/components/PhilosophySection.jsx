@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -57,8 +58,10 @@ export function PhilosophySection() {
   ];
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6">
+      {/* Geometric Background */}
+      <GeometricBackground />
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Main statement */}
         <div ref={textRef} className="mb-32">
           <div className="grid md:grid-cols-2 gap-16 items-start">

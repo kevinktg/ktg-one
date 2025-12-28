@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-black text-white">
+      <GeometricBackground />
       <Header />
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">

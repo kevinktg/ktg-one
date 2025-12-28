@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,8 +54,8 @@ export function ValidationSection() {
   return (
     <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40">
 
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30 pointer-events-none" />
+      {/* Geometric Background */}
+      <GeometricBackground />
 
       {/* Header */}
       <div className="absolute top-12 left-6 md:left-12 z-10 mix-blend-difference">

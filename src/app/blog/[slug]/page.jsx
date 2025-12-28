@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 // Force dynamic rendering to avoid build-time API failures
 export const dynamic = 'force-dynamic';
@@ -109,6 +110,7 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <GeometricBackground />
       <Header />
       <script
         type="application/ld+json"
