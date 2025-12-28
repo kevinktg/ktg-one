@@ -153,12 +153,12 @@ export const HeroSection = forwardRef((props, ref) => {
         {/* Profile image */}
         <div ref={imageRef} className="flex justify-center md:justify-end">
           <div className="relative" style={{ contain: "layout paint" }}>
-            <div className="absolute -inset-8 border-2 border-white/20 rotate-6" style={{ position: "absolute" }} />
-            <div className="absolute -inset-12 border border-white/10 -rotate-3" style={{ position: "absolute" }} />
+            <div className="absolute -inset-8 border-2 border-white/20 rotate-6" />
+            <div className="absolute -inset-12 border border-white/10 -rotate-3" />
 
             <div className="relative w-80 h-80 md:w-96 md:h-96">
               <Image
-                src="/assets/ktg-one.svg"
+                src="/assets/ktg.svg"
                 alt="ktg profile"
                 width={384}
                 height={384}
