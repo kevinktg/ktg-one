@@ -53,6 +53,7 @@ export function ExpertiseSection() {
         end: "+=500",     // Slightly longer for smoother transition
         pin: true,        // 🔒 Lock the screen
         scrub: 1,         // Smooth scrubbing
+        pinSpacing: false, // Prevent overlap with other sections
       }
     });
 
@@ -114,19 +115,21 @@ export function ExpertiseSection() {
       {/* MAIN CONTENT                                 */}
       {/* ============================================ */}
       <div ref={contentRef} className="relative w-full h-full flex flex-col justify-center py-20 px-6">
-          
-          {/* Background Decor (Lower opacity to not fight text) */}
+
+          {/* Background Decor (More visible vectors) */}
           <div className="absolute inset-0 pointer-events-none">
-             <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/5 rotate-45" />
-             <div className="absolute bottom-20 left-20 w-96 h-96 border border-black/5 rounded-full" />
+             <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/15 rotate-45" />
+             <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/10" />
+             <div className="absolute bottom-20 left-20 w-96 h-96 border border-black/15 rounded-full" />
+             <div className="absolute bottom-1/3 left-1/4 w-72 h-72 border border-black/10 rotate-12" />
              {/* Grid Texture */}
-             <div className="absolute inset-0 opacity-[0.03]" 
-                  style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+             <div className="absolute inset-0 opacity-[0.05]"
+                  style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
              />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto w-full">
-            <h2 className="expertise-item mb-20 text-center text-4xl md:text-6xl font-syne font-bold uppercase tracking-tighter">
+            <h2 className="expertise-item mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter">
               expertise_matrix
             </h2>
 
@@ -135,7 +138,7 @@ export function ExpertiseSection() {
                 <div key={area.category} className="expertise-item relative group">
                   {/* Hover Box Effect */}
                   <div className="absolute -inset-6 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 rounded-lg -z-10" />
-                  
+
                   {/* Category Header */}
                   <div className="mb-8 relative">
                     <div className="absolute -left-4 top-0 w-1 h-full bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
