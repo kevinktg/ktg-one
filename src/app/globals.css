@@ -9,7 +9,7 @@
   body {
     background-color: #000000;
     color: #ffffff;
-    font-family: "Ubuntu", "Iosevka Term", monospace;
+    font-family: var(--font-syne), sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -54,13 +54,13 @@
   }
 
   p {
-    font-family: "Ubuntu", sans-serif;
+    font-family: var(--font-syne), sans-serif;
     line-height: 1.6;
   }
 
   code,
   .monospace {
-    font-family: "Iosevka Term", monospace;
+    font-family: var(--font-mono), monospace;
   }
 }
 
