@@ -40,7 +40,7 @@ export function Header() {
       ref={headerRef}
       className="fixed top-0 left-0 w-full z-[100] px-6 py-6 md:px-12 flex justify-between items-center mix-blend-difference text-white"
     >
-      {/* LOGO: Matches ktg.png style */}
+      {/* LOGO: ktg brand text */}
       <Link href="/" className="group">
         <span className="font-syne font-bold text-4xl md:text-5xl lowercase tracking-tighter leading-none group-hover:opacity-70 transition-opacity">
           ktg.
