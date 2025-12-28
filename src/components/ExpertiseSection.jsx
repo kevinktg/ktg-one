@@ -46,13 +46,13 @@ export function ExpertiseSection() {
   const shutterRef = useRef(null);
 
   useGSAP(() => {
-    // Phase 1: Pin section naturally (no forced pinning)
-    // Shutter reveal happens on scroll, section continues scrolling after
+    // Full-screen transition: Shutter reveal, then natural scroll, then fade out
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "bottom top",
+        end: "bottom 80%",
+        scrub: 1,
       }
     });
 
@@ -91,6 +91,13 @@ export function ExpertiseSection() {
       stagger: 0.2,
     }, "-=1");
 
+    // 5. FULL SCREEN FADE OUT - White to Black transition
+    tl.to(".expertise-fade-out", {
+      opacity: 0,
+      duration: 2,
+      ease: "power2.inOut"
+    });
+
   }, { scope: containerRef });
 
   return (
@@ -113,7 +120,7 @@ export function ExpertiseSection() {
          <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/15 rotate-45" />
          <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/10" />
          <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/15 rounded-full" />
-         <div className="absolute bottom-1/3 left-1/4 w-72 h-72 border border-black/10 rotate-12" />
+         <div className="absolute bottom-1/3 left-1/4 w-72 h-72 border-2 border-black/10 rotate-12" />
          {/* Grid Texture */}
          <div className="absolute inset-0 opacity-[0.05]"
               style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}
@@ -173,6 +180,9 @@ export function ExpertiseSection() {
               </div>
             </div>
           </div>
+
+          {/* Full-screen transition overlay - White to Black */}
+          <div className="expertise-fade-out absolute inset-0 bg-white pointer-events-none z-40" style={{ opacity: 0 }} />
       </div>
     </section>
   );
