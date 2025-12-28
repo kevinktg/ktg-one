@@ -71,18 +71,12 @@ export function ValidationSection() {
       <GeometricBackground />
 
       {/* White transition overlay - fades out to reveal black section */}
-      <div className="transition-overlay absolute inset-0 bg-white pointer-events-none z-50" />
-
-      {/* Geometric Background */}
-      <GeometricBackground />
-
-      {/* Geometric Background */}
-      <GeometricBackground />
+      <div className="transition-overlay absolute inset-0 bg-white pointer-events-none z-50" style={{ opacity: 1 }} />
 
       {/* Header */}
       <div className="absolute top-12 left-6 md:left-12 z-10 mix-blend-difference">
           <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase">
-            system_<span className="text-white/30">audits</span>
+             system_<span className="text-white/30">audits</span>
           </h2>
       </div>
 
