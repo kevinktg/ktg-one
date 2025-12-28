@@ -121,15 +121,6 @@ export const HeroSection = forwardRef((props, ref) => {
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
 
-      {/* Brand Logo - Top Left */}
-      <div className="absolute top-8 left-6 md:left-12 z-20">
-        <svg className="w-16 h-16 md:w-20 md:h-20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <text x="50" y="70" textAnchor="middle" fontSize="28" fontWeight="bold" fill="white" fontFamily="sans-serif">
-            ktg
-          </text>
-        </svg>
-      </div>
-
       {/* Interactive Floating Background Shapes - White on Black */}
       <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
          <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
@@ -167,8 +158,8 @@ export const HeroSection = forwardRef((props, ref) => {
 
             <div className="relative w-80 h-80 md:w-96 md:h-96">
               <Image
-                src="/assets/7d041e6f392514bea854c5ccc9f806bf8656635e.png"
-                alt="Profile"
+                src="/assets/ktg-one.svg"
+                alt="ktg profile"
                 width={384}
                 height={384}
                 className="w-full h-full object-contain filter brightness-110 contrast-125 grayscale hover:grayscale-0 transition-all duration-700"
