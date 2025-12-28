@@ -1,5 +1,6 @@
 import { Syne, Ubuntu_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
         <ClientLayout>
           {children}
           <SpeedInsights />
+          <Analytics />
         </ClientLayout>
       </body>
     </html>
