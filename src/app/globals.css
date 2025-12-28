@@ -1,51 +1,58 @@
 @import "tailwindcss";
 
+/* THEME CONFIGURATION
+  Maps your CSS variables to Tailwind's theme system
+*/
+@theme {
+  --font-syne: var(--font-syne);
+  --font-mono: var(--font-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+/* BASE LAYER:
+   Reset and global typography settings
+*/
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --background: #000000;
+    --foreground: #ffffff;
   }
 
   body {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-syne), sans-serif;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Critical for preventing scrollbar flicker during animations */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  img, video {
-    max-width: 100%;
-    height: auto;
-    display: block;
-  }
-
+  /* Reset for consistent box sizing */
   * {
     box-sizing: border-box;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  /* Responsive Typography Scale */
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-syne), sans-serif;
     font-weight: 700;
     line-height: 1.1;
-    text-transform: lowercase;
+    text-transform: lowercase; /* Brand Identity */
   }
 
   h1 {
     font-size: clamp(3rem, 10vw, 8rem);
     font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   h2 {
     font-size: clamp(2rem, 6vw, 5rem);
     font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   h3 {
@@ -58,31 +65,52 @@
     line-height: 1.6;
   }
 
-  code,
-  .monospace {
+  /* Utility for Monospace elements (code, labels, dates) */
+  .monospace, code {
     font-family: var(--font-mono), monospace;
+  }
+
+  /* Image Reset */
+  img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
   }
 }
 
+/* UTILITIES LAYER:
+   Custom patterns and animation helpers
+*/
 @layer utilities {
-  .geometric-pattern {
-    background-image: linear-gradient(
-        45deg,
-        transparent 48%,
-        white 48%,
-        white 52%,
-        transparent 52%
-      ),
-      linear-gradient(
-        -45deg,
-        transparent 48%,
-        white 48%,
-        white 52%,
-        transparent 52%
-      );
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
-    opacity: 0.12;
+
+  /* GPU Acceleration Helper (Critical for GSAP) */
+  .will-change-transform {
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* Custom Scrollbar for Audit Section */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Geometric Background Utilities */
+  .grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.5; /* Adjusted for better visibility on black */
   }
 
   .diagonal-lines {
@@ -90,91 +118,17 @@
       45deg,
       transparent,
       transparent 10px,
-      white 10px,
-      white 11px
+      rgba(255, 255, 255, 0.1) 10px,
+      rgba(255, 255, 255, 0.1) 11px
     );
-    opacity: 0.15;
   }
 
-  .grid-pattern {
-    background-image: linear-gradient(white 1px, transparent 1px),
-      linear-gradient(90deg, white 1px, transparent 1px);
-    background-size: 50px 50px;
-    opacity: 0.1;
+  /* 3D Perspective Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
   }
 
-  /* Scroll Transition Section */
-  .scroll-transition-section {
-    position: relative;
-    overflow: hidden;
-    view-timeline: --scroll-transition;
-  }
-
-  .scroll-transition-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .scroll-transition-image {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    filter: blur(20px);
-    transform: scale(1.5);
-    animation: scroll-zoom-blur linear both;
-    animation-timeline: --scroll-transition;
-  }
-
-  /* Stagger each image */
-  .scroll-transition-image:nth-child(1) {
-    animation-range: entry 0% exit 25%;
-  }
-
-  .scroll-transition-image:nth-child(2) {
-    animation-range: entry 25% exit 50%;
-  }
-
-  .scroll-transition-image:nth-child(3) {
-    animation-range: entry 50% exit 75%;
-  }
-
-  .scroll-transition-image:nth-child(4) {
-    animation-range: entry 75% exit 100%;
-  }
-
-  @keyframes scroll-zoom-blur {
-    0% {
-      opacity: 0;
-      filter: blur(30px);
-      transform: scale(2);
-    }
-    20% {
-      opacity: 0.3;
-      filter: blur(10px);
-      transform: scale(1.2);
-    }
-    50% {
-      opacity: 0.6;
-      filter: blur(0px);
-      transform: scale(1);
-    }
-    80% {
-      opacity: 0.3;
-      filter: blur(10px);
-      transform: scale(1.2);
-    }
-    100% {
-      opacity: 0;
-      filter: blur(30px);
-      transform: scale(2);
-    }
-  }
-
-  .scroll-transition-content {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
+  .transform-style-3d {
+    transform-style: preserve-3d;
   }
 }

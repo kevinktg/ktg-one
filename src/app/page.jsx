@@ -1,5 +1,3 @@
-"use client";
-
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
@@ -7,44 +5,58 @@ import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
-import { useRef, useState, useEffect } from "react";
 import { getPosts } from "@/lib/wordpress";
 
-export default function Home() {
-  const heroRef = useRef(null);
-  const [blogPosts, setBlogPosts] = useState([]);
+// Force dynamic rendering if you want new blog posts to appear instantly on refresh
+// or use 'export const revalidate = 3600' to cache for 1 hour.
+export const revalidate = 60;
 
-  // Fetch blog posts on mount
-  useEffect(() => {
-    getPosts(1, 6).then(setBlogPosts).catch(console.error);
-  }, []);
+export default async function Home() {
+  // 1. FETCH DATA ON SERVER
+  // This runs on the server before the page is sent to the browser.
+  let blogPosts = [];
+  try {
+    // Attempt to fetch posts. If WP is down, it won't crash the whole site.
+    blogPosts = await getPosts(1, 6);
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+    // Component will use the fallback 'DEMO_POSTS' we added earlier
+  }
+
+  // 2. DEFINE DATA FOR OTHER SECTIONS (Optional)
+  // You can fetch this from WP too, or define it here to keep the components "dumb"
+  // For now, we rely on the default props inside the components,
+  // but this is where you would pass "heroData", "expertiseData", etc.
 
   return (
-    <div>
+    <div className="bg-black min-h-screen flex flex-col">
+      {/* Header is usually fixed/sticky.
+        Ensure it has z-50 to sit above the Hero canvas
+      */}
       <Header />
 
-      <main className="relative bg-transparent text-white">
-        <div className="relative z-10">
-          {/* Hero Section */}
-          <HeroSection ref={heroRef} />
+      <main className="flex-grow">
 
-          {/* Expertise Section */}
-          <ExpertiseSection />
+        {/* HERO: Black Background */}
+        <HeroSection />
 
-          {/* Validation Section */}
-          <ValidationSection />
+        {/* EXPERTISE: White Background (Scrolls over Hero) */}
+        <ExpertiseSection />
 
-          {/* Philosophy Section */}
-          <PhilosophySection />
+        {/* VALIDATION: Black Background (Horizontal Scroll) */}
+        <ValidationSection />
 
-          {/* Blog Preview */}
-          <BlogPreview posts={blogPosts} />
+        {/* PHILOSOPHY: Black Background (Parallax Quotes) */}
+        <PhilosophySection />
 
-          {/* Footer */}
-          <Footer />
-        </div>
+        {/* BLOG: Black Background (Grid Stagger) */}
+        {/* We pass the server-fetched posts here */}
+        <BlogPreview posts={blogPosts} />
+
       </main>
+
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 }
-

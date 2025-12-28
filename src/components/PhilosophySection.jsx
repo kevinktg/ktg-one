@@ -4,133 +4,169 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+// Ensure this path is correct based on your folder structure
 import { GeometricBackground } from "@/components/GeometricBackground";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function PhilosophySection() {
+export function PhilosophySection({ philosophyData }) {
   const sectionRef = useRef(null);
   const textRef = useRef(null);
   const quoteRefs = useRef([]);
 
+  // Default WP Fallback Data
+  const data = philosophyData || {
+    heading: {
+      line1: "synthesis",
+      line2: "over",
+      line3: "specialization"
+    },
+    description: [
+      "Seven careers aren't seven separate lives. They're seven lenses on the same problem: how to synthesize complexity into clarity.",
+      "From the precision of a pilot to the creativity of sound engineering, from market dynamics to human teaching—each domain taught a different dimension of problem-solving.",
+      "AI is where they all converge."
+    ],
+    quotes: [
+      {
+        text: "Don't just evaluate... collaborate.",
+        label: "PRINCIPLE 01",
+      },
+      {
+        text: "Ideation. Brainstorm. Implement. Test. Evaluate. Feedback. Iterate",
+        label: "PRINCIPLE 02",
+      },
+      {
+        text: "'Each LLM is wildly unique with patterned traits & features' - April 2024",
+        label: "PRINCIPLE 03",
+      },
+    ]
+  };
+
   useGSAP(() => {
-    // Main text parallax
+    // 1. HEADER PARALLAX
+    // Moves the text slightly faster than scroll for depth
     gsap.to(textRef.current, {
+      y: -50,
+      ease: "none",
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top bottom",
         end: "bottom top",
-        scrub: 1,
+        scrub: 1, // Smooth scrubbing
       },
-      y: -50,
     });
 
-    // Quotes animation
+    // 2. QUOTES SLIDE-IN
     quoteRefs.current.forEach((quote, index) => {
-      if (quote) {
-        gsap.from(quote, {
+      if (!quote) return;
+
+      // Determine direction based on index (even = left, odd = right)
+      const xVal = index % 2 === 0 ? -50 : 50;
+
+      gsap.fromTo(quote,
+        { opacity: 0, x: xVal },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: quote,
-            start: "top 85%",
+            start: "top 85%", // Start when top of element hits 85% of viewport height
             end: "top 60%",
-            scrub: 1,
-          },
-          x: index % 2 === 0 ? -100 : 100,
-          opacity: 0,
-        });
-      }
+            scrub: 1, // Link to scroll position
+          }
+        }
+      );
     });
+
   }, { scope: sectionRef });
 
-  const quotes = [
-    {
-      text: "Don't just evaluate... collaborate.",
-      label: "PRINCIPLE 01",
-    },
-    {
-      text: "Ideation. Brainstorm. Implement. Test. Evaluate. Feedback. Iterate",
-      label: "PRINCIPLE 02",
-    },
-    {
-      text: "'Each LLM is wildly unique with patterned traits & features' - April 2024",
-      label: "PRINCIPLE 03",
-    },
-  ];
-
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6" style={{ contain: "layout paint" }}>
-      {/* Geometric Background */}
-      <GeometricBackground />
-      <div className="max-w-6xl mx-auto relative z-10" style={{ contain: "layout" }}>
-        {/* Main statement */}
-        <div ref={textRef} className="mb-32">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-30">
+
+      {/* Geometric Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <GeometricBackground />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+
+        {/* Main Statement */}
+        <div ref={textRef} className="mb-40">
           <div className="grid md:grid-cols-2 gap-16 items-start">
+
+            {/* Header */}
             <div>
-              <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
+              <div className="font-mono text-sm text-white/40 mb-6 tracking-widest border-l border-white/20 pl-4">
                 PHILOSOPHY
               </div>
-              <h2>
-                synthesis<br />
-                over<br />
-                specialization
+              <h2 className="text-5xl md:text-7xl font-syne font-bold lowercase leading-[0.9] text-white">
+                <span className="block">{data.heading.line1}</span>
+                <span className="block text-white/50">{data.heading.line2}</span>
+                <span className="block">{data.heading.line3}</span>
               </h2>
             </div>
-            <div className="space-y-6 text-white/70 text-lg">
-              <p>
-                Seven careers aren't seven separate lives. They're seven lenses on the same problem:
-                how to synthesize complexity into clarity.
+
+            {/* Description Text */}
+            <div className="space-y-8 text-white/70 text-lg md:text-xl font-light">
+              <p className="leading-relaxed">
+                {data.description[0]}
               </p>
-              <p>
-                From the precision of a pilot to the creativity of sound engineering,
-                from market dynamics to human teaching—each domain taught a different dimension
-                of problem-solving.
+              <p className="leading-relaxed">
+                {data.description[1]}
               </p>
-              <p className="monospace text-white/90">
-                AI is where they all converge.
+              <p className="font-mono text-white/90 border-l-2 border-white/50 pl-4">
+                {data.description[2]}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Principles */}
-        <div className="space-y-16">
-          {quotes.map((quote, index) => (
+        {/* Principles / Quotes */}
+        <div className="space-y-24 md:space-y-32">
+          {data.quotes.map((quote, index) => (
             <div
               key={index}
-              ref={(el) => {
-                quoteRefs.current[index] = el;
-              }}
-              className="relative group"
+              ref={(el) => { quoteRefs.current[index] = el; }}
+              className={`relative group flex ${index % 2 !== 0 ? 'justify-end' : 'justify-start'}`}
             >
-              <div className="border-l-2 border-white/20 pl-8 py-4 group-hover:border-white/60 transition-colors duration-500">
-                <div className="monospace text-xs text-white/40 mb-3 tracking-widest">
-                  {quote.label}
-                </div>
-                <blockquote className="text-3xl md:text-4xl italic text-white/90 tracking-tight">
-                  "{quote.text}"
-                </blockquote>
-              </div>
+              <div className="max-w-3xl relative">
+                {/* Visual Anchor Line */}
+                <div className={`absolute top-0 bottom-0 w-1 bg-white/20 group-hover:bg-white/60 transition-colors duration-500 ${index % 2 !== 0 ? 'right-0' : 'left-0'}`} />
 
-              {/* Geometric accent */}
-              <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-16 h-16 border border-white/5 rotate-45 group-hover:rotate-90 transition-transform duration-700" />
+                <div className={`${index % 2 !== 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
+                  <div className="font-mono text-xs text-white/40 mb-4 tracking-widest">
+                    {quote.label}
+                  </div>
+                  <blockquote className="text-3xl md:text-5xl font-syne font-bold text-white/90 leading-tight">
+                    "{quote.text}"
+                  </blockquote>
+                </div>
+
+                {/* Geometric accent (Diamond) */}
+                <div className={`absolute top-1/2 -translate-y-1/2 w-12 h-12 border border-white/10 rotate-45 group-hover:rotate-90 transition-transform duration-700 ${index % 2 !== 0 ? '-left-6' : '-right-6'}`} />
+              </div>
             </div>
           ))}
         </div>
 
         {/* Closing statement */}
-        <div className="mt-32 text-center space-y-8">
-          <div className="inline-block relative">
-            <div className="absolute -inset-8 border border-white/10" />
-            <div className="relative monospace text-2xl md:text-3xl px-12 py-8 tracking-wide">
+        <div className="mt-40 text-center space-y-8">
+          <div className="inline-block relative group cursor-default">
+            <div className="absolute -inset-8 border border-white/10 group-hover:border-white/30 transition-colors duration-500" />
+            <div className="absolute -inset-8 border border-white/5 rotate-3 group-hover:rotate-0 transition-transform duration-700" />
+
+            <div className="relative font-mono text-xl md:text-3xl px-12 py-8 tracking-wide text-white">
               CONTEXT • CONTINUATION • SOLVE
             </div>
           </div>
-          
+
           {/* Blog link for SEO */}
-          <div className="pt-8">
-            <a 
-              href="/blog" 
-              className="monospace text-sm text-white/60 hover:text-white transition-colors underline underline-offset-4"
+          <div className="pt-12">
+            <a
+              href="/blog"
+              className="font-mono text-sm text-white/40 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1"
             >
               read insights →
             </a>
@@ -140,4 +176,3 @@ export function PhilosophySection() {
     </section>
   );
 }
-
