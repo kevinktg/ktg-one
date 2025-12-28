@@ -121,28 +121,39 @@ export const HeroSection = forwardRef((props, ref) => {
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
 
-      {/* Interactive Floating Background Shapes - White on Black */}
-      <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
-         <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
-         <div className="hero-shape-2 absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10" />
-         <div className="hero-shape-3 absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full" />
-         <div className="hero-shape-4 absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12" />
+      {/* Layer 1: Revealed Background (shown when logo is wiped away) */}
+      <div className="absolute inset-0 z-10">
+        <div className="cyberpunk-background" />
+        <Image
+          src="/assets/profile.svg"
+          alt="cyberpunk avatar"
+          width={400}
+          height={400}
+          className="avatar-revealed"
+          priority
+        />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        {/* Text content */}
+      {/* Keep existing geometric shapes */}
+      <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
+        <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
+        <div className="hero-shape-2 absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10" />
+        <div className="hero-shape-3 absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full" />
+        <div className="hero-shape-4 absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12" />
+      </div>
+
+      {/* Layer 4: Text content (keep existing) */}
+      <div className="relative z-40 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         <div className="hero__title-wrapper space-y-6">
           <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase text-white">
             <span className="block">top 0.01%</span>
             <span className="block mt-2 text-white/80">prompt</span>
             <span className="block mt-2">engineer</span>
           </h1>
-
           <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-white/70 tracking-wide font-light">
             context continuation solve.<br />
             frameworks. arxiv-ready papers.
           </p>
-
           <div className="pt-8 flex gap-4 opacity-50">
             <div className="w-20 h-1 bg-white" />
             <div className="w-12 h-1 bg-white/50" />
@@ -150,23 +161,9 @@ export const HeroSection = forwardRef((props, ref) => {
           </div>
         </div>
 
-        {/* Profile image */}
-        <div ref={imageRef} className="flex justify-center md:justify-end">
-          <div className="relative" style={{ contain: "layout paint" }}>
-            <div className="absolute -inset-8 border-2 border-white/20 rotate-6" />
-            <div className="absolute -inset-12 border border-white/10 -rotate-3" />
-
-            <div className="relative w-80 h-80 md:w-96 md:h-96">
-              <Image
-                src="/assets/ktg.svg"
-                alt="ktg profile"
-                width={384}
-                height={384}
-                className="w-full h-full object-contain filter brightness-110 contrast-125 grayscale hover:grayscale-0 transition-all duration-700"
-                priority
-              />
-            </div>
-          </div>
+        {/* Placeholder for logo layer (next task) */}
+        <div className="flex justify-center md:justify-end">
+          <div className="text-white/50">Logo layer coming next...</div>
         </div>
       </div>
     </section>
