@@ -50,7 +50,7 @@ export function ExpertiseSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top", // When section hits top of viewport
-        end: "+=400",     // Much shorter - 400px instead of 1500px
+        end: "+=500",     // Slightly longer for smoother transition
         pin: true,        // 🔒 Lock the screen
         scrub: 1,         // Smooth scrubbing
       }
