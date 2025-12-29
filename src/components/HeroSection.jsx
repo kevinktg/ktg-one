@@ -106,13 +106,15 @@ export const HeroSection = forwardRef((props, ref) => {
 
   }, { scope: heroRef });
 
-  // SIMPLE BLOB CURSOR
+  // BLOB CURSOR WITH MASKING
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const mask = maskRef.current;
+    if (!canvas || !mask) return;
 
     const ctx = canvas.getContext('2d');
     const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const revealedCircles = [];
 
     // Setup canvas
     canvas.width = window.innerWidth;
@@ -122,6 +124,14 @@ export const HeroSection = forwardRef((props, ref) => {
     const handleMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+
+      // Add circle to revealed areas
+      revealedCircles.push({ x: mouse.x, y: mouse.y, r: 90 });
+
+      // Keep only last 50 circles for performance
+      if (revealedCircles.length > 50) {
+        revealedCircles.shift();
+      }
     };
 
     // Animation loop
@@ -137,6 +147,18 @@ export const HeroSection = forwardRef((props, ref) => {
       ctx.beginPath();
       ctx.arc(mouse.x, mouse.y, 100, 0, Math.PI * 2);
       ctx.fill();
+
+      // Update mask to hide logo where blob has been
+      if (revealedCircles.length > 0) {
+        const circles = revealedCircles.map(c =>
+          `circle(${c.r}px at ${c.x}px ${c.y}px)`
+        ).join(', ');
+
+        mask.style.webkitMaskImage = circles;
+        mask.style.maskImage = circles;
+        mask.style.webkitMaskComposite = 'xor';
+        mask.style.maskComposite = 'exclude';
+      }
 
       requestAnimationFrame(draw);
     };
