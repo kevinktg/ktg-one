@@ -43,7 +43,19 @@ export function ExpertiseSection({ expertiseData }) {
   ];
 
   useGSAP(() => {
-    // 1. SHUTTER REVEAL
+    // 1. PIN AND EXPAND TO FULLSCREEN
+    // Pause scroll and expand white section to cover full viewport
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "+=100%", // Pin for full scroll range
+        pin: true,
+        scrub: 1,
+      }
+    });
+
+    // 2. SHUTTER REVEAL
     // Uses scaleY for high-performance animation - slower transition
     gsap.to(shutterRef.current?.children, {
       scaleY: 0,
@@ -54,17 +66,17 @@ export function ExpertiseSection({ expertiseData }) {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top bottom",
-        end: "top 40%", // Slower reveal (was 20%)
+        end: "top center", // Complete reveal by center
         scrub: 1.5, // Smoother scrub
       }
     });
 
-    // 2. CONTENT ENTRANCE
+    // 3. CONTENT ENTRANCE
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 70%", // Later start (was 60%)
-        end: "top 30%", // Later end (was 20%)
+        start: "top center", // Start when centered (after shutter)
+        end: "top top", // End when fully visible
         toggleActions: "play none none reverse"
       }
     });
@@ -72,7 +84,7 @@ export function ExpertiseSection({ expertiseData }) {
     tl.from(".expertise-title", { y: 50, opacity: 0, duration: 1.2, ease: "power4.out" })
       .from(".expertise-group", { y: 40, opacity: 0, duration: 1, stagger: 0.15, ease: "power2.out" }, "-=0.6");
 
-    // 3. COUNTERS
+    // 4. COUNTERS
     const stats = gsap.utils.toArray(".stat-counter");
     stats.forEach((stat) => {
       const targetVal = parseFloat(stat.getAttribute("data-val"));
