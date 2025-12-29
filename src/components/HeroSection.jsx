@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { useRef, forwardRef } from "react";
+import { useRef, forwardRef, useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,6 +15,7 @@ export const HeroSection = forwardRef((props, ref) => {
   const subtitleRef = useRef(null);
   const imageRef = useRef(null);
   const maskRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useGSAP(() => {
     // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax using quickSetter
@@ -105,6 +106,50 @@ export const HeroSection = forwardRef((props, ref) => {
 
   }, { scope: heroRef });
 
+  // SIMPLE BLOB CURSOR
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    // Setup canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Mouse tracking
+    const handleMove = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+
+    // Animation loop
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw simple purple blob
+      const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100);
+      gradient.addColorStop(0, 'rgba(138, 43, 226, 0.8)');
+      gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 100, 0, Math.PI * 2);
+      ctx.fill();
+
+      requestAnimationFrame(draw);
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    const handle = requestAnimationFrame(draw);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      cancelAnimationFrame(handle);
+    };
+  }, []);
+
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
 
@@ -140,6 +185,13 @@ export const HeroSection = forwardRef((props, ref) => {
           priority
         />
       </div>
+
+      {/* Layer 3.5: Blob Cursor Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 35 }}
+      />
 
       {/* Layer 4: Text content (keep existing) */}
       <div className="relative z-40 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
