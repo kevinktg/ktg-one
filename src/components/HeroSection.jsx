@@ -113,7 +113,14 @@ export const HeroSection = forwardRef((props, ref) => {
     const mask = maskRef.current;
     const textWrapper = textWrapperRef.current;
 
-    if (!canvas || !mask || !textWrapper) return;
+    console.log('Blob cursor effect initializing...', { canvas, mask, textWrapper });
+
+    if (!canvas || !mask || !textWrapper) {
+      console.error('Missing refs:', { canvas: !!canvas, mask: !!mask, textWrapper: !!textWrapper });
+      return;
+    }
+
+    console.log('Blob cursor effect starting!');
 
     const ctx = canvas.getContext('2d');
     let rafId;
@@ -196,9 +203,12 @@ export const HeroSection = forwardRef((props, ref) => {
     };
 
     // Animation loop
+    let frameCount = 0;
     const animate = () => {
-      // Skip if cursor idle for >100ms
-      const isIdle = Date.now() - lastMouseMove > 100;
+      frameCount++;
+      if (frameCount % 60 === 0) {
+        console.log('Blob animating at 60fps, blob pos:', blob);
+      }
 
       // Update blob position with easing
       blob.x += (target.x - blob.x) * EASING;
