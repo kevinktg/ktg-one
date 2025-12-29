@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { useRef, forwardRef, useState, useEffect } from "react";
+import { useRef, forwardRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,59 +15,45 @@ export const HeroSection = forwardRef((props, ref) => {
   const subtitleRef = useRef(null);
   const imageRef = useRef(null);
   const maskRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
+  useGSAP(() => {
+    // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax using quickSetter
+    const shapes = [
+      { el: '.hero-shape-1', speedX: 20, speedY: 20 },
+      { el: '.hero-shape-2', speedX: -30, speedY: 15 },
+      { el: '.hero-shape-3', speedX: 15, speedY: -25 },
+      { el: '.hero-shape-4', speedX: -25, speedY: 20 },
+    ];
+
+    // Create quickSetters for performance
+    const setters = shapes.map(({ el, speedX, speedY }) => {
+      const element = document.querySelector(el);
+      if (!element) return null;
+      return {
+        x: gsap.quickSetter(element, 'x', 'px'),
+        y: gsap.quickSetter(element, 'y', 'px'),
+        speedX,
+        speedY
+      };
+    }).filter(Boolean);
+
+    // Animate on mouse move (outside GSAP context)
     const handleMouseMove = (e) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 2;
       const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setMousePos({ x, y });
+
+      setters.forEach(({ x: setX, y: setY, speedX, speedY }) => {
+        setX(x * speedX);
+        setY(y * speedY);
+      });
     };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
-  useGSAP(() => {
-    // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax
-    gsap.to(".hero-shape-1", {
-      x: () => mousePos.x * 20,
-      y: () => mousePos.y * 20,
-      rotation: "random(-5, 5)",
-      duration: "random(3, 6)",
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
-
-    gsap.to(".hero-shape-2", {
-      x: () => mousePos.x * -30,
-      y: () => mousePos.y * 15,
-      rotation: "random(-5, 5)",
-      duration: "random(3, 6)",
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
-
-    gsap.to(".hero-shape-3", {
-      x: () => mousePos.x * 15,
-      y: () => mousePos.y * -25,
-      rotation: "random(-5, 5)",
-      duration: "random(3, 6)",
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
-
-    gsap.to(".hero-shape-4", {
-      x: () => mousePos.x * -25,
-      y: () => mousePos.y * 20,
-      rotation: "random(-5, 5)",
-      duration: "random(3, 6)",
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
+    // Cleanup
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
 
     // 2. ENTRANCE ANIMATION
     const tl = gsap.timeline();
