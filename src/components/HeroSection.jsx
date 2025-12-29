@@ -121,12 +121,24 @@ export const HeroSection = forwardRef((props, ref) => {
         />
       </div>
 
-      {/* Keep existing geometric shapes */}
+      {/* Layer 2: Geometric Shapes */}
       <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
-        <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45" />
-        <div className="hero-shape-2 absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10" />
-        <div className="hero-shape-3 absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full" />
-        <div className="hero-shape-4 absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12" />
+        <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45 will-change-transform" />
+        <div className="hero-shape-2 absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10 will-change-transform" />
+        <div className="hero-shape-3 absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full will-change-transform" />
+        <div className="hero-shape-4 absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12 will-change-transform" />
+      </div>
+
+      {/* Layer 3: Logo Mask (will be clipped by blob cursor) - Sibling to section */}
+      <div ref={maskRef} className="absolute inset-0 z-30 flex items-center justify-center" style={{ willChange: 'clip-path' }}>
+        <Image
+          src="/assets/ktg.svg"
+          alt="ktg logo"
+          width={800}
+          height={800}
+          className="w-auto h-[80vh] object-contain"
+          priority
+        />
       </div>
 
       {/* Layer 4: Text content (keep existing) */}
@@ -146,18 +158,6 @@ export const HeroSection = forwardRef((props, ref) => {
             <div className="w-12 h-1 bg-white/50" />
             <div className="w-8 h-1 bg-white/30" />
           </div>
-        </div>
-
-        {/* Layer 2: Logo Mask (will be clipped by blob cursor) */}
-        <div ref={maskRef} className="absolute inset-0 z-30 flex items-center justify-center">
-          <Image
-            src="/assets/ktg.svg"
-            alt="ktg logo"
-            width={800}
-            height={800}
-            className="w-auto h-[80vh] object-contain"
-            priority
-          />
         </div>
       </div>
     </section>
