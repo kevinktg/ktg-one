@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { useRef, forwardRef } from "react";
+import { useRef, forwardRef, useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,6 +15,8 @@ export const HeroSection = forwardRef((props, ref) => {
   const subtitleRef = useRef(null);
   const imageRef = useRef(null);
   const maskRef = useRef(null);
+  const canvasRef = useRef(null);
+  const textWrapperRef = useRef(null);
 
   useGSAP(() => {
     // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax using quickSetter
@@ -105,6 +107,186 @@ export const HeroSection = forwardRef((props, ref) => {
 
   }, { scope: heroRef });
 
+  // BLOB CURSOR EFFECT
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const mask = maskRef.current;
+    const textWrapper = textWrapperRef.current;
+
+    if (!canvas || !mask || !textWrapper) return;
+
+    const ctx = canvas.getContext('2d');
+    let rafId;
+    let lastMouseMove = Date.now();
+
+    // Blob state
+    const blob = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const trailBlobs = [];
+    const revealedAreas = [];
+
+    // Constants
+    const BLOB_SIZE = 180;
+    const TRAIL_SIZE = 100;
+    const MAX_TRAILS = 8;
+    const EASING = 0.15;
+    const FADE_RADIUS = 200;
+
+    // Setup canvas
+    const setupCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    setupCanvas();
+
+    // Mouse tracking
+    const handleMouseMove = (e) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      lastMouseMove = Date.now();
+
+      // Spawn trail blob
+      if (trailBlobs.length < MAX_TRAILS) {
+        trailBlobs.push({
+          x: blob.x,
+          y: blob.y,
+          size: TRAIL_SIZE,
+          opacity: 0.6,
+          age: 0
+        });
+      }
+    };
+
+    // Update text opacity based on blob proximity
+    const updateTextFade = () => {
+      if (!titleRef.current || !subtitleRef.current) return;
+
+      const textBounds = textWrapper.getBoundingClientRect();
+      const textCenterX = textBounds.left + textBounds.width / 2;
+      const textCenterY = textBounds.top + textBounds.height / 2;
+
+      const distance = Math.hypot(blob.x - textCenterX, blob.y - textCenterY);
+
+      if (distance < FADE_RADIUS) {
+        const opacity = 0.2 + (0.8 * (distance / FADE_RADIUS));
+        titleRef.current.style.opacity = opacity;
+        subtitleRef.current.style.opacity = opacity;
+      } else {
+        titleRef.current.style.opacity = 1;
+        subtitleRef.current.style.opacity = 1;
+      }
+    };
+
+    // Apply clip-path masking
+    const updateMask = () => {
+      // Build SVG path from revealed areas
+      const circles = revealedAreas.map(area =>
+        `circle(${area.radius}px at ${area.x}px ${area.y}px)`
+      ).join(', ');
+
+      if (circles) {
+        // Invert: show logo everywhere EXCEPT revealed areas
+        mask.style.clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 100%)`;
+        mask.style.webkitClipPath = `polygon(0 0, 100% 0, 100% 100%, 0 100%)`;
+
+        // Use mask composite for punch-out effect
+        const maskImage = circles ? `radial-gradient(circle, transparent ${BLOB_SIZE}px, black ${BLOB_SIZE}px)` : 'none';
+        mask.style.maskImage = circles;
+        mask.style.webkitMaskImage = circles;
+        mask.style.maskComposite = 'exclude';
+        mask.style.webkitMaskComposite = 'source-out';
+      }
+    };
+
+    // Animation loop
+    const animate = () => {
+      // Skip if cursor idle for >100ms
+      const isIdle = Date.now() - lastMouseMove > 100;
+
+      // Update blob position with easing
+      blob.x += (target.x - blob.x) * EASING;
+      blob.y += (target.y - blob.y) * EASING;
+
+      // Add current blob position to revealed areas
+      revealedAreas.push({
+        x: blob.x,
+        y: blob.y,
+        radius: BLOB_SIZE / 2
+      });
+
+      // Limit revealed areas (keep last 100)
+      if (revealedAreas.length > 100) {
+        revealedAreas.shift();
+      }
+
+      // Update trail blobs
+      trailBlobs.forEach((trail, index) => {
+        trail.age += 1;
+        trail.opacity -= 0.015;
+        trail.size *= 0.98;
+
+        if (trail.opacity <= 0) {
+          trailBlobs.splice(index, 1);
+        }
+      });
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Set composite mode for metaball effect
+      ctx.globalCompositeOperation = 'lighter';
+
+      // Draw trail blobs
+      trailBlobs.forEach(trail => {
+        const gradient = ctx.createRadialGradient(
+          trail.x, trail.y, 0,
+          trail.x, trail.y, trail.size
+        );
+        gradient.addColorStop(0, `rgba(138, 43, 226, ${trail.opacity})`);
+        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${trail.opacity * 0.5})`);
+        gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(trail.x, trail.y, trail.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw main blob
+      const mainGradient = ctx.createRadialGradient(
+        blob.x, blob.y, 0,
+        blob.x, blob.y, BLOB_SIZE
+      );
+      mainGradient.addColorStop(0, 'rgba(138, 43, 226, 0.8)');
+      mainGradient.addColorStop(0.5, 'rgba(138, 43, 226, 0.4)');
+      mainGradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
+
+      ctx.fillStyle = mainGradient;
+      ctx.beginPath();
+      ctx.arc(blob.x, blob.y, BLOB_SIZE, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Update effects
+      updateTextFade();
+      updateMask();
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    // Start animation
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', setupCanvas);
+    animate();
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', setupCanvas);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
 
@@ -141,15 +323,22 @@ export const HeroSection = forwardRef((props, ref) => {
         />
       </div>
 
+      {/* Layer 3.5: Blob Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 z-35 pointer-events-none"
+        style={{ mixBlendMode: 'screen' }}
+      />
+
       {/* Layer 4: Text content (keep existing) */}
-      <div className="relative z-40 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <div ref={textWrapperRef} className="relative z-40 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         <div className="hero__title-wrapper space-y-6">
-          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase text-white">
+          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase text-white" style={{ transition: 'opacity 300ms ease-out' }}>
             <span className="block">top 0.01%</span>
             <span className="block mt-2 text-white/80">prompt</span>
             <span className="block mt-2">engineer</span>
           </h1>
-          <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-white/70 tracking-wide font-light">
+          <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-white/70 tracking-wide font-light" style={{ transition: 'opacity 300ms ease-out' }}>
             context continuation solve.<br />
             frameworks. arxiv-ready papers.
           </p>
