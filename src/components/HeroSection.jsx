@@ -87,21 +87,21 @@ export const HeroSection = forwardRef((props, ref) => {
     }
 
     // 3. SCROLL TRANSITION TO EXPERTISE SECTION
-    // Fade out completely before white section appears
+    // Fade out completely before white section appears (clean transition)
     const tl2 = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
-        start: "top top",
-        end: "bottom top", // Fade out by the time bottom reaches top
+        start: "bottom bottom", // Start fading when bottom of hero hits bottom of viewport
+        end: "bottom top", // Complete fade when bottom leaves viewport
         scrub: true,
       }
     });
 
     tl2.to(heroRef.current, {
       opacity: 0,
-      scale: 1.05,
-      y: -50,
-      ease: "power2.inOut"
+      scale: 1.02,
+      y: -30,
+      ease: "none" // Linear fade for clean transition
     });
 
   }, { scope: heroRef });
