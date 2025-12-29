@@ -173,14 +173,14 @@ export function ValidationSection({ auditData }) {
                         <span className="text-white/40 block mb-2 text-xs tracking-widest">FINDINGS:</span>
                         <p className="leading-relaxed text-white/90">{data.audit.findings}</p>
                     </div>
-                    <div className="space-y-4 text-sm md:text-base text-white/70">
+                    <ul className="space-y-4 text-sm md:text-base text-white/70">
                         {data.audit.checklist.map((item, i) => (
                              <li key={i} className="flex gap-4 digital-text items-start">
                                 <span className="text-green-500 mt-1">✓</span>
                                 <span><strong className="text-white">{item.label}:</strong> {item.desc}</span>
                             </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
             </div>
 
