@@ -43,6 +43,17 @@ export function ExpertiseSection({ expertiseData }) {
   ];
 
   useGSAP(() => {
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('expertise-revealed') === 'true';
+
+    if (hasPlayed) {
+      // Skip animation - just hide shutters immediately
+      if (shutterRef.current?.children) {
+        gsap.set(shutterRef.current.children, { scaleY: 0 });
+      }
+      return;
+    }
+
     // 1. PIN AND EXPAND TO FULLSCREEN
     // Pause scroll and expand white section to cover full viewport
     gsap.timeline({
@@ -52,6 +63,10 @@ export function ExpertiseSection({ expertiseData }) {
         end: "+=100%", // Pin for full scroll range
         pin: true,
         scrub: 1,
+        onLeave: () => {
+          // Mark as played once animation completes
+          sessionStorage.setItem('expertise-revealed', 'true');
+        }
       }
     });
 
