@@ -106,49 +106,105 @@ export const HeroSection = forwardRef((props, ref) => {
 
   }, { scope: heroRef });
 
-  // BLOB CURSOR WITH MASKING
+  // FLUID SPLASH CURSOR WITH PARTICLES
   useEffect(() => {
     const canvas = canvasRef.current;
     const mask = maskRef.current;
     if (!canvas || !mask) return;
 
     const ctx = canvas.getContext('2d');
-    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const particles = [];
     const revealedCircles = [];
+    let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
 
     // Setup canvas
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    // Particle class for fluid effect
+    class Particle {
+      constructor(x, y, vx, vy) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.life = 1;
+        this.size = Math.random() * 40 + 60;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.95; // Friction
+        this.vy *= 0.95;
+        this.life -= 0.015;
+        this.size *= 0.98;
+      }
+
+      draw(ctx) {
+        const gradient = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, this.size
+        );
+        gradient.addColorStop(0, `rgba(138, 43, 226, ${this.life * 0.8})`);
+        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${this.life * 0.4})`);
+        gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // Mouse tracking
     const handleMove = (e) => {
+      mouse.lastX = mouse.x;
+      mouse.lastY = mouse.y;
       mouse.x = e.clientX;
       mouse.y = e.clientY;
 
-      // Add circle to revealed areas
-      revealedCircles.push({ x: mouse.x, y: mouse.y, r: 90 });
+      // Calculate mouse velocity
+      const vx = (mouse.x - mouse.lastX) * 0.5;
+      const vy = (mouse.y - mouse.lastY) * 0.5;
 
-      // Keep only last 50 circles for performance
-      if (revealedCircles.length > 50) {
+      // Spawn particles based on movement
+      const speed = Math.sqrt(vx * vx + vy * vy);
+      if (speed > 1) {
+        for (let i = 0; i < Math.min(3, Math.floor(speed / 2)); i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = Math.random() * 2;
+          particles.push(new Particle(
+            mouse.x,
+            mouse.y,
+            Math.cos(angle) * velocity + vx * 0.1,
+            Math.sin(angle) * velocity + vy * 0.1
+          ));
+        }
+      }
+
+      // Add to revealed areas for masking
+      revealedCircles.push({ x: mouse.x, y: mouse.y, r: 100 });
+      if (revealedCircles.length > 100) {
         revealedCircles.shift();
       }
     };
 
     // Animation loop
-    const draw = () => {
+    const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw simple purple blob
-      const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100);
-      gradient.addColorStop(0, 'rgba(138, 43, 226, 0.8)');
-      gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
+      // Update and draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw(ctx);
 
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(mouse.x, mouse.y, 100, 0, Math.PI * 2);
-      ctx.fill();
+        if (particles[i].life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
 
-      // Update mask to hide logo where blob has been
+      // Update mask
       if (revealedCircles.length > 0) {
         const circles = revealedCircles.map(c =>
           `circle(${c.r}px at ${c.x}px ${c.y}px)`
@@ -160,15 +216,15 @@ export const HeroSection = forwardRef((props, ref) => {
         mask.style.maskComposite = 'exclude';
       }
 
-      requestAnimationFrame(draw);
+      requestAnimationFrame(animate);
     };
 
     window.addEventListener('mousemove', handleMove);
-    const handle = requestAnimationFrame(draw);
+    const raf = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMove);
-      cancelAnimationFrame(handle);
+      cancelAnimationFrame(raf);
     };
   }, []);
 
