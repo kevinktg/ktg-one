@@ -129,7 +129,7 @@ export const HeroSection = forwardRef((props, ref) => {
         this.vx = vx;
         this.vy = vy;
         this.life = 1;
-        this.size = Math.random() * 40 + 60;
+        this.size = Math.random() * 60 + 80; // Bigger particles
       }
 
       update() {
@@ -146,8 +146,9 @@ export const HeroSection = forwardRef((props, ref) => {
           this.x, this.y, 0,
           this.x, this.y, this.size
         );
-        gradient.addColorStop(0, `rgba(138, 43, 226, ${this.life * 0.8})`);
-        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${this.life * 0.4})`);
+        // Brighter, more visible purple particles
+        gradient.addColorStop(0, `rgba(138, 43, 226, ${this.life})`);
+        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${this.life * 0.6})`);
         gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
 
         ctx.fillStyle = gradient;
@@ -171,7 +172,8 @@ export const HeroSection = forwardRef((props, ref) => {
       // Spawn particles based on movement
       const speed = Math.sqrt(vx * vx + vy * vy);
       if (speed > 1) {
-        for (let i = 0; i < Math.min(3, Math.floor(speed / 2)); i++) {
+        const spawnCount = Math.min(3, Math.floor(speed / 2));
+        for (let i = 0; i < spawnCount; i++) {
           const angle = Math.random() * Math.PI * 2;
           const velocity = Math.random() * 2;
           particles.push(new Particle(
@@ -259,7 +261,7 @@ export const HeroSection = forwardRef((props, ref) => {
           alt="ktg logo"
           width={800}
           height={800}
-          className="w-auto h-[80vh] object-contain"
+          className="w-auto h-screen object-contain"
           priority
         />
       </div>
