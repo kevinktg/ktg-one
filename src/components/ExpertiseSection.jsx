@@ -48,7 +48,7 @@ export function ExpertiseSection({ expertiseData }) {
     gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top bottom",
+        start: "top top", // Pin when top hits top of viewport
         end: "+=100%", // Pin for full scroll range
         pin: true,
         scrub: 1,
@@ -65,8 +65,8 @@ export function ExpertiseSection({ expertiseData }) {
       transformOrigin: "top",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top bottom",
-        end: "top center", // Complete reveal by center
+        start: "top top", // Start when section hits top
+        end: "+=50%", // Complete reveal over 50% scroll
         scrub: 1.5, // Smoother scrub
       }
     });
@@ -75,8 +75,7 @@ export function ExpertiseSection({ expertiseData }) {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top center", // Start when centered (after shutter)
-        end: "top top", // End when fully visible
+        start: "top top+=20%", // Start shortly after pin begins
         toggleActions: "play none none reverse"
       }
     });
