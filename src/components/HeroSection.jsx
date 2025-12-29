@@ -106,7 +106,7 @@ export const HeroSection = forwardRef((props, ref) => {
 
   }, { scope: heroRef });
 
-  // FLUID SPLASH CURSOR WITH PARTICLES
+  // FLUID SPLASH CURSOR WITH PARTICLES (LIGHTWEIGHT)
   useEffect(() => {
     const canvas = canvasRef.current;
     const mask = maskRef.current;
@@ -114,21 +114,12 @@ export const HeroSection = forwardRef((props, ref) => {
 
     const ctx = canvas.getContext('2d');
     const particles = [];
+    const revealedAreas = []; // Track mouse path for simple masking
     let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
 
     // Setup canvas
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    // Create mask canvas for logo reveal
-    const maskCanvas = document.createElement('canvas');
-    maskCanvas.width = window.innerWidth;
-    maskCanvas.height = window.innerHeight;
-    const maskCtx = maskCanvas.getContext('2d');
-
-    // Start with logo fully visible (white mask)
-    maskCtx.fillStyle = 'white';
-    maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     // Particle class for fluid effect
     class Particle {
@@ -138,29 +129,21 @@ export const HeroSection = forwardRef((props, ref) => {
         this.vx = vx;
         this.vy = vy;
         this.life = 1;
-        this.size = Math.random() * 60 + 80; // Bigger particles
+        this.size = Math.random() * 40 + 50; // Smaller particles for performance
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
-        this.vx *= 0.95; // Friction
-        this.vy *= 0.95;
-        this.life -= 0.015;
-        this.size *= 0.98;
+        this.vx *= 0.96; // Faster decay
+        this.vy *= 0.96;
+        this.life -= 0.025; // Faster fadeout
+        this.size *= 0.97;
       }
 
       draw(ctx) {
-        const gradient = ctx.createRadialGradient(
-          this.x, this.y, 0,
-          this.x, this.y, this.size
-        );
-        // Brighter, more visible purple particles
-        gradient.addColorStop(0, `rgba(138, 43, 226, ${this.life})`);
-        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${this.life * 0.6})`);
-        gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
-
-        ctx.fillStyle = gradient;
+        // Simpler rendering - single fill, no gradient
+        ctx.fillStyle = `rgba(138, 43, 226, ${this.life * 0.5})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -178,37 +161,34 @@ export const HeroSection = forwardRef((props, ref) => {
       const vx = (mouse.x - mouse.lastX) * 0.5;
       const vy = (mouse.y - mouse.lastY) * 0.5;
 
-      // Spawn particles based on movement
+      // Reduced particle spawning for performance
       const speed = Math.sqrt(vx * vx + vy * vy);
-      if (speed > 1) {
-        const spawnCount = Math.min(3, Math.floor(speed / 2));
+      if (speed > 2 && particles.length < 30) { // Cap at 30 particles
+        const spawnCount = Math.min(2, Math.floor(speed / 4));
         for (let i = 0; i < spawnCount; i++) {
           const angle = Math.random() * Math.PI * 2;
-          const velocity = Math.random() * 2;
+          const velocity = Math.random() * 1.5;
           particles.push(new Particle(
             mouse.x,
             mouse.y,
-            Math.cos(angle) * velocity + vx * 0.1,
-            Math.sin(angle) * velocity + vy * 0.1
+            Math.cos(angle) * velocity + vx * 0.08,
+            Math.sin(angle) * velocity + vy * 0.08
           ));
         }
       }
 
-      // Paint black circle on mask to hide logo where cursor moves
-      maskCtx.globalCompositeOperation = 'destination-out';
-      maskCtx.fillStyle = 'black';
-      maskCtx.beginPath();
-      maskCtx.arc(mouse.x, mouse.y, 120, 0, Math.PI * 2);
-      maskCtx.fill();
-      maskCtx.globalCompositeOperation = 'source-over';
+      // Lightweight masking - just track positions, limit array size
+      revealedAreas.push({ x: mouse.x, y: mouse.y });
+      if (revealedAreas.length > 50) {
+        revealedAreas.shift();
+      }
     };
 
     // Animation loop
-    let frameCount = 0;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw particles
+      // Update and draw particles (lightweight)
       for (let i = particles.length - 1; i >= 0; i--) {
         particles[i].update();
         particles[i].draw(ctx);
@@ -218,15 +198,17 @@ export const HeroSection = forwardRef((props, ref) => {
         }
       }
 
-      // Apply mask to logo layer - only update every 2 frames for performance
-      if (frameCount % 2 === 0) {
-        const maskData = maskCanvas.toDataURL();
-        mask.style.webkitMaskImage = `url(${maskData})`;
-        mask.style.maskImage = `url(${maskData})`;
-        mask.style.webkitMaskSize = '100% 100%';
-        mask.style.maskSize = '100% 100%';
+      // Lightweight CSS masking - only create circles from recent mouse positions
+      if (revealedAreas.length > 0) {
+        const circles = revealedAreas.map(pos =>
+          `circle(100px at ${pos.x}px ${pos.y}px)`
+        ).join(', ');
+
+        mask.style.webkitMaskImage = circles;
+        mask.style.maskImage = circles;
+        mask.style.webkitMaskComposite = 'xor';
+        mask.style.maskComposite = 'exclude';
       }
-      frameCount++;
 
       requestAnimationFrame(animate);
     };
