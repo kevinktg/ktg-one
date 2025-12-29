@@ -114,12 +114,21 @@ export const HeroSection = forwardRef((props, ref) => {
 
     const ctx = canvas.getContext('2d');
     const particles = [];
-    const revealedCircles = [];
     let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
 
     // Setup canvas
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    // Create mask canvas for logo reveal
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = window.innerWidth;
+    maskCanvas.height = window.innerHeight;
+    const maskCtx = maskCanvas.getContext('2d');
+
+    // Start with logo fully visible (white mask)
+    maskCtx.fillStyle = 'white';
+    maskCtx.fillRect(0, 0, maskCanvas.width, maskCanvas.height);
 
     // Particle class for fluid effect
     class Particle {
@@ -185,14 +194,17 @@ export const HeroSection = forwardRef((props, ref) => {
         }
       }
 
-      // Add to revealed areas for masking
-      revealedCircles.push({ x: mouse.x, y: mouse.y, r: 100 });
-      if (revealedCircles.length > 100) {
-        revealedCircles.shift();
-      }
+      // Paint black circle on mask to hide logo where cursor moves
+      maskCtx.globalCompositeOperation = 'destination-out';
+      maskCtx.fillStyle = 'black';
+      maskCtx.beginPath();
+      maskCtx.arc(mouse.x, mouse.y, 120, 0, Math.PI * 2);
+      maskCtx.fill();
+      maskCtx.globalCompositeOperation = 'source-over';
     };
 
     // Animation loop
+    let frameCount = 0;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -206,17 +218,15 @@ export const HeroSection = forwardRef((props, ref) => {
         }
       }
 
-      // Update mask
-      if (revealedCircles.length > 0) {
-        const circles = revealedCircles.map(c =>
-          `circle(${c.r}px at ${c.x}px ${c.y}px)`
-        ).join(', ');
-
-        mask.style.webkitMaskImage = circles;
-        mask.style.maskImage = circles;
-        mask.style.webkitMaskComposite = 'xor';
-        mask.style.maskComposite = 'exclude';
+      // Apply mask to logo layer - only update every 2 frames for performance
+      if (frameCount % 2 === 0) {
+        const maskData = maskCanvas.toDataURL();
+        mask.style.webkitMaskImage = `url(${maskData})`;
+        mask.style.maskImage = `url(${maskData})`;
+        mask.style.webkitMaskSize = '100% 100%';
+        mask.style.maskSize = '100% 100%';
       }
+      frameCount++;
 
       requestAnimationFrame(animate);
     };
