@@ -180,23 +180,19 @@ export const HeroSection = forwardRef((props, ref) => {
 
     // Apply clip-path masking
     const updateMask = () => {
-      // Build SVG path from revealed areas
+      // Simple approach: build path of circles to exclude
+      if (revealedAreas.length === 0) return;
+
+      // Create a path that excludes revealed circles
       const circles = revealedAreas.map(area =>
         `circle(${area.radius}px at ${area.x}px ${area.y}px)`
       ).join(', ');
 
-      if (circles) {
-        // Invert: show logo everywhere EXCEPT revealed areas
-        mask.style.clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 100%)`;
-        mask.style.webkitClipPath = `polygon(0 0, 100% 0, 100% 100%, 0 100%)`;
-
-        // Use mask composite for punch-out effect
-        const maskImage = circles ? `radial-gradient(circle, transparent ${BLOB_SIZE}px, black ${BLOB_SIZE}px)` : 'none';
-        mask.style.maskImage = circles;
-        mask.style.webkitMaskImage = circles;
-        mask.style.maskComposite = 'exclude';
-        mask.style.webkitMaskComposite = 'source-out';
-      }
+      // Apply mask to hide logo where blob has been
+      mask.style.webkitMaskImage = circles;
+      mask.style.maskImage = circles;
+      mask.style.webkitMaskComposite = 'xor';
+      mask.style.maskComposite = 'exclude';
     };
 
     // Animation loop
@@ -326,8 +322,8 @@ export const HeroSection = forwardRef((props, ref) => {
       {/* Layer 3.5: Blob Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 z-35 pointer-events-none"
-        style={{ mixBlendMode: 'screen' }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 35 }}
       />
 
       {/* Layer 4: Text content (keep existing) */}
