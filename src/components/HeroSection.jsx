@@ -51,11 +51,6 @@ export const HeroSection = forwardRef((props, ref) => {
 
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Cleanup
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-
     // 2. ENTRANCE ANIMATION
     const tl = gsap.timeline();
 
@@ -104,6 +99,11 @@ export const HeroSection = forwardRef((props, ref) => {
       ease: "power1.inOut"
     });
 
+    // Cleanup - MUST be at end, not in middle!
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+
   }, { scope: heroRef });
 
   // FLUID SPLASH CURSOR WITH PARTICLES
@@ -113,13 +113,20 @@ export const HeroSection = forwardRef((props, ref) => {
     if (!canvas || !mask) return;
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     const particles = [];
     const revealedCircles = [];
     let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
+    let animationId = null;
+    let isActive = true;
 
-    // Setup canvas
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Setup canvas dimensions
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
 
     // Particle class for fluid effect
     class Particle {
@@ -142,6 +149,7 @@ export const HeroSection = forwardRef((props, ref) => {
       }
 
       draw(ctx) {
+        if (this.size <= 0) return;
         const gradient = ctx.createRadialGradient(
           this.x, this.y, 0,
           this.x, this.y, this.size
@@ -185,15 +193,17 @@ export const HeroSection = forwardRef((props, ref) => {
         }
       }
 
-      // Add to revealed areas for masking
+      // Add to revealed areas for masking (limit array size for memory)
       revealedCircles.push({ x: mouse.x, y: mouse.y, r: 100 });
       if (revealedCircles.length > 100) {
         revealedCircles.shift();
       }
     };
 
-    // Animation loop
+    // Animation loop with proper tracking
     const animate = () => {
+      if (!isActive) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw particles
@@ -204,6 +214,11 @@ export const HeroSection = forwardRef((props, ref) => {
         if (particles[i].life <= 0) {
           particles.splice(i, 1);
         }
+      }
+
+      // Limit particle count to prevent memory issues
+      while (particles.length > 200) {
+        particles.shift();
       }
 
       // Update mask
@@ -218,15 +233,23 @@ export const HeroSection = forwardRef((props, ref) => {
         mask.style.maskComposite = 'exclude';
       }
 
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
     };
 
     window.addEventListener('mousemove', handleMove);
-    const raf = requestAnimationFrame(animate);
+    window.addEventListener('resize', resizeCanvas);
+    animationId = requestAnimationFrame(animate);
 
     return () => {
+      isActive = false;
       window.removeEventListener('mousemove', handleMove);
-      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      // Clear particles array
+      particles.length = 0;
+      revealedCircles.length = 0;
     };
   }, []);
 

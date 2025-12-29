@@ -97,9 +97,11 @@ export function BlogPreview({ posts }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {posts.slice(0, 6).map((post) => {
             const featuredImage = getFeaturedImage(post);
-            const excerpt = post.excerpt.rendered
+            const rawExcerpt = post.excerpt?.rendered || '';
+            const excerpt = rawExcerpt
               .replace(/<[^>]*>/g, "")
-              .substring(0, 120) + "...";
+              .substring(0, 120) + (rawExcerpt.length > 120 ? "..." : "");
+            const postTitle = post.title?.rendered || post.title || 'Untitled';
 
             return (
               <Link
@@ -112,7 +114,7 @@ export function BlogPreview({ posts }) {
                     <div className="mb-6 overflow-hidden rounded-lg" style={{ aspectRatio: "2/1", contain: "layout paint" }}>
                       <Image
                         src={featuredImage}
-                        alt={post.title?.rendered || post.title || 'Blog post'}
+                        alt={postTitle}
                         width={800}
                         height={400}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -124,7 +126,7 @@ export function BlogPreview({ posts }) {
                       {formatDate(post.date)}
                     </div>
                     <h3 className="font-syne text-2xl font-bold mb-3 lowercase group-hover:text-white/80 transition-colors line-clamp-2">
-                      {post.title.rendered}
+                      {postTitle}
                     </h3>
                     <p className="text-white/60 text-sm line-clamp-3 mb-4">
                       {excerpt}

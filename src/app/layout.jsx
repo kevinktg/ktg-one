@@ -4,10 +4,12 @@ import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 
 // OPTIMIZATION: Use 'swap' to ensure branding fonts load even on slower connections.
+// fallback ensures graceful degradation if Google Fonts fails
 const syne = Syne({
   subsets: ["latin"],
   variable: "--font-syne",
   display: "swap",
+  fallback: ["system-ui", "Arial", "sans-serif"],
 });
 
 const ubuntuMono = Ubuntu_Mono({
@@ -15,6 +17,7 @@ const ubuntuMono = Ubuntu_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
 });
 
 export const metadata = {

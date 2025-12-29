@@ -1,15 +1,36 @@
 // WordPress REST API client
 const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com';
+const REQUEST_TIMEOUT = 10000; // 10 second timeout
+
+// Helper: fetch with timeout
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 // Test WordPress connection
 export async function testWordPressConnection() {
   try {
-    const response = await fetch(`${WORDPRESS_URL}/wp-json/wp/v2`, {
+    const response = await fetchWithTimeout(`${WORDPRESS_URL}/wp-json/wp/v2`, {
       cache: 'no-store',
     });
     return response.ok;
   } catch (error) {
-    console.error('WordPress connection test failed:', error);
+    if (error.name === 'AbortError') {
+      console.error('WordPress connection test timed out');
+    } else {
+      console.error('WordPress connection test failed:', error);
+    }
     return false;
   }
 }
@@ -18,8 +39,8 @@ export async function testWordPressConnection() {
 export async function getPosts(page = 1, perPage = 10) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
-    
-    const response = await fetch(url, {
+
+    const response = await fetchWithTimeout(url, {
       cache: 'no-store', // No caching - always fresh (Next.js 16 compatible)
       headers: {
         'User-Agent': 'Next.js WordPress Client',
@@ -33,11 +54,11 @@ export async function getPosts(page = 1, perPage = 10) {
       console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
       console.error(`URL: ${url}`);
       console.error(`Response: ${errorText.substring(0, 200)}`);
-      
+
       // Try without _embed if 403
       if (response.status === 403) {
         console.warn('Attempting fetch without _embed parameter...');
-        const fallbackResponse = await fetch(
+        const fallbackResponse = await fetchWithTimeout(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
           {
             cache: 'no-store',
@@ -48,12 +69,12 @@ export async function getPosts(page = 1, perPage = 10) {
             },
           }
         );
-        
+
         if (fallbackResponse.ok) {
           return await fallbackResponse.json();
         }
       }
-      
+
       return [];
     }
 
@@ -61,10 +82,13 @@ export async function getPosts(page = 1, perPage = 10) {
     console.log(`Successfully fetched ${data.length} posts from WordPress`);
     return data;
   } catch (error) {
-    console.error('Error fetching WordPress posts:', error);
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
+    if (error.name === 'AbortError') {
+      console.error('WordPress API request timed out');
+    } else {
+      console.error('Error fetching WordPress posts:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
     }
     return [];
   }
@@ -73,9 +97,9 @@ export async function getPosts(page = 1, perPage = 10) {
 // Fetch a single post by slug
 export async function getPostBySlug(slug) {
   try {
-    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
-    
-    const response = await fetch(url, {
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`;
+
+    const response = await fetchWithTimeout(url, {
       cache: 'no-store',
       headers: {
         'User-Agent': 'Next.js WordPress Client',
@@ -89,12 +113,12 @@ export async function getPostBySlug(slug) {
       console.error(`WordPress API error: ${response.status} - ${response.statusText}`);
       console.error(`URL: ${url}`);
       console.error(`Response: ${errorText.substring(0, 200)}`);
-      
+
       // Try without _embed if 403
       if (response.status === 403) {
         console.warn('Attempting fetch without _embed parameter...');
-        const fallbackResponse = await fetch(
-          `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
+        const fallbackResponse = await fetchWithTimeout(
+          `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`,
           {
             cache: 'no-store',
             headers: {
@@ -104,22 +128,26 @@ export async function getPostBySlug(slug) {
             },
           }
         );
-        
+
         if (fallbackResponse.ok) {
           const posts = await fallbackResponse.json();
           return posts.length > 0 ? posts[0] : null;
         }
       }
-      
+
       return null;
     }
 
     const posts = await response.json();
     return posts.length > 0 ? posts[0] : null;
   } catch (error) {
-    console.error('Error fetching WordPress post:', error);
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
+    if (error.name === 'AbortError') {
+      console.error('WordPress API request timed out');
+    } else {
+      console.error('Error fetching WordPress post:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+      }
     }
     return null;
   }
