@@ -115,11 +115,23 @@ export const HeroSection = forwardRef((props, ref) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Performance: Detect mobile/low-power devices
+    const isMobile = window.innerWidth < 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Skip particle animation entirely for reduced motion preference
+    if (prefersReducedMotion) return;
+
     const particles = [];
     const revealedCircles = [];
     let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
     let animationId = null;
     let isActive = true;
+
+    // Performance settings based on device
+    const maxParticles = isMobile ? 50 : 200;
+    const maxCircles = isMobile ? 50 : 100;
+    const particleSize = isMobile ? 40 : 80;
 
     // Setup canvas dimensions
     const resizeCanvas = () => {
@@ -136,7 +148,7 @@ export const HeroSection = forwardRef((props, ref) => {
         this.vx = vx;
         this.vy = vy;
         this.life = 1;
-        this.size = Math.random() * 60 + 80; // Bigger particles
+        this.size = Math.random() * 60 + particleSize;
       }
 
       update() {
@@ -195,7 +207,7 @@ export const HeroSection = forwardRef((props, ref) => {
 
       // Add to revealed areas for masking (limit array size for memory)
       revealedCircles.push({ x: mouse.x, y: mouse.y, r: 100 });
-      if (revealedCircles.length > 100) {
+      if (revealedCircles.length > maxCircles) {
         revealedCircles.shift();
       }
     };
@@ -217,7 +229,7 @@ export const HeroSection = forwardRef((props, ref) => {
       }
 
       // Limit particle count to prevent memory issues
-      while (particles.length > 200) {
+      while (particles.length > maxParticles) {
         particles.shift();
       }
 

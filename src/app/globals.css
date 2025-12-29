@@ -89,6 +89,42 @@
     backface-visibility: hidden;
   }
 
+  /* Performance: Content Visibility for off-screen sections */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 100vh;
+  }
+
+  /* Performance: Reduce paint complexity */
+  .contain-paint {
+    contain: paint;
+  }
+
+  .contain-layout {
+    contain: layout;
+  }
+
+  .contain-strict {
+    contain: strict;
+  }
+
+  /* Performance: Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Performance: Hardware acceleration for animated elements */
+  .gpu-accelerate {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
   /* Custom Scrollbar for Audit Section */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;

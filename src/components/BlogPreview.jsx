@@ -57,7 +57,7 @@ export function BlogPreview({ posts }) {
   if (posts.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden" style={{ contain: "layout paint" }}>
+    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden content-visibility-auto" style={{ contain: "layout paint" }}>
       {/* Geometric Background */}
       <div className="absolute inset-0 pointer-events-none z-0" style={{ contain: "strict layout paint" }}>
         {/* Grid pattern overlay */}
