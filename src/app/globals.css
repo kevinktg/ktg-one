@@ -131,4 +131,48 @@
   .transform-style-3d {
     transform-style: preserve-3d;
   }
+
+  /* Cyberpunk Background (Hero Reveal Layer) */
+  .cyberpunk-background {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center,
+      #1a1a2e 0%,
+      #0a0a0f 100%
+    );
+    background-image:
+      linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .cyberpunk-background::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(
+      circle,
+      rgba(138, 43, 226, 0.3) 0%,
+      transparent 70%
+    );
+    filter: blur(60px);
+    z-index: -1;
+  }
+
+  .avatar-revealed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    max-width: 90vw;
+    height: auto;
+    filter: drop-shadow(0 0 40px rgba(138, 43, 226, 0.6));
+    z-index: 10;
+  }
 }
