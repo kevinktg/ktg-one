@@ -44,7 +44,7 @@ export function ExpertiseSection({ expertiseData }) {
 
   useGSAP(() => {
     // 1. SHUTTER REVEAL
-    // Uses scaleY for high-performance animation
+    // Uses scaleY for high-performance animation - slower transition
     gsap.to(shutterRef.current?.children, {
       scaleY: 0,
       duration: 1.5,
@@ -54,8 +54,8 @@ export function ExpertiseSection({ expertiseData }) {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top bottom",
-        end: "top 20%",
-        scrub: 1,
+        end: "top 40%", // Slower reveal (was 20%)
+        scrub: 1.5, // Smoother scrub
       }
     });
 
@@ -63,14 +63,14 @@ export function ExpertiseSection({ expertiseData }) {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 60%",
-        end: "top 20%",
+        start: "top 70%", // Later start (was 60%)
+        end: "top 30%", // Later end (was 20%)
         toggleActions: "play none none reverse"
       }
     });
 
-    tl.from(".expertise-title", { y: 50, opacity: 0, duration: 1, ease: "power4.out" })
-      .from(".expertise-group", { y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" }, "-=0.5");
+    tl.from(".expertise-title", { y: 50, opacity: 0, duration: 1.2, ease: "power4.out" })
+      .from(".expertise-group", { y: 40, opacity: 0, duration: 1, stagger: 0.15, ease: "power2.out" }, "-=0.6");
 
     // 3. COUNTERS
     const stats = gsap.utils.toArray(".stat-counter");

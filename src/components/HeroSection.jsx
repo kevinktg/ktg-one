@@ -87,21 +87,21 @@ export const HeroSection = forwardRef((props, ref) => {
     }
 
     // 3. SCROLL TRANSITION TO EXPERTISE SECTION
-    // Fade out later to let expertise shutter animation play out fully
+    // Slow fade to give time to read white expertise section
     const tl2 = gsap.timeline({
       scrollTrigger: {
         trigger: heroRef.current,
-        start: "top 10%",
-        end: "bottom 10%", // Fade out over last 90% of hero section
+        start: "top top",
+        end: "bottom+=100% top", // Extended scroll range for slower fade
         scrub: true,
       }
     });
 
     tl2.to(heroRef.current, {
       opacity: 0,
-      scale: 1.2,
-      y: -60,
-      ease: "power2.inOut"
+      scale: 1.1,
+      y: -100,
+      ease: "power1.inOut"
     });
 
   }, { scope: heroRef });
