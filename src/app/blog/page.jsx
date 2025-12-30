@@ -23,9 +23,8 @@ export const metadata = {
   },
 };
 
-// Force dynamic rendering to avoid build-time API failures
-export const dynamic = 'force-dynamic';
-export const revalidate = 0; // No caching - always fresh
+// Use ISR with 1 hour revalidation for performance
+export const revalidate = 3600; // Cache for 1 hour, then revalidate
 
 export default async function BlogPage() {
   let posts = [];

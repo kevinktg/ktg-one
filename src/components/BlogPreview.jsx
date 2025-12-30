@@ -32,25 +32,14 @@ export function BlogPreview({ posts }) {
       });
     }
 
-    // Animate blog cards
-    const cards = gsap.utils.toArray(
-      sectionRef.current?.querySelectorAll(".blog-card") || []
-    );
-
-    cards.forEach((card, index) => {
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top 85%",
-          end: "top 60%",
-          scrub: 1,
-        },
-        opacity: 0,
-        y: 60,
-        duration: 1,
-        delay: index * 0.1,
-        ease: "power2.out",
-      });
+    // Animate blog cards - Batched for performance
+    ScrollTrigger.batch(".blog-card", {
+      start: "top 85%",
+      onEnter: batch => gsap.fromTo(batch,
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.1 }
+      ),
+      onLeaveBack: batch => gsap.to(batch, { opacity: 0, y: 60, duration: 0.4 })
     });
   }, { scope: sectionRef });
 
@@ -115,6 +104,7 @@ export function BlogPreview({ posts }) {
                         alt={post.title?.rendered || post.title || 'Blog post'}
                         width={800}
                         height={400}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>

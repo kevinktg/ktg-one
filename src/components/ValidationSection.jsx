@@ -89,22 +89,16 @@ export function ValidationSection({ auditData }) {
       duration: 5 // Relative duration (5x longer than the swoop)
     });
 
-    // 3. TEXT REVEAL ANIMATIONS
-    // These trigger based on the horizontal scroll position
-    gsap.utils.toArray(".digital-text").forEach((text) => {
-        gsap.from(text, {
-            opacity: 0,
-            x: 50,
-            duration: 0.8,
-            ease: "power2.out",
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: text,
-                containerAnimation: scrollTween, // Link to the horizontal part of the timeline
-                start: "left 90%",
-                toggleActions: "play none none reverse"
-            }
-        });
+    // 3. TEXT REVEAL ANIMATIONS - Batched for performance
+    // Using batch instead of individual ScrollTriggers for less overhead
+    ScrollTrigger.batch(".digital-text", {
+        containerAnimation: scrollTween,
+        start: "left 90%",
+        onEnter: batch => gsap.fromTo(batch,
+            { opacity: 0, x: 50 },
+            { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", stagger: 0.08 }
+        ),
+        onLeaveBack: batch => gsap.to(batch, { opacity: 0, x: 50, duration: 0.4 })
     });
 
   }, { scope: sectionRef });

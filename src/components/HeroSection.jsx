@@ -107,15 +107,27 @@ export const HeroSection = forwardRef((props, ref) => {
   }, { scope: heroRef });
 
   // FLUID SPLASH CURSOR WITH PARTICLES (LIGHTWEIGHT)
+  // DISABLED on mobile/touch devices for performance
   useEffect(() => {
     const canvas = canvasRef.current;
     const mask = maskRef.current;
     if (!canvas || !mask) return;
 
+    // Skip on mobile/touch devices - major performance win
+    const isMobile = window.matchMedia('(max-width: 768px)').matches ||
+                     window.matchMedia('(hover: none)').matches ||
+                     'ontouchstart' in window;
+    if (isMobile) {
+      // On mobile, just hide the mask layer to reveal content
+      mask.style.opacity = '0';
+      return;
+    }
+
     const ctx = canvas.getContext('2d');
     const particles = [];
     const revealedAreas = []; // Track mouse path for simple masking
     let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
+    let frameCount = 0; // For throttling mask updates
 
     // Setup canvas
     canvas.width = window.innerWidth;
@@ -198,8 +210,9 @@ export const HeroSection = forwardRef((props, ref) => {
         }
       }
 
-      // Lightweight CSS masking - only create circles from recent mouse positions
-      if (revealedAreas.length > 0) {
+      // Throttled CSS masking - update every 3 frames for performance
+      frameCount++;
+      if (revealedAreas.length > 0 && frameCount % 3 === 0) {
         const circles = revealedAreas.map(pos =>
           `circle(100px at ${pos.x}px ${pos.y}px)`
         ).join(', ');
@@ -234,7 +247,7 @@ export const HeroSection = forwardRef((props, ref) => {
           width={400}
           height={400}
           className="avatar-revealed"
-          priority
+          loading="lazy"
         />
       </div>
 
