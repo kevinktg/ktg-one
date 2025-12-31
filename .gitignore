@@ -1,133 +1,122 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# Dependencies
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
-# testing
-/coverage
+# Testing
+coverage/
+*.test.js.snap
 
-# next.js
-/.next/
-/out/
+# Next.js
+.next/
+out/
+.vercel/
+next-env.d.ts
+*.tsbuildinfo
 
-# production
-/build
+# Production builds
+build/
+dist/
 
-# misc
-.DS_Store
-*.pem
+# Environment variables
+.env
+.env*.local
+.env.production
 
-# debug
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+build_log.txt
 
-# local env files
-.env*.local
-.env
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDE
+# IDE and editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
-Thumbs.db
-.DS_Store
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # Temporary files
 *.tmp
 *.temp
-*.log
-
-# Build artifacts
-dist/
+*.cache
 .cache/
 
-# Story files (Make.com workflow files)
-*.make
-
-# Old/unused directories (only top-level)
-/components/
-/styles/
-
-
-# In Memoria
-in-memoria.db
-.in-memoria/cache/
-.in-memoria/.env
-
-# Claude Flow generated files
-.claude/settings.local.json
-.mcp.json
-claude-flow.config.json
-.swarm/
-.hive-mind/
-.claude-flow/
-memory/
-coordination/
-memory/claude-flow-data.json
-memory/sessions/*
-!memory/sessions/README.md
-memory/agents/*
-!memory/agents/README.md
-coordination/memory_bank/*
-coordination/subtasks/*
-coordination/orchestration/*
-*.db
-*.db-journal
-*.db-wal
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-claude-flow
-# Removed Windows wrapper files per user request
-hive-mind-prompt-*.txt
-
-# OpenMemory - IDE/Assistant specific rules
-.cursor\rules\openmemory.mdc
-CLAUDE.md
-
-# Screenshot and recording folders
-capsule-screenshots/
-capsule-scroll-record/
-screenshots/
-
-# Build logs
-build_log.txt
-
-# Database folders
-in-memoria-vectors.db/
-ktg-one/
-
-# IDE config files
-claude_desktop_config.json
-claude-flow.cmd
-.agent/
-.claude/
-.cursor/
-
-# Development scripts and tools
+# Development tools and scripts
 record-scroll.js
 record-with-screenshots.js
 scripts/
-.cursor\rules\openmemory.mdc
-CLAUDE.md
+context.json
+project_index.json
+claude-flow.cmd
+claude_desktop_config.json
+*.make
 
-# Auto Claude data directory
+# Database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+in-memoria.db
+in-memoria-vectors.db/
+
+# Memory and coordination (AI/Claude specific)
+memory/
+coordination/
+.mcp.json
+claude-flow.config.json
+.claude/
+.agent/
 .auto-claude/
-.cursor\rules\openmemory.mdc
-CLAUDE.md
+.swarm/
+.hive-mind/
+.claude-flow/
+.auto-claude/
+
+# Cursor/Claude IDE specific
+.cursor/
+.cursor/rules/
+openmemory.md
 AGENTS.md
+CLAUDE.md
+KTG_MEMORY_v3.md
+
+# Screenshots and recordings
+screenshots/
+capsule-screenshots/
+capsule-scroll-record/
+
+# Old/unused directories
+components/  # Root level components (using src/components instead)
+styles/      # Using src/app/globals.css instead
+
+# In Memoria
+.in-memoria/
+.in-memoria/cache/
+.in-memoria/.env
+
+# Package manager locks (keep package-lock.json, ignore others if switching)
+# yarn.lock
+# pnpm-lock.yaml
