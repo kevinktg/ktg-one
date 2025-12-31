@@ -3,9 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef, forwardRef } from "react";
-import { Hero3DScene } from "@/components/Hero3DScene";
 import { HeroImages } from "@/components/HeroImages";
-// import { BlobCursorMask } from "@/components/BlobCursorMask";
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
@@ -45,24 +43,30 @@ export const HeroSection = forwardRef((props, ref) => {
   }, { scope: heroRef });
 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-background">
+    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20" suppressHydrationWarning>
 
-      {/* Layer 0: Hero Images with Blob Reveal */}
+      {/* Layer 0: Pulsing Background - Your original design */}
+      <div className="absolute inset-0 z-0 bg-black">
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)]" style={{ backgroundSize: '14px 24px' }}></div>
+        {/* Pulsing radial gradient */}
+        <div className="absolute left-1/2 top-[-10%] -translate-x-1/2 h-[1000px] w-[1000px] rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,#fbfbfb36,#000)]"></div>
+      </div>
+      
+      {/* Layer 1: Hero Images with Blob Reveal - Landon Norris Effect */}
       <HeroImages 
         topImage="/assets/top-hero.webp"
         bottomImage="/assets/btm-hero.webp"
       />
-      
-      {/* Layer 0: 3D Background Scene */}
-      {/* <Hero3DScene variant="network" /> */}
-      
-      {/* Blob Cursor Mask Effect - Uncomment to enable */}
-      {/* <BlobCursorMask /> */}
 
-      {/* Layer 1: Clean background - Behind images */}
-      <div className="absolute inset-0 z-0 bg-background">
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[20px_20px] opacity-30"></div>
+      {/* Center Content - Visible Title/Content */}
+      <div className="relative z-30 text-center pointer-events-none">
+        <h1 className="font-syne text-7xl md:text-9xl font-bold mb-6 lowercase text-foreground opacity-90">
+          ktg
+        </h1>
+        <p className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">
+          Top 0.01% Prompt Engineer
+        </p>
       </div>
 
       {/* Scrolling word banner at bottom */}
@@ -98,3 +102,4 @@ export const HeroSection = forwardRef((props, ref) => {
 });
 
 HeroSection.displayName = "HeroSection";
+

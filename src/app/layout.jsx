@@ -59,8 +59,8 @@ export default function RootLayout({ children }) {
           ${syne.variable}
           ${inter.variable}
           antialiased
-          bg-black
-          text-white
+          bg-background
+          text-foreground
           overflow-x-hidden
           selection:bg-white
           selection:text-black

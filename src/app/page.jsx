@@ -39,13 +39,13 @@ export default async function Home() {
   // but this is where you would pass "heroData", "expertiseData", etc.
 
   return (
-    <div className="bg-background min-h-screen flex flex-col">
+    <div className="bg-background min-h-screen flex flex-col" suppressHydrationWarning>
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}
       <Header />
 
-      <main className="flex-grow">
+      <main className="flex-grow" suppressHydrationWarning>
 
         {/* HERO: Black Background */}
         <HeroSection />
