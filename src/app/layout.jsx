@@ -1,19 +1,19 @@
-import { Syne, Ubuntu_Mono } from "next/font/google";
+import { Syne, Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 
 // OPTIMIZATION: Use 'swap' to ensure branding fonts load even on slower connections.
 const syne = Syne({
+  weight: ["400", "700", "800"],
   subsets: ["latin"],
   variable: "--font-syne",
   display: "swap",
 });
 
-const ubuntuMono = Ubuntu_Mono({
-  weight: ["400", "700"],
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -57,7 +57,7 @@ export default function RootLayout({ children }) {
       <body
         className={`
           ${syne.variable}
-          ${ubuntuMono.variable}
+          ${inter.variable}
           antialiased
           bg-black
           text-white

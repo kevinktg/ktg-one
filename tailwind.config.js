@@ -49,7 +49,7 @@ module.exports = {
       },
       fontFamily: {
         syne: ["var(--font-syne)", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        inter: ["var(--font-inter)", "sans-serif"],
       },
     },
   },

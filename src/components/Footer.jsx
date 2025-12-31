@@ -19,11 +19,10 @@ export function Footer() {
       return;
     }
 
-    // Run immediately on mount
+    // Subtle fade in - Run once on mount
     gsap.from(footerRef.current, {
-      y: 20,
       opacity: 0,
-      duration: 0.8,
+      duration: 0.6,
       ease: "power2.out",
       onComplete: () => {
         sessionStorage.setItem('footer-animated', 'true');
@@ -32,78 +31,73 @@ export function Footer() {
   }, { scope: footerRef });
 
   return (
-    <footer ref={footerRef} className="relative py-10 px-6 border-t border-white/10 bg-black text-white overflow-hidden z-50">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-12">
+    <footer ref={footerRef} className="relative py-12 md:py-16 px-6 md:px-8 border-t border-border bg-background overflow-hidden z-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between gap-12 md:gap-16">
+          
+          {/* LEFT SIDE: Brand & Socials */}
+          <div className="flex-1">
+            <div className="mb-6">
+              <h3 className="font-syne text-sm font-bold lowercase text-foreground mb-3">let's build something</h3>
+              <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
+                Context continuation. Framework development. Arxiv-ready research.
+              </p>
+            </div>
 
-        {/* LEFT SIDE: Brand & Socials */}
-        <div className="w-full md:w-auto">
-          <h3 className="text-2xl font-bold mb-2 lowercase font-syne">let's build something</h3>
-          <p className="text-white/50 text-sm mb-6 max-w-md font-mono">
-            Context continuation. Framework development. Arxiv-ready research.
-          </p>
+            {/* Social Links */}
+            <div className="flex gap-3 mb-8">
+              {[
+                { icon: Mail, label: "Email", href: "mailto:hello@ktg.one" },
+                { icon: Github, label: "GitHub", href: "https://github.com" },
+                { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
+                { icon: FileText, label: "Papers", href: "/papers" },
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors duration-200"
+                    aria-label={item.label}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </Link>
+                );
+              })}
+            </div>
 
-          {/* Compact Social Row */}
-          <div className="flex gap-3">
-            {[
-              { icon: Mail, label: "Email", href: "mailto:hello@ktg.one" },
-              { icon: Github, label: "GitHub", href: "https://github.com" },
-              { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
-              { icon: FileText, label: "Papers", href: "/papers" },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className="group relative w-10 h-10 flex items-center justify-center border border-white/20 hover:border-white transition-colors duration-300"
-                  aria-label={item.label}
-                >
-                  <Icon className="w-4 h-4 text-white/70 group-hover:text-white transition-colors" />
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 font-mono text-xs text-white/30 tracking-widest">
-            © 2025 • TOP 0.01% PROMPT ENGINEER
-          </div>
-        </div>
-
-        {/* RIGHT SIDE: Horizontal Links (Compressed) */}
-        <div className="w-full md:w-auto text-left md:text-right space-y-6">
-
-          {/* Navigation Row */}
-          <div className="space-y-2">
-            <div className="font-mono text-xs text-white/30 tracking-widest uppercase">Navigation</div>
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8 text-sm font-syne font-bold text-white/80">
-              <Link href="/" className="hover:text-white hover:underline decoration-white/30 underline-offset-4 transition-all">Home</Link>
-              <Link href="/blog" className="hover:text-white hover:underline decoration-white/30 underline-offset-4 transition-all">Blog</Link>
-              <Link href="/projects" className="hover:text-white hover:underline decoration-white/30 underline-offset-4 transition-all">System Audits</Link>
+            <div className="text-xs text-muted-foreground">
+              © 2025
             </div>
           </div>
 
-          {/* Specialties Row */}
-          <div className="space-y-2">
-            <div className="font-mono text-xs text-white/30 tracking-widest uppercase">Domain Expertise</div>
-            <div className="flex flex-wrap md:justify-end gap-x-6 gap-y-2 text-xs font-mono text-white/50">
-              <span>Prompt Engineering</span>
-              <span>•</span>
-              <span>Framework Design</span>
-              <span>•</span>
-              <span>Cognitive Architectures</span>
+          {/* RIGHT SIDE: Links */}
+          <div className="flex flex-col md:flex-row gap-12 md:gap-16">
+            
+            {/* Navigation */}
+            <div className="space-y-3">
+              <div className="font-syne text-xs font-bold lowercase text-muted-foreground">navigation</div>
+              <div className="flex flex-col gap-2">
+                <Link href="/" className="text-sm text-foreground/80 hover:text-foreground transition-colors duration-200">Home</Link>
+                <Link href="/blog" className="text-sm text-foreground/80 hover:text-foreground transition-colors duration-200">Blog</Link>
+                <Link href="/projects" className="text-sm text-foreground/80 hover:text-foreground transition-colors duration-200">Projects</Link>
+              </div>
             </div>
+
+            {/* Expertise */}
+            <div className="space-y-3">
+              <div className="font-syne text-xs font-bold lowercase text-muted-foreground">expertise</div>
+              <div className="flex flex-col gap-2">
+                <span className="text-sm text-foreground/60">Prompt Engineering</span>
+                <span className="text-sm text-foreground/60">Framework Design</span>
+                <span className="text-sm text-foreground/60">Cognitive Architectures</span>
+              </div>
+            </div>
+
           </div>
 
-          {/* Tech Stack (Faded) */}
-          <div className="pt-2 font-mono text-[10px] text-white/20">
-            BUILT WITH: NEXT.JS • TAILWIND • GSAP • WORDPRESS HEADLESS
-          </div>
         </div>
-
       </div>
-
-      {/* Subtle Geometric Accent (Bottom Right Corner) */}
-      <div className="absolute -bottom-10 -right-10 w-40 h-40 border border-white/5 rotate-45 pointer-events-none" />
     </footer>
   );
 }

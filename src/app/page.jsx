@@ -29,7 +29,7 @@ export default async function Home() {
   // but this is where you would pass "heroData", "expertiseData", etc.
 
   return (
-    <div className="bg-black min-h-screen flex flex-col">
+    <div className="bg-background min-h-screen flex flex-col">
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}

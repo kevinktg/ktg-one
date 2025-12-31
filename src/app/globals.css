@@ -5,7 +5,7 @@
 */
 @theme {
   --font-syne: var(--font-syne);
-  --font-mono: var(--font-mono);
+  --font-inter: var(--font-inter);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -16,36 +16,38 @@
 */
 @layer base {
   :root {
-    /* Base theme (keeping your existing black/white) */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    /* Graphite-inspired dark theme - softer blacks, better contrast */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
     
-    /* shadcn/ui variables - Graphite-inspired slate theme */
-    --card: 0 0% 3.9%;
+    /* shadcn/ui variables - Graphite-inspired refined palette */
+    --card: 0 0% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 12%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --radius: 0.5rem;
+    --border: 0 0% 18%;
+    --input: 0 0% 12%;
+    --ring: 0 0% 75%;
+    --radius: 0.375rem;
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-syne), sans-serif;
-    overflow-x: hidden; /* Critical for preventing scrollbar flicker during animations */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-inter), sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -56,39 +58,41 @@
     box-sizing: border-box;
   }
 
-  /* Responsive Typography Scale */
+  /* Headers: Syne bold lowercase */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-syne), sans-serif;
     font-weight: 700;
-    line-height: 1.1;
-    text-transform: lowercase; /* Brand Identity */
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
   }
 
   h1 {
-    font-size: clamp(3rem, 10vw, 8rem);
-    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
 
   h2 {
-    font-size: clamp(2rem, 6vw, 5rem);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-weight: 700;
     letter-spacing: -0.01em;
   }
 
   h3 {
-    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
     font-weight: 700;
   }
 
   p {
-    font-family: var(--font-syne), sans-serif;
-    line-height: 1.6;
+    font-family: var(--font-inter), sans-serif;
+    line-height: 1.7;
+    font-size: 14px;
   }
 
-  /* Utility for Monospace elements (code, labels, dates) */
+  /* Utility for Monospace elements (code blocks, etc.) */
   .monospace, code {
-    font-family: var(--font-mono), monospace;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   }
 
   /* Image Reset */
@@ -153,63 +157,22 @@
     transform-style: preserve-3d;
   }
 
-  /* Cyberpunk Background (Hero Reveal Layer) */
-  .cyberpunk-background {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at center,
-      #1a1a2e 0%,
-      #0a0a0f 100%
-    );
-    background-image:
-      linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-
-  .cyberpunk-background::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(
-      circle,
-      rgba(138, 43, 226, 0.3) 0%,
-      transparent 70%
-    );
-    filter: blur(60px);
-    z-index: -1;
-  }
-
-  .avatar-revealed {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    max-width: 90vw;
-    height: auto;
-    filter: drop-shadow(0 0 40px rgba(138, 43, 226, 0.6));
-    z-index: 10;
-  }
-
-  /* Pulsing Background Animation */
-  .pulse-glow {
-    animation: pulseGlow 4s ease-in-out infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% {
-      opacity: 0.8;
-      transform: translateX(-50%) scale(1);
+  /* Scrolling banner animation */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
     }
-    50% {
-      opacity: 1;
-      transform: translateX(-50%) scale(1.1);
+    100% {
+      transform: translateX(-50%);
     }
+  }
+
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+  
+  /* Smooth transitions for interactive elements */
+  a, button {
+    transition: color 0.2s ease, opacity 0.2s ease;
   }
 }

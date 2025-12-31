@@ -18,13 +18,11 @@ export function Header() {
       return;
     }
 
-    // Initial animate in - Run once on mount
+    // Subtle fade in - Run once on mount
     gsap.from(headerRef.current, {
-      y: -100,
       opacity: 0,
-      duration: 1,
-      ease: "power4.out",
-      delay: 0.5,
+      duration: 0.6,
+      ease: "power2.out",
       onComplete: () => {
         sessionStorage.setItem('header-animated', 'true');
       }
@@ -37,23 +35,22 @@ export function Header() {
   return (
     <header 
       ref={headerRef}
-      className="fixed top-0 left-0 w-full z-[100] px-6 py-6 md:px-12 flex justify-between items-center mix-blend-difference text-white"
+      className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-4 md:py-5 flex justify-between items-center border-b border-border/50 bg-background/80 backdrop-blur-sm"
     >
-      {/* LOGO: ktg brand text */}
+      {/* LOGO: Syne bold lowercase */}
       <Link href="/" className="group">
-        <span className="font-syne font-bold text-4xl md:text-5xl lowercase tracking-tighter leading-none group-hover:opacity-70 transition-opacity">
-          ktg.
+        <span className="font-syne text-sm font-bold lowercase text-foreground/90 group-hover:text-foreground transition-colors duration-200">
+          ktg
         </span>
       </Link>
 
-      {/* NAV: Mono (The Terminal/Tech) */}
-      <nav className="flex items-center gap-8">
-        <Link href="/blog" className="group flex items-center gap-2">
-          {/* Animated dot on hover */}
-          <span className="w-1.5 h-1.5 bg-white rounded-full scale-0 group-hover:scale-100 transition-transform duration-300" />
-          <span className="font-mono text-xs md:text-sm uppercase tracking-widest opacity-70 group-hover:opacity-100 transition-opacity">
-            blog
-          </span>
+      {/* NAV: Clean minimal navigation */}
+      <nav className="flex items-center gap-6 md:gap-8">
+        <Link 
+          href="/blog" 
+          className="font-mono text-xs text-foreground/60 hover:text-foreground transition-colors duration-200 uppercase tracking-wider"
+        >
+          Blog
         </Link>
       </nav>
     </header>
