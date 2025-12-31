@@ -3,6 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef, forwardRef } from "react";
+import { Hero3DScene } from "@/components/Hero3DScene";
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
@@ -44,10 +45,13 @@ export const HeroSection = forwardRef((props, ref) => {
   return (
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-background">
 
+      {/* Layer 0: 3D Background Scene */}
+      <Hero3DScene variant="network" />
+
       {/* Layer 1: Clean background */}
       <div className="absolute inset-0 z-10 bg-background">
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:20px_20px] opacity-30"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-size-[20px_20px] opacity-30"></div>
       </div>
 
       {/* Scrolling word banner at bottom */}

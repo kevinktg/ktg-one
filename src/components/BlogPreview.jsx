@@ -4,12 +4,41 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 
-export function BlogPreview({ posts }) {
+export function BlogPreview({ posts: serverPosts }) {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
+  const [clientPosts, setClientPosts] = useState(null);
+  
+  // Client-side fallback: Try fetching posts if server-side fetch failed
+  useEffect(() => {
+    // Only fetch if server posts are empty/null
+    if ((!serverPosts || serverPosts.length === 0) && !clientPosts) {
+      const fetchPosts = async () => {
+        try {
+          const WORDPRESS_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com';
+          const response = await fetch(`${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=6`, {
+            cache: 'no-store',
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+              console.log('[BlogPreview] Client-side fetch successful:', data.length, 'posts');
+              setClientPosts(data);
+            }
+          }
+        } catch (error) {
+          console.error('[BlogPreview] Client-side fetch failed:', error);
+        }
+      };
+      fetchPosts();
+    }
+  }, [serverPosts, clientPosts]);
+  
+  // Use client posts if available, otherwise use server posts
+  const posts = (clientPosts && clientPosts.length > 0) ? clientPosts : serverPosts;
 
   useGSAP(() => {
     // Check if animation has already played this session
@@ -56,9 +85,22 @@ export function BlogPreview({ posts }) {
         }
       });
     });
-  }, { scope: sectionRef });
+  }, { scope: sectionRef, dependencies: [displayPosts] }); // Re-run when posts change
 
-  if (posts.length === 0) return null;
+  // Always render the section, even if no posts (critical for visibility)
+  // Handle both server-side props and potential undefined/null
+  const displayPosts = posts && Array.isArray(posts) && posts.length > 0 ? posts : [];
+  const hasPosts = displayPosts.length > 0;
+  
+  // Debug logging in development
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('[BlogPreview] Posts received:', {
+      postsCount: posts?.length || 0,
+      isArray: Array.isArray(posts),
+      hasPosts,
+      firstPost: posts?.[0]?.title?.rendered || posts?.[0]?.title || 'N/A',
+    });
+  }
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden bg-background">
@@ -83,12 +125,15 @@ export function BlogPreview({ posts }) {
         </div>
 
         {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {posts.slice(0, 6).map((post) => {
+        {hasPosts ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {displayPosts.slice(0, 6).map((post) => {
             const featuredImage = getFeaturedImage(post);
-            const excerpt = post.excerpt.rendered
-              .replace(/<[^>]*>/g, "")
-              .substring(0, 120) + "...";
+            // Handle excerpt safely - WordPress may not always have excerpt.rendered
+            const rawExcerpt = post.excerpt?.rendered || post.excerpt || post.content?.rendered || '';
+            const excerpt = rawExcerpt
+              ? rawExcerpt.replace(/<[^>]*>/g, "").substring(0, 120) + "..."
+              : "Read more...";
 
             return (
               <Link
@@ -113,7 +158,7 @@ export function BlogPreview({ posts }) {
                       {formatDate(post.date)}
                     </div>
                     <h3 className="font-syne text-xl font-bold mb-3 lowercase group-hover:text-foreground/90 transition-colors line-clamp-2">
-                      {post.title.rendered}
+                      {post.title?.rendered || post.title || 'Untitled Post'}
                     </h3>
                     <p className="text-muted-foreground text-base line-clamp-3 mb-4">
                       {excerpt}
@@ -127,16 +172,28 @@ export function BlogPreview({ posts }) {
             );
           })}
         </div>
+        ) : (
+          <div className="text-center py-16 border border-border rounded-lg bg-card/30">
+            <p className="text-muted-foreground text-base mb-4">
+              Loading blog posts...
+            </p>
+            <p className="text-xs text-muted-foreground/60 font-mono">
+              If posts don't appear, check WordPress API connection
+            </p>
+          </div>
+        )}
 
-        {/* View All Link */}
-        <div className="text-center">
-          <Link
-            href="/blog"
-            className="inline-block font-mono text-sm border border-border hover:border-foreground/40 px-8 py-4 transition-all duration-300 hover:bg-card/50"
-          >
-            view all posts
-          </Link>
-        </div>
+        {/* View All Link - only show if we have posts */}
+        {hasPosts && (
+          <div className="text-center">
+            <Link
+              href="/blog"
+              className="inline-block font-mono text-sm border border-border hover:border-foreground/40 px-8 py-4 transition-all duration-300 hover:bg-card/50"
+            >
+              view all posts
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
