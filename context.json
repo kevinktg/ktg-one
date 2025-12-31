@@ -1,0 +1,50 @@
+{
+  "files_to_modify": {
+    "main": [
+      "src/app/page.jsx",
+      "src/components/Header.jsx",
+      "src/app/sitemap.js"
+    ]
+  },
+  "files_to_create": {
+    "main": [
+      "src/components/PortfolioSection.jsx",
+      "src/components/AgentsSection.jsx",
+      "public/assets/og-image.jpg"
+    ]
+  },
+  "files_to_reference": [
+    "src/components/HeroSection.jsx",
+    "src/components/ExpertiseSection.jsx",
+    "src/components/ValidationSection.jsx",
+    "src/components/Header.jsx"
+  ],
+  "patterns": {
+    "gsap_animation": "Use useGSAP hook with { scope: ref }, register ScrollTrigger, forwardRef pattern, only animate transform/opacity",
+    "section_layout": "min-h-screen, max-w-7xl mx-auto, grid layouts, black/white backgrounds",
+    "navigation": "Animated dot hover, mono font, uppercase, opacity transitions",
+    "component_structure": "'use client' directive, forwardRef, displayName for debugging"
+  },
+  "existing_implementations": {
+    "description": "Site has 5 sections: Hero, Expertise, Validation, Philosophy, BlogPreview. All use GSAP ScrollTrigger animations with consistent patterns.",
+    "relevant_files": [
+      "src/components/HeroSection.jsx",
+      "src/components/ExpertiseSection.jsx",
+      "src/components/ValidationSection.jsx",
+      "src/components/PhilosophySection.jsx",
+      "src/components/BlogPreview.jsx"
+    ]
+  },
+  "current_page_order": [
+    "Header",
+    "HeroSection",
+    "ExpertiseSection",
+    "ValidationSection",
+    "PhilosophySection",
+    "BlogPreview",
+    "Footer"
+  ],
+  "missing_assets": [
+    "public/assets/og-image.jpg - Referenced in layout.jsx but doesn't exist"
+  ]
+}

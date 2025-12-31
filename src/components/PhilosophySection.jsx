@@ -2,12 +2,9 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 // Ensure this path is correct based on your folder structure
 import { GeometricBackground } from "@/components/GeometricBackground";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function PhilosophySection({ philosophyData }) {
   const sectionRef = useRef(null);
@@ -43,20 +40,29 @@ export function PhilosophySection({ philosophyData }) {
   };
 
   useGSAP(() => {
-    // 1. HEADER PARALLAX
-    // Moves the text slightly faster than scroll for depth
-    gsap.to(textRef.current, {
-      y: -50,
-      ease: "none",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1, // Smooth scrubbing
-      },
-    });
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('philosophy-animated') === 'true';
 
-    // 2. QUOTES SLIDE-IN
+    if (hasPlayed) {
+      // Skip animation - set final states immediately
+      if (textRef.current) gsap.set(textRef.current, { opacity: 1, y: 0 });
+      quoteRefs.current.forEach((quote) => {
+        if (quote) gsap.set(quote, { opacity: 1, x: 0 });
+      });
+      return;
+    }
+
+    // 1. HEADER - Run immediately on mount
+    if (textRef.current) {
+      gsap.from(textRef.current, {
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        ease: "power2.out",
+      });
+    }
+
+    // 2. QUOTES SLIDE-IN - Stagger after header
     quoteRefs.current.forEach((quote, index) => {
       if (!quote) return;
 
@@ -70,11 +76,11 @@ export function PhilosophySection({ philosophyData }) {
           x: 0,
           duration: 1,
           ease: "power2.out",
-          scrollTrigger: {
-            trigger: quote,
-            start: "top 85%", // Start when top of element hits 85% of viewport height
-            end: "top 60%",
-            scrub: 1, // Link to scroll position
+          delay: 0.5 + (index * 0.2), // Stagger quotes
+          onComplete: () => {
+            if (index === quoteRefs.current.length - 1) {
+              sessionStorage.setItem('philosophy-animated', 'true');
+            }
           }
         }
       );

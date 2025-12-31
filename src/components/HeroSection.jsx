@@ -2,11 +2,8 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useRef, forwardRef, useEffect } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
@@ -18,7 +15,11 @@ export const HeroSection = forwardRef((props, ref) => {
   const canvasRef = useRef(null);
 
   useGSAP(() => {
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('hero-animated') === 'true';
+
     // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax using quickSetter
+    // Keep this active (no sessionStorage check - interactive feature)
     const shapes = [
       { el: '.hero-shape-1', speedX: 20, speedY: 20 },
       { el: '.hero-shape-2', speedX: -30, speedY: 15 },
@@ -52,57 +53,52 @@ export const HeroSection = forwardRef((props, ref) => {
     window.addEventListener('mousemove', handleMouseMove);
 
     // Cleanup
-    return () => {
+    const cleanup = () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
 
-    // 2. ENTRANCE ANIMATION
-    const tl = gsap.timeline();
-
-    if (titleRef.current) {
-      tl.from(titleRef.current, {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
+    // 2. ENTRANCE ANIMATION (run once per session)
+    if (!hasPlayed) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          sessionStorage.setItem('hero-animated', 'true');
+        }
       });
-    }
 
-    if (subtitleRef.current) {
-      tl.from(subtitleRef.current, {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      }, "-=0.4");
-    }
-
-    if (imageRef.current) {
-      tl.from(imageRef.current, {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      }, "-=0.4");
-    }
-
-    // 3. SCROLL TRANSITION TO EXPERTISE SECTION
-    // Fade out completely before white section appears (clean transition)
-    const tl2 = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "bottom bottom", // Start fading when bottom of hero hits bottom of viewport
-        end: "bottom top", // Complete fade when bottom leaves viewport
-        scrub: true,
+      if (titleRef.current) {
+        tl.from(titleRef.current, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        });
       }
-    });
 
-    tl2.to(heroRef.current, {
-      opacity: 0,
-      scale: 1.02,
-      y: -30,
-      ease: "none" // Linear fade for clean transition
-    });
+      if (subtitleRef.current) {
+        tl.from(subtitleRef.current, {
+          y: 30,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        }, "-=0.4");
+      }
+
+      if (imageRef.current) {
+        tl.from(imageRef.current, {
+          scale: 0.9,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        }, "-=0.4");
+      }
+    } else {
+      // If already played, set final state immediately
+      if (titleRef.current) gsap.set(titleRef.current, { opacity: 1, y: 0 });
+      if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1, y: 0 });
+      if (imageRef.current) gsap.set(imageRef.current, { opacity: 1, scale: 1 });
+    }
+
+    return cleanup;
 
   }, { scope: heroRef });
 
@@ -228,6 +224,13 @@ export const HeroSection = forwardRef((props, ref) => {
       {/* Layer 1: Revealed Background (shown when logo is wiped away) */}
       <div className="absolute inset-0 z-10">
         <div className="cyberpunk-background" />
+        
+        {/* Pulsing Background */}
+        <div className="relative h-full w-full bg-black">
+          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+          <div className="absolute left-1/2 top-[-10%] h-[1000px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,#fbfbfb36,#000)] pulse-glow"></div>
+        </div>
+        
         <Image
           src="/assets/profile.svg"
           alt="cyberpunk avatar"

@@ -125,3 +125,9 @@ record-with-screenshots.js
 scripts/
 .cursor\rules\openmemory.mdc
 CLAUDE.md
+
+# Auto Claude data directory
+.auto-claude/
+.cursor\rules\openmemory.mdc
+CLAUDE.md
+AGENTS.md

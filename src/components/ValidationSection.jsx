@@ -2,11 +2,8 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import { GeometricBackground } from "@/components/GeometricBackground";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
@@ -51,61 +48,48 @@ export function ValidationSection({ auditData }) {
   };
 
   useGSAP(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('validation-animated') === 'true';
 
-    // MASTER TIMELINE
-    // This handles both the "Swoop" transition AND the horizontal scroll
-    // effectively pinning the user in place until both are done.
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top", // Pin immediately when it hits the top
-        // Total scroll distance = Window Height (for transition) + Scroll Width (for movement)
-        end: () => `+=${container.scrollWidth + window.innerHeight}`,
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
+    if (hasPlayed) {
+      // Skip animation - set final states immediately
+      if (shutterRef.current?.children) {
+        gsap.set(shutterRef.current.children, { scaleY: 0 });
+      }
+      gsap.set(".digital-text", { opacity: 1, x: 0 });
+      // Don't animate horizontal scroll - just show content
+      if (containerRef.current) {
+        gsap.set(containerRef.current, { x: 0 });
+      }
+      return;
+    }
+
+    // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
+    gsap.to(shutterRef.current?.children, {
+      scaleY: 0,
+      duration: 1,
+      stagger: 0.05,
+      ease: "power3.inOut",
+      transformOrigin: "bottom",
+      onComplete: () => {
+        sessionStorage.setItem('validation-animated', 'true');
       }
     });
 
-    // PHASE 1: THE SWOOP (White -> Black)
-    // Shutters shrink to reveal the black background.
-    // This happens *before* horizontal movement starts.
-    tl.to(shutterRef.current.children, {
-      scaleY: 0,
-      duration: 1, // Relative duration (short and punchy)
-      stagger: 0.05,
-      ease: "power3.inOut",
-      transformOrigin: "bottom" // "Swoop" down
+    // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
+    const textElements = gsap.utils.toArray(".digital-text");
+    textElements.forEach((text, index) => {
+      gsap.from(text, {
+        opacity: 0,
+        x: 50,
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.8 + (index * 0.1), // Stagger after shutter animation
+      });
     });
 
-    // PHASE 2: HORIZONTAL SCROLL
-    // Now that black is revealed, we scroll sideways.
-    const scrollTween = tl.to(container, {
-      x: () => -(container.scrollWidth - window.innerWidth),
-      ease: "none",
-      duration: 5 // Relative duration (5x longer than the swoop)
-    });
-
-    // 3. TEXT REVEAL ANIMATIONS
-    // These trigger based on the horizontal scroll position
-    gsap.utils.toArray(".digital-text").forEach((text) => {
-        gsap.from(text, {
-            opacity: 0,
-            x: 50,
-            duration: 0.8,
-            ease: "power2.out",
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: text,
-                containerAnimation: scrollTween, // Link to the horizontal part of the timeline
-                start: "left 90%",
-                toggleActions: "play none none reverse"
-            }
-        });
-    });
+    // Note: Horizontal scroll removed - content is now static
+    // If you want horizontal scroll back, we can add it without pinning
 
   }, { scope: sectionRef });
 
@@ -137,8 +121,8 @@ export function ValidationSection({ auditData }) {
           </h2>
       </div>
 
-      {/* Horizontal Container */}
-      <div className="relative h-full flex items-center z-10 will-change-transform">
+      {/* Horizontal Container - Now static (no horizontal scroll) */}
+      <div className="relative h-full flex items-center z-10 overflow-x-auto">
         <div ref={containerRef} className="flex gap-20 md:gap-40 px-6 md:px-20 w-fit items-center">
 
             {/* 01. INTRO MANIFESTO */}

@@ -2,27 +2,32 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function Footer() {
   const footerRef = useRef(null);
 
   useGSAP(() => {
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('footer-animated') === 'true';
+
+    if (hasPlayed) {
+      // Skip animation - set final state immediately
+      if (footerRef.current) gsap.set(footerRef.current, { opacity: 1, y: 0 });
+      return;
+    }
+
+    // Run immediately on mount
     gsap.from(footerRef.current, {
-      scrollTrigger: {
-        trigger: footerRef.current,
-        start: "top bottom",
-        end: "bottom bottom",
-        toggleActions: "play none none reverse",
-      },
-      y: 20, // Reduced movement distance for a tighter feel
+      y: 20,
       opacity: 0,
       duration: 0.8,
+      ease: "power2.out",
+      onComplete: () => {
+        sessionStorage.setItem('footer-animated', 'true');
+      }
     });
   }, { scope: footerRef });
 

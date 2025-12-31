@@ -12,10 +12,6 @@ const nextConfig = {
       },
     ],
   },
-  // Fix workspace root warning
-  turbopack: {
-    root: __dirname,
-  },
 };
 
 module.exports = nextConfig;

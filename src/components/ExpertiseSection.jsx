@@ -2,10 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
@@ -47,45 +44,42 @@ export function ExpertiseSection({ expertiseData }) {
     const hasPlayed = sessionStorage.getItem('expertise-revealed') === 'true';
 
     if (hasPlayed) {
-      // Skip animation - just hide shutters immediately
+      // Skip animation - just hide shutters immediately and set final states
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 0 });
       }
+      gsap.set(".expertise-title", { opacity: 1, y: 0 });
+      gsap.set(".expertise-group", { opacity: 1, y: 0 });
+      
+      // Set counters to final values immediately
+      const stats = gsap.utils.toArray(".stat-counter");
+      stats.forEach((stat) => {
+        const targetVal = parseFloat(stat.getAttribute("data-val"));
+        const isFloat = stat.getAttribute("data-is-float") === "true";
+        const suffix = stat.getAttribute("data-suffix") || "";
+        stat.textContent = isFloat ? targetVal.toFixed(2) + suffix : Math.floor(targetVal) + suffix;
+      });
       return;
     }
 
-    // SHUTTER REVEAL (no pin - clean transition)
-    // Uses scaleY for high-performance animation
+    // SHUTTER REVEAL - Run immediately on mount
     gsap.to(shutterRef.current?.children, {
       scaleY: 0,
       duration: 1.5,
       stagger: 0.1,
       ease: "power3.inOut",
       transformOrigin: "top",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top bottom", // Start when entering viewport
-        end: "top center", // Complete by center
-        scrub: 1.5,
-        onLeave: () => {
-          sessionStorage.setItem('expertise-revealed', 'true');
-        }
+      onComplete: () => {
+        sessionStorage.setItem('expertise-revealed', 'true');
       }
     });
 
-    // 3. CONTENT ENTRANCE
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top+=20%", // Start shortly after pin begins
-        toggleActions: "play none none reverse"
-      }
-    });
-
+    // CONTENT ENTRANCE - Start slightly after shutters begin
+    const tl = gsap.timeline({ delay: 0.3 });
     tl.from(".expertise-title", { y: 50, opacity: 0, duration: 1.2, ease: "power4.out" })
       .from(".expertise-group", { y: 40, opacity: 0, duration: 1, stagger: 0.15, ease: "power2.out" }, "-=0.6");
 
-    // 4. COUNTERS
+    // COUNTERS - Animate after content appears
     const stats = gsap.utils.toArray(".stat-counter");
     stats.forEach((stat) => {
       const targetVal = parseFloat(stat.getAttribute("data-val"));
@@ -96,8 +90,8 @@ export function ExpertiseSection({ expertiseData }) {
       gsap.to(proxy, {
         val: targetVal,
         duration: 2,
+        delay: 1.5, // Start after content animation
         ease: "power2.out",
-        scrollTrigger: { trigger: stat, start: "top 85%", toggleActions: "play none none reverse" },
         onUpdate: () => {
           stat.textContent = isFloat ? proxy.val.toFixed(2) + suffix : Math.floor(proxy.val) + suffix;
         }

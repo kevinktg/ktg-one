@@ -4,7 +4,6 @@ import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { GeometricBackground } from "@/components/GeometricBackground";
 
 export const metadata = {
   title: "Blog | .ktg - AI Anthropology & Prompt Engineering Insights",
@@ -29,19 +28,12 @@ export const revalidate = 0; // No caching - always fresh
 
 export default async function BlogPage() {
   let posts = [];
-  let error = null;
-  
   try {
     posts = await getPosts();
-    if (!Array.isArray(posts)) {
-      posts = [];
-    }
-  } catch (err) {
-    console.error('Error loading blog posts:', err);
-    error = err instanceof Error ? err.message : 'Unknown error';
+  } catch (error) {
+    console.error('Error loading blog posts:', error);
     posts = [];
   }
-  
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktg.one';
 
   // Structured data for blog listing
@@ -69,8 +61,7 @@ export default async function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white" style={{ contain: "layout" }}>
-      <GeometricBackground />
+    <div className="min-h-screen bg-black text-white">
       <Header />
       <script
         type="application/ld+json"
@@ -88,11 +79,8 @@ export default async function BlogPage() {
           {posts.length === 0 ? (
             <div className="py-20 text-center">
               <p className="text-white/40 mb-4">No posts found.</p>
-              {error && (
-                <p className="text-red-400/60 text-sm mb-2">Error: {error}</p>
-              )}
               <p className="text-white/30 text-sm">
-                {error ? 'There was an error loading posts.' : 'Make sure NEXT_PUBLIC_WORDPRESS_URL is set correctly in your environment variables.'}
+                Make sure NEXT_PUBLIC_WORDPRESS_URL is set correctly in your environment variables.
               </p>
             </div>
           ) : (

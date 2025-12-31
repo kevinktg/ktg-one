@@ -4,34 +4,33 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function Header() {
   const headerRef = useRef(null);
 
   useGSAP(() => {
-    // --- 1. INITIAL ANIMATE IN (Existing) ---
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('header-animated') === 'true';
+
+    if (hasPlayed) {
+      // Skip animation - set final state immediately (always visible, no scroll hide)
+      if (headerRef.current) gsap.set(headerRef.current, { opacity: 1, y: 0 });
+      return;
+    }
+
+    // Initial animate in - Run once on mount
     gsap.from(headerRef.current, {
       y: -100,
       opacity: 0,
       duration: 1,
       ease: "power4.out",
-      delay: 0.5
+      delay: 0.5,
+      onComplete: () => {
+        sessionStorage.setItem('header-animated', 'true');
+      }
     });
     
-    // --- 2. HIDE ON SCROLL (New Logic) ---
-    gsap.to(headerRef.current, {
-        y: -100, // Move it up off screen
-        opacity: 0,
-        scrollTrigger: {
-            trigger: "body", // Monitors global scroll
-            start: "top 300px", // Starts fading when scroll reaches 300px down
-            end: "top 100px",   // Fully hidden when scroll reaches 500px down
-            scrub: 1, // Smoothly link animation to scroll position
-        }
-    });
+    // Removed scroll hide - header stays visible throughout session
     
   }, { scope: headerRef });
 

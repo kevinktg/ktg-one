@@ -2,29 +2,35 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
 import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import { GeometricBackground } from "@/components/GeometricBackground";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function BlogPreview({ posts }) {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
 
   useGSAP(() => {
-    // Animate title
+    // Check if animation has already played this session
+    const hasPlayed = sessionStorage.getItem('blog-animated') === 'true';
+
+    if (hasPlayed) {
+      // Skip animation - set final states immediately
+      if (titleRef.current) gsap.set(titleRef.current, { opacity: 1, y: 0 });
+      const cards = gsap.utils.toArray(
+        sectionRef.current?.querySelectorAll(".blog-card") || []
+      );
+      cards.forEach((card) => {
+        gsap.set(card, { opacity: 1, y: 0 });
+      });
+      return;
+    }
+
+    // Animate title - Run immediately on mount
     if (titleRef.current) {
       gsap.from(titleRef.current, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1,
-        },
         opacity: 0,
         y: 50,
         duration: 1.2,
@@ -32,24 +38,23 @@ export function BlogPreview({ posts }) {
       });
     }
 
-    // Animate blog cards
+    // Animate blog cards - Stagger after title
     const cards = gsap.utils.toArray(
       sectionRef.current?.querySelectorAll(".blog-card") || []
     );
 
     cards.forEach((card, index) => {
       gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top 85%",
-          end: "top 60%",
-          scrub: 1,
-        },
         opacity: 0,
         y: 60,
         duration: 1,
-        delay: index * 0.1,
+        delay: 0.6 + (index * 0.1), // Start after title, stagger cards
         ease: "power2.out",
+        onComplete: () => {
+          if (index === cards.length - 1) {
+            sessionStorage.setItem('blog-animated', 'true');
+          }
+        }
       });
     });
   }, { scope: sectionRef });
