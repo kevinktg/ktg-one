@@ -39,7 +39,7 @@ export function Footer() {
           <div className="flex-1">
             <div className="mb-6">
               <h3 className="font-syne text-sm font-bold lowercase text-foreground mb-3">let's build something</h3>
-              <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
+              <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
                 Context continuation. Framework development. Arxiv-ready research.
               </p>
             </div>

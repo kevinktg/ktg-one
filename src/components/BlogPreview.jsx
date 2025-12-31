@@ -77,7 +77,7 @@ export function BlogPreview({ posts }) {
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase tracking-tight">
             blog
           </h2>
-          <p className="text-muted-foreground text-base max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             thoughts, insights, and updates on AI anthropology and prompt engineering
           </p>
         </div>
@@ -115,7 +115,7 @@ export function BlogPreview({ posts }) {
                     <h3 className="font-syne text-xl font-bold mb-3 lowercase group-hover:text-foreground/90 transition-colors line-clamp-2">
                       {post.title.rendered}
                     </h3>
-                    <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
+                    <p className="text-muted-foreground text-base line-clamp-3 mb-4">
                       {excerpt}
                     </p>
                     <div className="font-mono text-xs text-muted-foreground group-hover:text-foreground transition-colors">

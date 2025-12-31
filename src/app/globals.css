@@ -45,7 +45,7 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: var(--font-inter), sans-serif;
-    font-size: 14px;
+    font-size: 16px; /* Increased from 14px for better readability */
     line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -87,7 +87,7 @@
   p {
     font-family: var(--font-inter), sans-serif;
     line-height: 1.7;
-    font-size: 14px;
+    font-size: 16px; /* Increased from 14px for better readability */
   }
 
   /* Utility for Monospace elements (code blocks, etc.) */
@@ -179,5 +179,21 @@
   /* Smooth transitions for interactive elements */
   a, button {
     transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  /* Typography Scale Utilities */
+  .text-body {
+    font-size: 1rem; /* 16px base */
+    line-height: 1.7;
+  }
+
+  .text-body-lg {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.7;
+  }
+
+  /* Ensure GSAP animations don't affect font-size - use transform only */
+  .gsap-safe {
+    will-change: transform, opacity;
   }
 }

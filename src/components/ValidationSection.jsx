@@ -118,12 +118,12 @@ export function ValidationSection({ auditData }) {
                   <div className="text-sm font-bold text-foreground bg-card px-3 py-1 font-mono whitespace-nowrap border border-border">{data.audit.badge}</div>
                 </div>
               </div>
-              <div className="space-y-6 font-mono text-sm md:text-base">
+              <div className="space-y-6 font-mono text-base md:text-lg">
                 <div className="border-l-4 border-border pl-6 py-2">
                   <span className="text-muted-foreground block mb-2 text-xs tracking-widest uppercase">FINDINGS:</span>
                   <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
                 </div>
-                <ul className="space-y-3 text-sm text-muted-foreground">
+                <ul className="space-y-3 text-base text-muted-foreground">
                   {data.audit.checklist.map((item, i) => (
                     <li key={i} className="flex gap-3 items-start">
                       <span className="text-foreground mt-1">✓</span>
@@ -143,12 +143,12 @@ export function ValidationSection({ auditData }) {
                   <div className="text-4xl font-bold text-foreground font-mono">{data.percentile.rank}</div>
                 </div>
               </div>
-              <div className="space-y-6 font-mono text-sm md:text-base">
+              <div className="space-y-6 font-mono text-base md:text-lg">
                 <div className="bg-card/50 p-6 rounded border border-border">
                   <div className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">JUSTIFICATION: DEPTH</div>
                   <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
                 </div>
-                <p className="text-muted-foreground text-sm italic border-l-2 border-border pl-4">
+                <p className="text-muted-foreground text-base italic border-l-2 border-border pl-4">
                   "{data.percentile.quote}"
                 </p>
               </div>

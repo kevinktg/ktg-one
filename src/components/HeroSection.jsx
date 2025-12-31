@@ -56,25 +56,25 @@ export const HeroSection = forwardRef((props, ref) => {
           {/* Single scrolling container with duplicated content for seamless loop */}
           <div ref={titleRef} className="flex items-center gap-8 md:gap-12">
             {/* Original content */}
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Context Continuation</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Frameworks</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
             {/* Duplicate for seamless loop */}
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Context Continuation</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Frameworks</span>
             <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
+            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
           </div>
         </div>
       </div>

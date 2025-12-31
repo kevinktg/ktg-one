@@ -136,7 +136,7 @@ export function ExpertiseSection({ expertiseData }) {
               </div>
               <ul className="space-y-3">
                 {area.skills.map((skill, i) => (
-                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed font-mono text-sm group-hover:text-black transition-colors duration-300">
+                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed font-mono text-base group-hover:text-black transition-colors duration-300">
                     <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-black/20 group-hover:bg-black transition-colors rotate-45" />
                     {skill}
                   </li>
