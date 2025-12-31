@@ -6,7 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
 import { formatDate, getFeaturedImage } from "@/lib/wordpress";
-import { GeometricBackground } from "@/components/GeometricBackground";
 
 export function BlogPreview({ posts }) {
   const sectionRef = useRef(null);
@@ -62,38 +61,23 @@ export function BlogPreview({ posts }) {
   if (posts.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden" style={{ contain: "layout paint" }}>
-      {/* Geometric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0" style={{ contain: "strict layout paint" }}>
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 grid-pattern" />
-        
-        {/* Floating geometric shapes */}
-        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white opacity-15 rotate-45" />
-        <div className="absolute top-1/4 left-10 w-48 h-48 border-2 border-white opacity-12" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white opacity-15 rounded-full" />
-        <div className="absolute bottom-20 left-20 w-56 h-56 border-2 border-white opacity-12 rotate-12" />
-        
-        {/* Additional circles */}
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 border border-white opacity-8 rounded-full" />
-        <div className="absolute bottom-1/3 left-1/3 w-40 h-40 border-2 border-white opacity-10 rounded-full" />
-        <div className="absolute top-2/3 right-1/2 w-32 h-32 border border-white opacity-8 rounded-full" />
-        
-        {/* Diagonal lines */}
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 diagonal-lines" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 diagonal-lines" />
+    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden bg-background">
+      {/* Subtle background */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:20px_20px] opacity-30"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Title */}
-        <div ref={titleRef} className="mb-16 text-center">
-          <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
-            LATEST INSIGHTS
+        <div ref={titleRef} className="mb-20 text-center">
+          <div className="font-mono text-xs text-muted-foreground mb-4 tracking-widest uppercase">
+            Latest Insights
           </div>
-          <h2 className="font-syne text-5xl md:text-6xl font-bold mb-6 lowercase">
+          <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase tracking-tight">
             blog
           </h2>
-          <p className="text-white/60 text-lg font-mono max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto">
             thoughts, insights, and updates on AI anthropology and prompt engineering
           </p>
         </div>
@@ -112,29 +96,29 @@ export function BlogPreview({ posts }) {
                 href={`/blog/${post.slug}`}
                 className="blog-card group block"
               >
-                <article className="h-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10">
+                <article className="h-full border border-border hover:border-foreground/20 transition-all duration-300 bg-card/50 hover:bg-card/80">
                   {featuredImage && (
-                    <div className="mb-6 overflow-hidden rounded-lg" style={{ aspectRatio: "2/1", contain: "layout paint" }}>
+                    <div className="mb-6 overflow-hidden" style={{ aspectRatio: "2/1" }}>
                       <Image
                         src={featuredImage}
                         alt={post.title?.rendered || post.title || 'Blog post'}
                         width={800}
                         height={400}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
                   )}
                   <div className="p-6">
-                    <div className="monospace text-xs text-white/40 mb-3">
+                    <div className="font-mono text-xs text-muted-foreground mb-3">
                       {formatDate(post.date)}
                     </div>
-                    <h3 className="font-syne text-2xl font-bold mb-3 lowercase group-hover:text-white/80 transition-colors line-clamp-2">
+                    <h3 className="font-syne text-xl font-bold mb-3 lowercase group-hover:text-foreground/90 transition-colors line-clamp-2">
                       {post.title.rendered}
                     </h3>
-                    <p className="text-white/60 text-sm line-clamp-3 mb-4">
+                    <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
                       {excerpt}
                     </p>
-                    <div className="monospace text-xs text-white/50 group-hover:text-white transition-colors">
+                    <div className="font-mono text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                       read more →
                     </div>
                   </div>
@@ -148,7 +132,7 @@ export function BlogPreview({ posts }) {
         <div className="text-center">
           <Link
             href="/blog"
-            className="inline-block monospace text-sm border border-white/20 hover:border-white/40 px-8 py-4 transition-all duration-300 hover:bg-white/5"
+            className="inline-block font-mono text-sm border border-border hover:border-foreground/40 px-8 py-4 transition-all duration-300 hover:bg-card/50"
           >
             view all posts
           </Link>

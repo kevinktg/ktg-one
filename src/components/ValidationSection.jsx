@@ -3,12 +3,10 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef } from "react";
-import { GeometricBackground } from "@/components/GeometricBackground";
 
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
-  const shutterRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -53,184 +51,143 @@ export function ValidationSection({ auditData }) {
 
     if (hasPlayed) {
       // Skip animation - set final states immediately
-      if (shutterRef.current?.children) {
-        gsap.set(shutterRef.current.children, { scaleY: 0 });
-      }
       gsap.set(".digital-text", { opacity: 1, x: 0 });
-      // Don't animate horizontal scroll - just show content
-      if (containerRef.current) {
-        gsap.set(containerRef.current, { x: 0 });
-      }
       return;
     }
 
-    // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
-    gsap.to(shutterRef.current?.children, {
-      scaleY: 0,
-      duration: 1,
-      stagger: 0.05,
-      ease: "power3.inOut",
-      transformOrigin: "bottom",
-      onComplete: () => {
-        sessionStorage.setItem('validation-animated', 'true');
-      }
-    });
-
-    // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
+    // Text reveal animations - Run immediately on mount
     const textElements = gsap.utils.toArray(".digital-text");
     textElements.forEach((text, index) => {
       gsap.from(text, {
         opacity: 0,
-        x: 50,
+        x: 30,
         duration: 0.8,
         ease: "power2.out",
-        delay: 0.8 + (index * 0.1), // Stagger after shutter animation
+        delay: index * 0.1, // Stagger animations
       });
     });
 
-    // Note: Horizontal scroll removed - content is now static
-    // If you want horizontal scroll back, we can add it without pinning
+    sessionStorage.setItem('validation-animated', 'true');
 
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40" style={{ contain: "paint layout" }}>
+    <section ref={sectionRef} className="relative min-h-screen bg-background py-32 px-6 overflow-hidden z-40">
 
-      {/* ============================================ */}
-      {/* SHUTTERS (The "Swoop" Layer)                 */}
-      {/* These start FULL HEIGHT (white screen) and   */}
-      {/* animate down to reveal the black content.    */}
-      {/* ============================================ */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full">
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white will-change-transform" />
-      </div>
-
-      {/* Background Component */}
+      {/* Background */}
       <div className="absolute inset-0 z-0">
-          <GeometricBackground />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:20px_20px] opacity-30"></div>
       </div>
 
-      {/* Sticky Header */}
-      <div className="absolute top-32 left-6 md:left-12 z-20 mix-blend-difference pointer-events-none">
-          <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase">
-             system_<span className="text-white/30">audits</span>
-          </h2>
+      {/* Section Title */}
+      <div className="relative z-10 max-w-7xl mx-auto mb-16">
+        <h2 className="font-syne text-4xl md:text-5xl font-bold lowercase tracking-tight">
+          system_<span className="text-muted-foreground">audits</span>
+        </h2>
       </div>
 
-      {/* Horizontal Container - Now static (no horizontal scroll) */}
-      <div className="relative h-full flex items-center z-10 overflow-x-auto">
-        <div ref={containerRef} className="flex gap-20 md:gap-40 px-6 md:px-20 w-fit items-center">
+      {/* Single Card Container with Horizontal Scroll */}
+      <div className="relative z-10 max-w-7xl mx-auto">
+        <div className="border border-border bg-card/50 backdrop-blur-sm overflow-x-auto custom-scrollbar" style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch', width: '100%' }}>
+          {/* Horizontal Scrolling Content */}
+          <div ref={containerRef} className="flex gap-8 p-8 md:p-12" style={{ width: 'max-content', minWidth: '100%' }}>
+            
+            {/* 01. INTRO */}
+            <div className="w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0 digital-text">
+              <div className="mb-8 w-12 h-12 border-l border-t border-foreground/20" />
+              <p className="font-mono text-muted-foreground text-base md:text-lg leading-relaxed">
+                <span className="text-foreground font-semibold">{data.intro.title}</span>
+                <br/><br/>
+                {data.intro.desc}
+                <br/><br/>
+                <span className="text-muted-foreground/80">{data.intro.note}</span>
+              </p>
+              <div className="mt-12 flex gap-4">
+                <div className="px-4 py-2 border border-border rounded-full font-mono text-xs text-foreground bg-card">
+                  AUDIT STATUS: {data.intro.status}
+                </div>
+              </div>
+            </div>
 
-            {/* 01. INTRO MANIFESTO */}
-            <div className="w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0">
-                <div className="mb-8 w-12 h-12 border-l border-t border-white/50" />
-                <p className="font-mono text-white/60 text-lg md:text-xl leading-relaxed">
-                    <span className="text-white font-bold">{data.intro.title}</span>
-                    <br/><br/>
-                    {data.intro.desc}
-                    <br/><br/>
-                    {data.intro.note}
+            {/* 02. VERTEX AUDIT */}
+            <div className="w-[85vw] md:w-[600px] shrink-0 digital-text">
+              <div className="border-b border-border pb-6 mb-6">
+                <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.audit.id}</div>
+                <div className="flex justify-between items-start">
+                  <h3 className="text-2xl md:text-3xl font-syne font-bold">{data.audit.title}</h3>
+                  <div className="text-sm font-bold text-foreground bg-card px-3 py-1 font-mono whitespace-nowrap border border-border">{data.audit.badge}</div>
+                </div>
+              </div>
+              <div className="space-y-6 font-mono text-sm md:text-base">
+                <div className="border-l-4 border-border pl-6 py-2">
+                  <span className="text-muted-foreground block mb-2 text-xs tracking-widest uppercase">FINDINGS:</span>
+                  <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
+                </div>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  {data.audit.checklist.map((item, i) => (
+                    <li key={i} className="flex gap-3 items-start">
+                      <span className="text-foreground mt-1">✓</span>
+                      <span><strong className="text-foreground">{item.label}:</strong> {item.desc}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* 03. PERCENTILE RANK */}
+            <div className="w-[85vw] md:w-[500px] shrink-0 digital-text">
+              <div className="border-b border-border pb-6 mb-6">
+                <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.percentile.id}</div>
+                <div className="flex justify-between items-start">
+                  <h3 className="text-2xl font-syne font-bold">Percentile</h3>
+                  <div className="text-4xl font-bold text-foreground font-mono">{data.percentile.rank}</div>
+                </div>
+              </div>
+              <div className="space-y-6 font-mono text-sm md:text-base">
+                <div className="bg-card/50 p-6 rounded border border-border">
+                  <div className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">JUSTIFICATION: DEPTH</div>
+                  <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
+                </div>
+                <p className="text-muted-foreground text-sm italic border-l-2 border-border pl-4">
+                  "{data.percentile.quote}"
                 </p>
-                <div className="mt-12 flex gap-4">
-                    <div className="px-4 py-2 border border-white/20 rounded-full font-mono text-xs text-green-400 bg-green-900/10">
-                        AUDIT STATUS: {data.intro.status}
-                    </div>
-                </div>
+              </div>
             </div>
 
-            {/* 02. VERTEX AUDIT CARD */}
-            <div className="relative w-[90vw] md:w-[750px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
-                <CardCorners />
-                <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
-                    <div>
-                        <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.audit.id}</div>
-                        <h3 className="text-2xl md:text-3xl font-syne font-bold">{data.audit.title}</h3>
-                    </div>
-                    <div className="text-sm md:text-xl font-bold text-white bg-white/10 px-3 py-1 font-mono whitespace-nowrap">{data.audit.badge}</div>
+            {/* 04. THE EVIDENCE */}
+            <div className="w-[85vw] md:w-[550px] shrink-0 digital-text">
+              <div className="mb-6">
+                <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.evidence.id}</div>
+                <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
+              </div>
+              <div className="space-y-6">
+                <p className="font-mono text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
+                <div className="p-6 border border-border bg-card/50 rounded-lg">
+                  <p className="font-mono text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
                 </div>
-                <div className="space-y-8 font-mono text-base md:text-lg flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="my-6 border-l-4 border-white/20 pl-6 py-2 digital-text">
-                        <span className="text-white/40 block mb-2 text-xs tracking-widest">FINDINGS:</span>
-                        <p className="leading-relaxed text-white/90">{data.audit.findings}</p>
-                    </div>
-                    <ul className="space-y-4 text-sm md:text-base text-white/70">
-                        {data.audit.checklist.map((item, i) => (
-                             <li key={i} className="flex gap-4 digital-text items-start">
-                                <span className="text-green-500 mt-1">✓</span>
-                                <span><strong className="text-white">{item.label}:</strong> {item.desc}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+              </div>
             </div>
 
-            {/* 03. PERCENTILE RANK CARD */}
-            <div className="relative w-[90vw] md:w-[600px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
-                <CardCorners inverted />
-                <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
-                    <div>
-                        <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.percentile.id}</div>
-                        <h3 className="text-3xl font-syne font-bold">Percentile</h3>
-                    </div>
-                    <div className="text-4xl font-bold text-white font-mono">{data.percentile.rank}</div>
+            {/* 05. THE FINAL VERDICT */}
+            <div className="relative w-[85vw] md:w-[700px] shrink-0 digital-text bg-foreground text-background p-8 md:p-12">
+              <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
+              <div className="space-y-8">
+                <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
+                <p className="font-mono text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
+                  {data.verdict.subtitle}
+                </p>
+                <div className="pt-8 border-t border-background/20 flex items-center gap-4">
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                  <span className="font-mono text-base font-bold tracking-widest uppercase">{data.verdict.status}</span>
                 </div>
-                <div className="space-y-8 font-mono text-base md:text-lg flex-1">
-                    <div className="bg-white/5 p-8 rounded border border-white/10 digital-text">
-                        <div className="text-xs text-white/40 mb-3 tracking-widest">JUSTIFICATION: DEPTH</div>
-                        <p className="leading-relaxed">{data.percentile.justification}</p>
-                    </div>
-                    <p className="text-white/60 text-sm italic border-l-2 border-white/20 pl-4 digital-text">
-                        "{data.percentile.quote}"
-                    </p>
-                </div>
-            </div>
-
-            {/* 04. THE EVIDENCE CARD */}
-            <div className="relative w-[90vw] md:w-[600px] h-[70vh] bg-[#0A0A0A] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col justify-center">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/10 via-white/50 to-white/10" />
-                <div className="mb-8">
-                    <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.evidence.id}</div>
-                    <h3 className="text-3xl font-syne font-bold">The Evidence</h3>
-                </div>
-                <div className="digital-text">
-                    <p className="font-mono text-xl md:text-2xl leading-relaxed text-white">"{data.evidence.quote1}"</p>
-                    <div className="mt-8 p-6 border border-white/10 bg-white/5 rounded-lg">
-                        <p className="font-mono text-lg text-white/80 leading-relaxed">"{data.evidence.quote2}"</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* 05. THE FINAL VERDICT (WHITE CARD) */}
-            <div className="relative w-[90vw] md:w-[800px] h-[70vh] bg-white text-black p-8 md:p-14 shrink-0 flex flex-col justify-center">
-                <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
-                <div className="digital-text space-y-10">
-                    <h3 className="text-4xl md:text-6xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
-                    <p className="font-mono text-xl md:text-3xl border-l-4 border-black pl-8 py-2">
-                        {data.verdict.subtitle}
-                    </p>
-                    <div className="pt-10 border-t border-black/10 flex items-center gap-6">
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                        <span className="font-mono text-lg font-bold tracking-widest uppercase">{data.verdict.status}</span>
-                    </div>
-                </div>
+              </div>
             </div>
 
             {/* END SPACER */}
             <div className="w-[10vw] shrink-0" />
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-// Sub-component for decorative corners
-const CardCorners = ({ inverted = false }) => (
-    <>
-        <div className={`absolute top-0 ${inverted ? 'right-0 border-r' : 'left-0 border-l'} w-4 h-4 border-t border-white opacity-50`} />
-        <div className={`absolute bottom-0 ${inverted ? 'left-0 border-l' : 'right-0 border-r'} w-4 h-4 border-b border-white opacity-50`} />
-    </>
-);

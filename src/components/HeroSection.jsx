@@ -13,22 +13,31 @@ export const HeroSection = forwardRef((props, ref) => {
     // Check if animation has already played this session
     const hasPlayed = sessionStorage.getItem('hero-animated') === 'true';
 
-    // Subtle fade in for banner
+    if (!titleRef.current) return;
+
+    // Fade in only on first load
     if (!hasPlayed) {
-      if (titleRef.current) {
-        gsap.from(titleRef.current, {
-          opacity: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          onComplete: () => {
-            sessionStorage.setItem('hero-animated', 'true');
-          }
-        });
-      }
+      gsap.from(titleRef.current, {
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        onComplete: () => {
+          sessionStorage.setItem('hero-animated', 'true');
+        }
+      });
     } else {
-      // If already played, set final state immediately
-      if (titleRef.current) gsap.set(titleRef.current, { opacity: 1 });
+      // Already played: Set opacity immediately
+      gsap.set(titleRef.current, { opacity: 1 });
     }
+
+    // Always start the infinite scroll animation
+    // Move by 50% (half width) where the duplicate content starts for seamless loop
+    gsap.to(titleRef.current, {
+      x: "-50%",
+      duration: 30,
+      ease: "none",
+      repeat: -1, // Infinite loop
+    });
 
   }, { scope: heroRef });
 
@@ -44,38 +53,28 @@ export const HeroSection = forwardRef((props, ref) => {
       {/* Scrolling word banner at bottom */}
       <div className="absolute bottom-0 left-0 right-0 z-40 overflow-hidden py-5 md:py-6 border-t border-border bg-background/50 backdrop-blur-sm">
         <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap">
-          {/* Scrolling text wrapper */}
-          <div ref={titleRef} className="flex items-center gap-8 md:gap-12 animate-scroll">
-            {/* Repeat the text for seamless scroll */}
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center gap-8 md:gap-12">
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
-              </div>
-            ))}
-          </div>
-          {/* Duplicate for seamless loop */}
-          <div className="flex items-center gap-8 md:gap-12 animate-scroll">
-            {[...Array(3)].map((_, i) => (
-              <div key={`dup-${i}`} className="flex items-center gap-8 md:gap-12">
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
-                <span className="text-muted-foreground/30">•</span>
-                <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
-              </div>
-            ))}
+          {/* Single scrolling container with duplicated content for seamless loop */}
+          <div ref={titleRef} className="flex items-center gap-8 md:gap-12">
+            {/* Original content */}
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
+            {/* Duplicate for seamless loop */}
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Context Continuation</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Frameworks</span>
+            <span className="text-muted-foreground/30">•</span>
+            <span className="font-mono text-xs md:text-sm text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
           </div>
         </div>
       </div>
