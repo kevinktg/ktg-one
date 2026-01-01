@@ -1,311 +1,302 @@
 'use client'
 
-import { Suspense, useRef, useEffect, useMemo, useState } from 'react'
-import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
-import { useFBO, OrbitControls } from '@react-three/drei'
-import { TextureLoader } from 'three'
+import { Suspense, useRef, useEffect, useState } from 'react'
+import { Canvas, useFrame, useThree, extend } from '@react-three/fiber'
+import { useFBO } from '@react-three/drei'
+import { TextureLoader, ShaderMaterial } from 'three'
 import * as THREE from 'three'
 
-// Dual Image Component - Reveals bottom image as blob reveals
+// ============================================================================
+// SHADERS
+// ============================================================================
+
+const dualImageVertexShader = `
+  varying vec2 vUv;
+  varying vec4 vPosProj;
+  
+  void main() {
+    vUv = uv;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+    vPosProj = gl_Position;
+  }
+`
+
+const dualImageFragmentShader = `
+  uniform sampler2D topTex;
+  uniform sampler2D bottomTex;
+  uniform sampler2D texBlob;
+  
+  varying vec2 vUv;
+  varying vec4 vPosProj;
+  
+  void main() {
+    vec2 blobUV = (vPosProj.xy / vPosProj.w) * 0.5 + 0.5;
+    float reveal = texture2D(texBlob, blobUV).r;
+    reveal = clamp(reveal, 0.0, 1.0);
+    
+    vec4 topColor = texture2D(topTex, vUv);
+    vec4 bottomColor = texture2D(bottomTex, vUv);
+    
+    // Mix colors based on blob reveal
+    vec3 finalColor = mix(topColor.rgb, bottomColor.rgb, reveal);
+    
+    // Mix alpha too - preserve transparency
+    float finalAlpha = mix(topColor.a, bottomColor.a, reveal);
+    
+    gl_FragColor = vec4(finalColor, finalAlpha);
+  }
+`
+
+const blobVertexShader = `
+  varying vec2 vUv;
+  
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const blobFragmentShader = `
+  uniform sampler2D fbTexture;
+  uniform vec2 pointer;
+  uniform float pointerDown;
+  uniform float pointerRadius;
+  uniform float pointerDuration;
+  uniform float dTime;
+  uniform float aspect;
+  
+  varying vec2 vUv;
+  
+  void main() {
+    float duration = pointerDuration;
+    float rVal = texture2D(fbTexture, vUv).r;
+    
+    rVal -= clamp(dTime / duration, 0.0, 0.1);
+    rVal = clamp(rVal, 0.0, 1.0);
+    
+    float f = 0.0;
+    if (pointerDown > 0.5) {
+      vec2 uv = (vUv - 0.5) * 2.0 * vec2(aspect, 1.0);
+      vec2 mouse = pointer * vec2(aspect, 1.0);
+      float dist = distance(uv, mouse);
+      f = 1.0 - smoothstep(pointerRadius * 0.1, pointerRadius, dist);
+    }
+    
+    rVal += f * 0.1;
+    rVal = clamp(rVal, 0.0, 1.0);
+    
+    gl_FragColor = vec4(rVal, rVal, rVal, 1.0);
+  }
+`
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+class DualImageMaterial extends ShaderMaterial {
+  constructor() {
+    super({
+      uniforms: {
+        topTex: { value: null },
+        bottomTex: { value: null },
+        texBlob: { value: null }
+      },
+      vertexShader: dualImageVertexShader,
+      fragmentShader: dualImageFragmentShader,
+      side: THREE.DoubleSide,
+      transparent: true // Enable alpha blending for transparent PNGs
+    })
+  }
+}
+
+extend({ DualImageMaterial })
+
 function DualImageReveal({ blobTexture, topImagePath, bottomImagePath }) {
   const meshRef = useRef()
   const materialRef = useRef()
-  const three = useThree()
-  const viewport = three?.viewport || { width: 10, height: 10 } // Fallback
-  const topTexture = useLoader(TextureLoader, topImagePath)
-  const bottomTexture = useLoader(TextureLoader, bottomImagePath)
+  const { viewport } = useThree()
+  const [topTexture, setTopTexture] = useState(null)
+  const [bottomTexture, setBottomTexture] = useState(null)
   
   useEffect(() => {
-    [topTexture, bottomTexture].forEach(texture => {
-      if (texture) {
-        texture.wrapS = THREE.ClampToEdgeWrapping
-        texture.wrapT = THREE.ClampToEdgeWrapping
-        texture.minFilter = THREE.LinearFilter
-        texture.magFilter = THREE.LinearFilter
-        texture.needsUpdate = true
-      }
+    const loader = new TextureLoader()
+    
+    loader.load(topImagePath, (texture) => {
+      texture.wrapS = THREE.ClampToEdgeWrapping
+      texture.wrapT = THREE.ClampToEdgeWrapping
+      texture.minFilter = THREE.LinearMipmapLinearFilter
+      texture.magFilter = THREE.LinearFilter
+      texture.anisotropy = 16 // Maximum anisotropic filtering
+      texture.generateMipmaps = true
+      texture.needsUpdate = true
+      setTopTexture(texture)
     })
-    console.log('[HeroImages] Textures loaded:', { topTexture, bottomTexture })
-  }, [topTexture, bottomTexture])
+    
+    loader.load(bottomImagePath, (texture) => {
+      texture.wrapS = THREE.ClampToEdgeWrapping
+      texture.wrapT = THREE.ClampToEdgeWrapping
+      texture.minFilter = THREE.LinearMipmapLinearFilter
+      texture.magFilter = THREE.LinearFilter
+      texture.anisotropy = 16
+      texture.generateMipmaps = true
+      texture.needsUpdate = true
+      setBottomTexture(texture)
+    })
+  }, [topImagePath, bottomImagePath])
   
   useEffect(() => {
-    if (!materialRef.current) {
-      console.log('[DualImageReveal] Waiting for material')
-      return
-    }
+    if (!materialRef.current) return
     
-    // Show top image immediately (basic fallback)
-    if (!topTexture || !bottomTexture) {
-      console.log('[DualImageReveal] Textures not loaded yet')
-      return
-    }
-    
-    // If no blob texture, just show top image
-    if (!blobTexture) {
-      console.log('[DualImageReveal] No blobTexture yet, showing top image only')
-      // Reset shader modification
-      materialRef.current.onBeforeCompile = null
-      materialRef.current.map = topTexture
-      materialRef.current.needsUpdate = true
-      return
-    }
-    
-    console.log('[DualImageReveal] Setting up shader with blobTexture')
-    
-    const uniforms = { 
-      texBlob: { value: blobTexture },
-      topTex: { value: topTexture },
-      bottomTex: { value: bottomTexture }
-    }
-    
-    materialRef.current.onBeforeCompile = (shader) => {
-      console.log('[DualImageReveal] Compiling shader')
-      // Add uniforms
-      shader.uniforms.texBlob = uniforms.texBlob
-      shader.uniforms.topTex = uniforms.topTex
-      shader.uniforms.bottomTex = uniforms.bottomTex
-      
-      // Modify vertex shader - add varying declarations at top
-      shader.vertexShader = `
-        varying vec4 vPosProj;
-        varying vec2 vUv;
-        ${shader.vertexShader}
-      `.replace(
-        `#include <project_vertex>`,
-        `#include <project_vertex>
-        vPosProj = gl_Position;
-        `
-      ).replace(
-        `#include <uv_vertex>`,
-        `#include <uv_vertex>
-        vUv = uv;
-        `
-      )
-      
-      // Modify fragment shader - add uniforms and varyings declarations
-      shader.fragmentShader = shader.fragmentShader.replace(
-        `#include <common>`,
-        `#include <common>
-        uniform sampler2D texBlob;
-        uniform sampler2D topTex;
-        uniform sampler2D bottomTex;
-        varying vec4 vPosProj;
-        varying vec2 vUv;
-        `
-      ).replace(
-        `#include <color_fragment>`,
-        `#include <color_fragment>
-        
-        // Convert projection position to screen-space UV
-        vec2 blobUV = ((vPosProj.xy / vPosProj.w) + 1.0) * 0.5;
-        vec4 blobData = texture2D(texBlob, blobUV);
-        
-        // Sample both images
-        vec4 topColor = texture2D(topTex, vUv);
-        vec4 bottomColor = texture2D(bottomTex, vUv);
-        
-        // Mix based on blob reveal value
-        float reveal = clamp(blobData.r, 0.0, 1.0);
-        diffuseColor.rgb = mix(topColor.rgb, bottomColor.rgb, reveal);
-        `
-      )
-    }
-    materialRef.current.needsUpdate = true
-    
-    // Force shader recompilation
-    if (materialRef.current.shader) {
-      materialRef.current.shader.needsUpdate = true
-    }
-  }, [blobTexture, topTexture, bottomTexture])
-
-  // Calculate size to fill viewport properly
-  // viewport gives us 3D units visible based on camera distance
-  const width = viewport.width
-  const height = viewport.height
+    if (topTexture) materialRef.current.uniforms.topTex.value = topTexture
+    if (bottomTexture) materialRef.current.uniforms.bottomTex.value = bottomTexture
+    if (blobTexture) materialRef.current.uniforms.texBlob.value = blobTexture
+  }, [topTexture, bottomTexture, blobTexture])
   
-  // Get image aspect ratio once texture loads
   const imageAspect = topTexture?.image 
     ? topTexture.image.width / topTexture.image.height 
-    : null
+    : 1.5
   
-  // Calculate size to COVER viewport (fill entire screen, may crop edges)
-  let finalWidth = width * 1.5  // Start larger to ensure coverage
-  let finalHeight = height * 1.5
+  let finalWidth = viewport.width * 1.2
+  let finalHeight = viewport.height * 1.2
   
-  if (imageAspect) {
-    const viewportAspect = width / height
-    if (imageAspect > viewportAspect) {
-      // Image is wider - cover height completely, extend width if needed
-      finalHeight = height * 1.5
-      finalWidth = finalHeight * imageAspect
-    } else {
-      // Image is taller - cover width completely, extend height if needed
-      finalWidth = width * 1.5
-      finalHeight = finalWidth / imageAspect
-    }
+  const viewportAspect = viewport.width / viewport.height
+  if (imageAspect > viewportAspect) {
+    finalHeight = viewport.height * 1.2
+    finalWidth = finalHeight * imageAspect
+  } else {
+    finalWidth = viewport.width * 1.2
+    finalHeight = finalWidth / imageAspect
+  }
+  
+  if (!topTexture || !bottomTexture) {
+    return null
   }
   
   return (
     <mesh ref={meshRef} position={[0, 0, 0]}>
       <planeGeometry args={[finalWidth, finalHeight]} />
-      <meshStandardMaterial 
-        ref={materialRef}
-        map={topTexture}
-        side={THREE.DoubleSide}
-      />
+      <dualImageMaterial ref={materialRef} />
     </mesh>
   )
 }
 
-// Blob Component - Creates the framebuffer feedback effect
+// Blob with PING-PONG FBOs to fix feedback loop
 function Blob({ pointer, pointerDown, pointerRadius, pointerDuration, dTime, aspect, onTextureReady }) {
   const { gl, size } = useThree()
-  const rtOutput = useFBO(size.width, size.height)
+  
+  // PING-PONG: Two FBOs that swap roles each frame
+  // Use higher resolution for FBO (match device pixel ratio)
+  const fboWidth = Math.floor(size.width * gl.getPixelRatio())
+  const fboHeight = Math.floor(size.height * gl.getPixelRatio())
+  
+  const fbo1 = useFBO(fboWidth, fboHeight, {
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    format: THREE.RGBAFormat
+  })
+  const fbo2 = useFBO(fboWidth, fboHeight, {
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    format: THREE.RGBAFormat
+  })
+  
+  const readRef = useRef(fbo1)   // Read from this
+  const writeRef = useRef(fbo2)  // Write to this
   const rtSceneRef = useRef()
-  const rtCameraRef = useRef(new THREE.Camera())
-  const prevTextureRef = useRef(null)
-  const blobTextureInitialized = useRef(false)
+  const rtCameraRef = useRef()
+  const materialRef = useRef()
+  const initialized = useRef(false)
 
   useEffect(() => {
-    // Initialize with black texture (no reveal)
-    const initSize = size.width * size.height
-    const data = new Uint8Array(initSize * 4) // RGBA - all zeros = black
-    const initTexture = new THREE.DataTexture(data, size.width, size.height, THREE.RGBAFormat)
-    initTexture.wrapS = THREE.ClampToEdgeWrapping
-    initTexture.wrapT = THREE.ClampToEdgeWrapping
-    initTexture.needsUpdate = true
-    prevTextureRef.current = initTexture
-    console.log('[Blob] Initialized texture:', { width: size.width, height: size.height })
-  }, [rtOutput, size.width, size.height])
+    rtCameraRef.current = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+    rtSceneRef.current = new THREE.Scene()
+    
+    // Clear both FBOs to black initially
+    gl.setRenderTarget(fbo1)
+    gl.clearColor(0, 0, 0, 1)
+    gl.clear()
+    gl.setRenderTarget(fbo2)
+    gl.clearColor(0, 0, 0, 1)
+    gl.clear()
+    gl.setRenderTarget(null)
+  }, [gl, fbo1, fbo2])
 
-  const uniforms = useMemo(() => ({
-    dTime: { value: dTime },
-    aspect: { value: aspect },
-    pointer: { value: new THREE.Vector2(pointer.x, pointer.y) },
-    pointerDown: { value: pointerDown },
-    pointerRadius: { value: pointerRadius },
-    pointerDuration: { value: pointerDuration },
-    fbTexture: { value: prevTextureRef.current || rtOutput.texture }
-  }), [dTime, aspect, pointer.x, pointer.y, pointerDown, pointerRadius, pointerDuration, rtOutput.texture])
-
-  useFrame(() => {
+  useEffect(() => {
     if (!rtSceneRef.current) return
     
-    // Update uniforms that change per frame
-    uniforms.pointer.value.set(pointer.x, pointer.y)
-    uniforms.pointerDown.value = pointerDown
-    uniforms.aspect.value = aspect
-    uniforms.dTime.value = dTime
+    const geometry = new THREE.PlaneGeometry(2, 2)
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        fbTexture: { value: null },
+        pointer: { value: new THREE.Vector2(0, 0) },
+        pointerDown: { value: 0 },
+        pointerRadius: { value: pointerRadius },
+        pointerDuration: { value: pointerDuration },
+        dTime: { value: 0 },
+        aspect: { value: 1 }
+      },
+      vertexShader: blobVertexShader,
+      fragmentShader: blobFragmentShader
+    })
     
-    // Update feedback texture before rendering
-    if (prevTextureRef.current) {
-      uniforms.fbTexture.value = prevTextureRef.current
+    const mesh = new THREE.Mesh(geometry, material)
+    rtSceneRef.current.add(mesh)
+    materialRef.current = material
+    
+    return () => {
+      if (rtSceneRef.current && mesh) {
+        rtSceneRef.current.remove(mesh)
+      }
+      if (geometry) geometry.dispose()
+      if (material) material.dispose()
     }
+  }, [pointerRadius, pointerDuration])
+
+  useFrame(() => {
+    if (!materialRef.current || !rtSceneRef.current || !rtCameraRef.current) return
     
-    // Render blob to FBO
-    gl.setRenderTarget(rtOutput)
+    // Update uniforms - READ from current read buffer
+    materialRef.current.uniforms.pointer.value.set(pointer.x, pointer.y)
+    materialRef.current.uniforms.pointerDown.value = pointerDown
+    materialRef.current.uniforms.aspect.value = aspect
+    materialRef.current.uniforms.dTime.value = dTime
+    materialRef.current.uniforms.fbTexture.value = readRef.current.texture
+    
+    // WRITE to current write buffer
+    gl.setRenderTarget(writeRef.current)
     gl.render(rtSceneRef.current, rtCameraRef.current)
     gl.setRenderTarget(null)
     
-    // Update feedback texture for next frame
-    prevTextureRef.current = rtOutput.texture
-    uniforms.fbTexture.value = rtOutput.texture
+    // SWAP buffers for next frame
+    const temp = readRef.current
+    readRef.current = writeRef.current
+    writeRef.current = temp
     
-    // Notify that texture is ready (only once)
-    if (onTextureReady && !blobTextureInitialized.current) {
-      onTextureReady(rtOutput.texture)
-      blobTextureInitialized.current = true
-      console.log('[Blob] Texture ready and passed to DualImageReveal')
+    // Pass current read texture to parent
+    if (!initialized.current && onTextureReady) {
+      onTextureReady(readRef.current.texture)
+      initialized.current = true
     }
   })
 
-  return (
-    <mesh ref={rtSceneRef} visible={false}>
-      <planeGeometry args={[2, 2]} />
-      <meshBasicMaterial
-        color={0x000000}
-        onBeforeCompile={(shader) => {
-          Object.assign(shader.uniforms, uniforms)
-          
-          // Add vUv varying to vertex shader
-          shader.vertexShader = `
-            varying vec2 vUv;
-            ${shader.vertexShader}
-          `.replace(
-            `#include <project_vertex>`,
-            `vUv = uv;
-            #include <project_vertex>`
-          )
-          
-          // Add uniforms and varyings to fragment shader
-          shader.fragmentShader = `
-            uniform float dTime;
-            uniform float aspect;
-            uniform vec2 pointer;
-            uniform float pointerDown;
-            uniform float pointerRadius;
-            uniform float pointerDuration;
-            uniform sampler2D fbTexture;
-            varying vec2 vUv;
-            
-            ${shader.fragmentShader}
-          `.replace(
-            `#include <color_fragment>`,
-            `#include <color_fragment>
-            
-            float duration = pointerDuration;
-            float rVal = texture2D(fbTexture, vUv).r;
-            rVal -= clamp(dTime / duration, 0., 0.1);
-            rVal = clamp(rVal, 0., 1.);
-            
-            float f = 0.;
-            if (pointerDown > 0.5) {
-              vec2 uv = (vUv - 0.5) * 2. * vec2(aspect, 1.);
-              vec2 mouse = pointer * vec2(aspect, 1.);
-              f = 1. - smoothstep(pointerRadius * 0.1, pointerRadius, distance(uv, mouse));
-            }
-            rVal += f * 0.1;
-            rVal = clamp(rVal, 0., 1.);
-            diffuseColor.rgb = vec3(rVal);
-            `
-          )
-        }}
-      />
-    </mesh>
-  )
+  return null
 }
 
 function Scene({ topImage, bottomImage }) {
   const { size, gl } = useThree()
   const [pointer, setPointer] = useState(new THREE.Vector2(0, 0))
-  const [pointerDown, setPointerDown] = useState(1) // Start at 1 - assume mouse is active
+  const [pointerDown, setPointerDown] = useState(0) // Start with 0 - no reveal until mouse moves
   const [blobTexture, setBlobTexture] = useState(null)
   const pointerRadius = 0.375
   const pointerDuration = 2.5
   const aspect = size.width / size.height
-  const logIntervalRef = useRef(null)
+  const dTime = useRef(0)
   
   useEffect(() => {
-    // Check if mouse is over canvas on mount
-    const checkInitialPosition = () => {
-      const rect = gl.domElement.getBoundingClientRect()
-      // If canvas exists and is visible, assume we might start with mouse over it
-      if (rect.width > 0 && rect.height > 0) {
-        setPointerDown(1)
-        console.log('[Scene] Canvas ready, pointerDown initialized to 1')
-      }
-    }
-    
-    // Small delay to ensure canvas is rendered
-    const timer = setTimeout(checkInitialPosition, 100)
-    
-    let moveCount = 0
-    const lastLogTime = { current: 0 }
-    
     const handlePointerMove = (event) => {
       const rect = gl.domElement.getBoundingClientRect()
       
-      // Check if pointer is within canvas bounds
       const isOverCanvas = (
         event.clientX >= rect.left &&
         event.clientX <= rect.right &&
@@ -319,58 +310,24 @@ function Scene({ topImage, bottomImage }) {
         
         setPointer(new THREE.Vector2(x, y))
         setPointerDown(1)
-        
-        // Log periodically (every 60 frames or ~1 second at 60fps)
-        moveCount++
-        const now = Date.now()
-        if (moveCount <= 3 || now - lastLogTime.current > 1000) {
-          console.log('[Scene] Pointer move:', { 
-            x: x.toFixed(3), 
-            y: y.toFixed(3), 
-            pointerDown: 1,
-            canvasSize: { width: rect.width, height: rect.height },
-            aspect
-          })
-          lastLogTime.current = now
-        }
-      } else {
-        // Mouse is outside canvas, but keep pointerDown active (might return)
-        // Only set to 0 if we're definitely leaving
       }
     }
     
-    const handlePointerLeave = () => {
-      setPointer(new THREE.Vector2(0, 0)) // Reset to center instead of far away
-      setPointerDown(0)
-      console.log('[Scene] Pointer left canvas')
-    }
-    
-    const handlePointerEnter = () => {
-      setPointerDown(1)
-      console.log('[Scene] Pointer entered canvas')
-    }
+    const handlePointerLeave = () => setPointerDown(0)
+    const handlePointerEnter = () => setPointerDown(1)
     
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
     gl.domElement.addEventListener('pointerleave', handlePointerLeave)
     gl.domElement.addEventListener('pointerenter', handlePointerEnter)
     
-    console.log('[Scene] Pointer event listeners attached', {
-      canvasSize: { width: size.width, height: size.height },
-      aspect: aspect.toFixed(3)
-    })
+    // Don't auto-activate - wait for actual mouse movement
     
     return () => {
-      clearTimeout(timer)
       window.removeEventListener('pointermove', handlePointerMove)
       gl.domElement.removeEventListener('pointerleave', handlePointerLeave)
       gl.domElement.removeEventListener('pointerenter', handlePointerEnter)
-      if (logIntervalRef.current) {
-        clearInterval(logIntervalRef.current)
-      }
     }
-  }, [gl.domElement, size.width, size.height, aspect])
-  
-  const dTime = useRef(0)
+  }, [gl.domElement])
   
   useFrame((state, delta) => {
     dTime.current = delta
@@ -379,7 +336,6 @@ function Scene({ topImage, bottomImage }) {
   return (
     <>
       <ambientLight intensity={1.5} />
-      <pointLight position={[5, 5, 5]} intensity={0.5} />
       
       <Blob
         pointer={pointer}
@@ -392,40 +348,36 @@ function Scene({ topImage, bottomImage }) {
       />
       
       <Suspense fallback={null}>
-        {/* Always render - shows top image if blobTexture not ready */}
         <DualImageReveal 
           blobTexture={blobTexture}
           topImagePath={topImage}
           bottomImagePath={bottomImage}
         />
       </Suspense>
-      
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.05}
-        enableZoom={false}
-        enablePan={false}
-      />
     </>
   )
 }
 
 export function HeroImages({ 
-  topImage = '/assets/top-hero.webp',
-  bottomImage = '/assets/btm-hero.webp'
+  topImage = '/assets/top-hero.png',
+  bottomImage = '/assets/bottom-hero.png'
 }) {
   return (
     <div className="absolute inset-0 z-10 pointer-events-auto w-full h-full">
       <Canvas
         camera={{ position: [0, 0, 4], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: 'high-performance'
+        }}
         style={{ 
           background: 'transparent',
           width: '100%',
           height: '100%',
           display: 'block'
         }}
-        dpr={[1, 2]} // Limit pixel ratio for performance
+        dpr={typeof window !== 'undefined' ? window.devicePixelRatio : 2}
       >
         <Scene 
           topImage={topImage}
@@ -435,4 +387,3 @@ export function HeroImages({
     </div>
   )
 }
-

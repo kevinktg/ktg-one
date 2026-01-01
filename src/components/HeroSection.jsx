@@ -43,20 +43,12 @@ export const HeroSection = forwardRef((props, ref) => {
   }, { scope: heroRef });
 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20" suppressHydrationWarning>
-
-      {/* Layer 0: Pulsing Background - Your original design */}
-      <div className="absolute inset-0 z-0 bg-black">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)]" style={{ backgroundSize: '14px 24px' }}></div>
-        {/* Pulsing radial gradient */}
-        <div className="absolute left-1/2 top-[-10%] -translate-x-1/2 h-[1000px] w-[1000px] rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,#fbfbfb36,#000)]"></div>
-      </div>
+    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black" suppressHydrationWarning>
       
-      {/* Layer 1: Hero Images with Blob Reveal - Landon Norris Effect */}
+      {/* Hero Images with Blob Reveal - Lando Norris Effect */}
       <HeroImages 
-        topImage="/assets/top-hero.webp"
-        bottomImage="/assets/btm-hero.webp"
+        topImage="/assets/top-hero.png"
+        bottomImage="/assets/bottom-hero.png"
       />
 
       {/* Center Content - Visible Title/Content */}

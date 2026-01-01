@@ -120,3 +120,8 @@ styles/      # Using src/app/globals.css instead
 # Package manager locks (keep package-lock.json, ignore others if switching)
 # yarn.lock
 # pnpm-lock.yaml
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor\rules\openmemory.mdc
+CLAUDE.md
+AGENTS.md
