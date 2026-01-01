@@ -358,28 +358,34 @@ function Scene({ topImage, bottomImage }) {
   )
 }
 
-export function HeroImages({ 
-  topImage = '/assets/top-hero.png',
-  bottomImage = '/assets/bottom-hero.png'
+export function HeroImages({
+  topImage = '/assets/top-hero.webp',
+  bottomImage = '/assets/bottom-hero.webp'
 }) {
   return (
-    <div className="absolute inset-0 z-10 pointer-events-auto w-full h-full">
+    <div
+      className="absolute inset-0 z-10 pointer-events-auto w-full h-full"
+      style={{
+        contain: 'layout style paint',
+        aspectRatio: '16 / 9' // Reserve space to prevent CLS
+      }}
+    >
       <Canvas
         camera={{ position: [0, 0, 4], fov: 50 }}
-        gl={{ 
-          antialias: true, 
+        gl={{
+          antialias: true,
           alpha: true,
           powerPreference: 'high-performance'
         }}
-        style={{ 
+        style={{
           background: 'transparent',
           width: '100%',
           height: '100%',
           display: 'block'
         }}
-        dpr={typeof window !== 'undefined' ? window.devicePixelRatio : 2}
+        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2}
       >
-        <Scene 
+        <Scene
           topImage={topImage}
           bottomImage={bottomImage}
         />

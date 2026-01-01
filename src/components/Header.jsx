@@ -33,23 +33,23 @@ export function Header() {
   }, { scope: headerRef });
 
   return (
-    <header 
+    <header
       ref={headerRef}
-      className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-4 md:py-5 flex justify-between items-center border-b border-border/50 bg-background/80 backdrop-blur-sm"
+      className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-4 md:py-5 flex justify-between items-center border-b border-border bg-background backdrop-blur-md"
       suppressHydrationWarning
     >
-      {/* LOGO: Syne bold lowercase */}
+      {/* LOGO: Syne bold lowercase - proper size hierarchy */}
       <Link href="/" className="group" suppressHydrationWarning>
-        <span className="font-syne text-sm font-bold lowercase text-foreground/90 group-hover:text-foreground transition-colors duration-200">
+        <span className="font-syne text-xl md:text-2xl font-bold lowercase text-foreground group-hover:text-foreground/80 transition-colors duration-200">
           ktg
         </span>
       </Link>
 
       {/* NAV: Clean minimal navigation */}
       <nav className="flex items-center gap-6 md:gap-8" suppressHydrationWarning>
-        <Link 
-          href="/blog" 
-          className="font-mono text-xs text-foreground/60 hover:text-foreground transition-colors duration-200 uppercase tracking-wider"
+        <Link
+          href="/blog"
+          className="font-mono text-sm text-foreground/70 hover:text-foreground transition-colors duration-200 uppercase tracking-wider"
           suppressHydrationWarning
         >
           Blog

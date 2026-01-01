@@ -7,6 +7,7 @@ import { useRef } from "react";
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
+  const shutterRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -51,11 +52,26 @@ export function ValidationSection({ auditData }) {
 
     if (hasPlayed) {
       // Skip animation - set final states immediately
+      if (shutterRef.current?.children) {
+        gsap.set(shutterRef.current.children, { scaleY: 0 });
+      }
       gsap.set(".digital-text", { opacity: 1, x: 0 });
       return;
     }
 
-    // Text reveal animations - Run immediately on mount
+    // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
+    gsap.to(shutterRef.current?.children, {
+      scaleY: 0,
+      duration: 1,
+      stagger: 0.05,
+      ease: "power3.inOut",
+      transformOrigin: "bottom",
+      onComplete: () => {
+        sessionStorage.setItem('validation-animated', 'true');
+      }
+    });
+
+    // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
     const textElements = gsap.utils.toArray(".digital-text");
     textElements.forEach((text, index) => {
       gsap.from(text, {
@@ -63,17 +79,22 @@ export function ValidationSection({ auditData }) {
         x: 30,
         duration: 0.8,
         ease: "power2.out",
-        delay: index * 0.1, // Stagger animations
+        delay: 0.8 + (index * 0.1), // Stagger after shutter animation
       });
     });
-
-    sessionStorage.setItem('validation-animated', 'true');
 
   }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className="relative w-full py-8 overflow-hidden z-40 bg-background">
-      
+
+      {/* SHUTTERS (White -> Black Swoop) */}
+      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
+         {[...Array(5)].map((_, i) => (
+           <div key={i} className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" style={{ contain: 'strict' }} />
+         ))}
+      </div>
+
       {/* Scroll Feature Container - matches Graphite pattern */}
       <div className="w-full scroll-feature-container">
         

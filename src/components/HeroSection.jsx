@@ -2,8 +2,10 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef, forwardRef } from "react";
-import { HeroImages } from "@/components/HeroImages";
+import { useRef, forwardRef, lazy, Suspense } from "react";
+
+// Lazy load Three.js component to avoid blocking initial page load
+const HeroImages = lazy(() => import("@/components/HeroImages").then(mod => ({ default: mod.HeroImages })));
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
@@ -43,23 +45,15 @@ export const HeroSection = forwardRef((props, ref) => {
   }, { scope: heroRef });
 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black" suppressHydrationWarning>
-      
-      {/* Hero Images with Blob Reveal - Lando Norris Effect */}
-      <HeroImages 
-        topImage="/assets/top-hero.png"
-        bottomImage="/assets/bottom-hero.png"
-      />
+    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-background" suppressHydrationWarning>
 
-      {/* Center Content - Visible Title/Content */}
-      <div className="relative z-30 text-center pointer-events-none">
-        <h1 className="font-syne text-7xl md:text-9xl font-bold mb-6 lowercase text-foreground opacity-90">
-          ktg
-        </h1>
-        <p className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">
-          Top 0.01% Prompt Engineer
-        </p>
-      </div>
+      {/* Hero Images with Blob Reveal - Lando Norris Effect (lazy loaded) */}
+      <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
+        <HeroImages
+          topImage="/assets/top-hero.webp"
+          bottomImage="/assets/bottom-hero.webp"
+        />
+      </Suspense>
 
       {/* Scrolling word banner at bottom */}
       <div className="absolute bottom-0 left-0 right-0 z-50 overflow-hidden py-5 md:py-6 border-t border-border bg-background/50 backdrop-blur-sm">

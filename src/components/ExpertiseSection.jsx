@@ -103,9 +103,9 @@ export function ExpertiseSection({ expertiseData }) {
     <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30">
 
       {/* SHUTTERS (Transition Layer) */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full">
+      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
          {[...Array(5)].map((_, i) => (
-           <div key={i} className="w-1/5 h-full bg-black border-r border-white/10 will-change-transform" />
+           <div key={i} className="w-1/5 h-full bg-black border-r border-white/10 will-change-transform" style={{ contain: 'strict' }} />
          ))}
       </div>
 
@@ -127,17 +127,16 @@ export function ExpertiseSection({ expertiseData }) {
         {/* Grid */}
         <div className="grid md:grid-cols-3 gap-12 mb-24">
           {data.map((area) => (
-            <div key={area.category} className="expertise-group relative group">
-              <div className="absolute -inset-6 bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl -z-10" />
+            <div key={area.category} className="expertise-group relative">
               <div className="mb-8 relative pl-4">
-                <div className="absolute left-0 top-0 w-1 h-full bg-black scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
-                <h3 className="font-mono tracking-wider font-bold text-lg">{area.category}</h3>
-                <div className="mt-2 w-12 h-0.5 bg-black group-hover:w-24 transition-all duration-500 ease-out" />
+                <div className="absolute left-0 top-0 w-1 h-full bg-black/30" />
+                <h3 className="font-mono tracking-wider font-bold text-sm uppercase">{area.category}</h3>
+                <div className="mt-2 w-24 h-0.5 bg-black" />
               </div>
               <ul className="space-y-3">
                 {area.skills.map((skill, i) => (
-                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed font-mono text-base group-hover:text-black transition-colors duration-300">
-                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-black/20 group-hover:bg-black transition-colors rotate-45" />
+                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed text-base">
+                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-black/30 rotate-45" />
                     {skill}
                   </li>
                 ))}
