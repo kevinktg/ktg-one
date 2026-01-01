@@ -78,7 +78,13 @@ export function ValidationSection({ auditData }) {
       <div className="w-full scroll-feature-container">
         
         {/* Sticky full-height container */}
-        <div className="h-dvh w-full sticky top-0 py-[var(--header-height,4rem)] flex flex-col items-center gap-x-8 md:flex-row" style={{ paddingTop: 'var(--header-height, 4rem)', paddingBottom: 'var(--header-height, 4rem)' }}>
+        <div 
+          className="h-dvh w-full sticky top-0 flex flex-col items-center gap-x-8 md:flex-row" 
+          style={{ 
+            paddingTop: 'var(--header-height, 4rem)', 
+            paddingBottom: 'var(--header-height, 4rem)' 
+          }}
+        >
           
           {/* Single Card Container with Horizontal Scroll - Graphite style */}
           <div className="h-full max-h-[720px] relative flex p-4 border border-border rounded-2xl gap-4 w-full mx-4 md:mx-auto max-w-7xl overflow-hidden">
