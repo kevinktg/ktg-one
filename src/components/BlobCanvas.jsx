@@ -37,8 +37,11 @@ export function BlobCanvas({ onCanvasReady }) {
     resize()
     window.addEventListener('resize', resize)
     
-    const pointerRadius = 150 // pixels
+    const pointerRadius = 200 // pixels - increased for better visibility
     const fadeDuration = 2500 // ms
+    const blobThrottle = 50 // ms - only add blob every 50ms (20fps)
+    let lastBlobTime = 0
+    let lastBlobPos = { x: 0, y: 0 }
     
     const render = (currentTime) => {
       if (!canvas || !ctx) return
@@ -46,21 +49,38 @@ export function BlobCanvas({ onCanvasReady }) {
       const width = canvas.width
       const height = canvas.height
       
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height)
+      // Clear canvas with black background (for mask: black = hidden, white = visible)
+      ctx.fillStyle = 'rgba(0, 0, 0, 1)'
+      ctx.fillRect(0, 0, width, height)
       
       // Read cursor state from refs (always current, no closure issues)
       const currentCursorPos = cursorPosRef.current
       const currentIsActive = isActiveRef.current
       
-      // Add new blob if cursor is active
+      // Add new blob if cursor is active and enough time has passed
       if (currentIsActive) {
-        blobHistoryRef.current.push({
-          x: (currentCursorPos.x / 100) * width,
-          y: (currentCursorPos.y / 100) * height,
-          time: currentTime,
-          radius: pointerRadius
-        })
+        const blobX = (currentCursorPos.x / 100) * width
+        const blobY = (currentCursorPos.y / 100) * height
+        
+        // Only add blob if:
+        // 1. Enough time has passed since last blob (throttle)
+        // 2. Cursor has moved significantly (at least 10px)
+        const timeSinceLastBlob = currentTime - lastBlobTime
+        const distanceFromLastBlob = Math.sqrt(
+          Math.pow(blobX - lastBlobPos.x, 2) + 
+          Math.pow(blobY - lastBlobPos.y, 2)
+        )
+        
+        if (timeSinceLastBlob >= blobThrottle && distanceFromLastBlob >= 10) {
+          blobHistoryRef.current.push({
+            x: blobX,
+            y: blobY,
+            time: currentTime,
+            radius: pointerRadius
+          })
+          lastBlobTime = currentTime
+          lastBlobPos = { x: blobX, y: blobY }
+        }
       }
       
       // Remove old blobs and draw current ones
@@ -73,14 +93,15 @@ export function BlobCanvas({ onCanvasReady }) {
         const fade = 1 - (age / fadeDuration)
         const currentRadius = blob.radius * fade
         
-        // Draw blob with gradient
+        // Draw blob with gradient - white for mask visibility
         const gradient = ctx.createRadialGradient(
           blob.x, blob.y, 0,
           blob.x, blob.y, currentRadius
         )
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${fade * 0.8})`)
-        gradient.addColorStop(0.3, `rgba(255, 255, 255, ${fade * 0.4})`)
-        gradient.addColorStop(0.6, `rgba(255, 255, 255, ${fade * 0.1})`)
+        // Use solid white in center, fade to transparent
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${fade})`)
+        gradient.addColorStop(0.4, `rgba(255, 255, 255, ${fade * 0.6})`)
+        gradient.addColorStop(0.7, `rgba(255, 255, 255, ${fade * 0.2})`)
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
         
         ctx.fillStyle = gradient

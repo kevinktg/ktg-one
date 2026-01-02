@@ -21,7 +21,7 @@ export function GeometricBackground({ fixed = false }) {
     
     let rafId = null
     let lastUpdate = 0
-    const throttleMs = 100 // Update 10 times per second
+    const throttleMs = 50 // Update 20 times per second for smoother effect
     
     const updateMask = (currentTime) => {
       if (currentTime - lastUpdate < throttleMs) {
@@ -30,11 +30,12 @@ export function GeometricBackground({ fixed = false }) {
       }
       
       try {
+        // Use toDataURL with better quality
         const dataUrl = blobCanvas.toDataURL('image/png')
         setBlobMaskUrl(dataUrl)
         lastUpdate = currentTime
       } catch (e) {
-        // Silently handle errors
+        console.warn('Failed to update blob mask:', e)
       }
       
       rafId = requestAnimationFrame(updateMask)
@@ -53,6 +54,7 @@ export function GeometricBackground({ fixed = false }) {
     
     if (blobMaskUrl) {
       // Use blob canvas as mask - white areas reveal, black areas hide
+      // The blob canvas has black background with white blobs
       const maskValue = `url(${blobMaskUrl})`
       gradientRef.current.style.maskImage = maskValue
       gradientRef.current.style.WebkitMaskImage = maskValue
@@ -60,6 +62,8 @@ export function GeometricBackground({ fixed = false }) {
       gradientRef.current.style.WebkitMaskSize = '100% 100%'
       gradientRef.current.style.maskRepeat = 'no-repeat'
       gradientRef.current.style.WebkitMaskRepeat = 'no-repeat'
+      gradientRef.current.style.maskPosition = 'center'
+      gradientRef.current.style.WebkitMaskPosition = 'center'
       
       gridRef.current.style.maskImage = maskValue
       gridRef.current.style.WebkitMaskImage = maskValue
@@ -67,18 +71,23 @@ export function GeometricBackground({ fixed = false }) {
       gridRef.current.style.WebkitMaskSize = '100% 100%'
       gridRef.current.style.maskRepeat = 'no-repeat'
       gridRef.current.style.WebkitMaskRepeat = 'no-repeat'
+      gridRef.current.style.maskPosition = 'center'
+      gridRef.current.style.WebkitMaskPosition = 'center'
     } else {
-      // Fallback to CSS gradient mask
+      // Fallback: hide grid/gradient by default, reveal on cursor
       if (isActive) {
-        const gradientMask = `radial-gradient(circle 500px at var(--cursor-x) var(--cursor-y), black 0%, black 40%, transparent 70%)`
+        const gradientMask = `radial-gradient(circle 400px at var(--cursor-x) var(--cursor-y), white 0%, white 30%, transparent 70%)`
         gridRef.current.style.maskImage = gradientMask
         gridRef.current.style.WebkitMaskImage = gradientMask
+        gradientRef.current.style.maskImage = gradientMask
+        gradientRef.current.style.WebkitMaskImage = gradientMask
       } else {
-        gridRef.current.style.maskImage = 'none'
-        gridRef.current.style.WebkitMaskImage = 'none'
+        // Hide when cursor not active
+        gridRef.current.style.maskImage = 'radial-gradient(circle 0px, transparent 0%, transparent 100%)'
+        gridRef.current.style.WebkitMaskImage = 'radial-gradient(circle 0px, transparent 0%, transparent 100%)'
+        gradientRef.current.style.maskImage = 'radial-gradient(circle 0px, transparent 0%, transparent 100%)'
+        gradientRef.current.style.WebkitMaskImage = 'radial-gradient(circle 0px, transparent 0%, transparent 100%)'
       }
-      gradientRef.current.style.maskImage = 'none'
-      gradientRef.current.style.WebkitMaskImage = 'none'
     }
   }, [blobMaskUrl, isActive, cursorPos])
   
@@ -101,10 +110,8 @@ export function GeometricBackground({ fixed = false }) {
           ref={gradientRef}
           className="absolute inset-0 will-change-[opacity]"
           style={{
-            background: isActive
-              ? `radial-gradient(circle 600px at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 30%, transparent 70%)`
-              : 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)',
-            opacity: isActive ? 1 : 0.8,
+            background: `radial-gradient(circle 600px at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.02) 60%, transparent 100%)`,
+            opacity: blobMaskUrl ? 1 : (isActive ? 0.6 : 0.3), // Lower opacity when no blob mask
             transition: 'opacity 0.2s ease-out',
           }}
         />
@@ -114,9 +121,9 @@ export function GeometricBackground({ fixed = false }) {
           ref={gridRef}
           className="absolute inset-0 will-change-[opacity]"
           style={{
-            backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)`,
             backgroundSize: '40px 40px',
-            opacity: isActive ? 0.8 : 1,
+            opacity: blobMaskUrl ? 1 : (isActive ? 0.5 : 0.2), // Lower opacity when no blob mask
             transition: 'opacity 0.2s ease-out'
           }}
         />
