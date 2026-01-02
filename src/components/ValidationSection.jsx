@@ -2,7 +2,10 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
@@ -47,6 +50,8 @@ export function ValidationSection({ auditData }) {
   };
 
   useGSAP(() => {
+    if (!containerRef.current) return;
+    
     // Check if animation has already played this session
     const hasPlayed = sessionStorage.getItem('validation-animated') === 'true';
 
@@ -82,6 +87,38 @@ export function ValidationSection({ auditData }) {
         delay: 0.8 + (index * 0.1), // Stagger after shutter animation
       });
     });
+
+    // PHASE 3: CARD-ONLY SCROLLTRIGGER (Graphite.com pattern)
+    // Pin only the card container, not the entire section
+    const cardContainer = sectionRef.current?.querySelector('.sticky');
+    if (cardContainer && containerRef.current) {
+      // Calculate horizontal scroll distance
+      const contentWidth = containerRef.current.scrollWidth - containerRef.current.clientWidth;
+      
+      if (contentWidth > 0) {
+        // Pin the sticky card container
+        ScrollTrigger.create({
+          trigger: cardContainer,
+          start: "top top",
+          end: () => `+=${contentWidth + window.innerWidth}`,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+        });
+        
+        // Animate horizontal scroll
+        gsap.to(containerRef.current, {
+          x: -contentWidth,
+          ease: "none",
+          scrollTrigger: {
+            trigger: cardContainer,
+            start: "top top",
+            end: () => `+=${contentWidth + window.innerWidth}`,
+            scrub: 1,
+          }
+        });
+      }
+    }
 
   }, { scope: sectionRef });
 

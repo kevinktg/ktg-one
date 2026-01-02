@@ -3,58 +3,98 @@
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export function Header() {
   const headerRef = useRef(null);
+  const lastScrollY = useRef(0);
 
   useGSAP(() => {
-    // Check if animation has already played this session
-    const hasPlayed = sessionStorage.getItem('header-animated') === 'true';
+    if (!headerRef.current) return;
 
-    if (hasPlayed) {
-      // Skip animation - set final state immediately (always visible, no scroll hide)
-      if (headerRef.current) gsap.set(headerRef.current, { opacity: 1, y: 0 });
-      return;
-    }
-
-    // Subtle fade in - Run once on mount
+    // Initial fade in
     gsap.from(headerRef.current, {
       opacity: 0,
+      y: -20,
       duration: 0.6,
       ease: "power2.out",
-      onComplete: () => {
-        sessionStorage.setItem('header-animated', 'true');
-      }
     });
-    
-    // Removed scroll hide - header stays visible throughout session
-    
+
+    // Scroll-based show/hide (Graphite-style) - hide on scroll down, show on scroll up
+    let scrollTrigger = ScrollTrigger.create({
+      trigger: "body",
+      start: "top top",
+      end: "max",
+      onUpdate: (self) => {
+        const currentScrollY = self.scroll();
+        
+        if (currentScrollY < 100) {
+          // Always show near top
+          gsap.to(headerRef.current, {
+            y: 0,
+            opacity: 1,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        } else if (currentScrollY > lastScrollY.current) {
+          // Scrolling down - hide
+          gsap.to(headerRef.current, {
+            y: -100,
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        } else {
+          // Scrolling up - show
+          gsap.to(headerRef.current, {
+            y: 0,
+            opacity: 1,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        }
+        
+        lastScrollY.current = currentScrollY;
+      },
+    });
+
+    return () => {
+      if (scrollTrigger) scrollTrigger.kill();
+    };
   }, { scope: headerRef });
 
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-4 md:py-5 flex justify-between items-center border-b border-border bg-background backdrop-blur-md"
+      className="fixed top-0 left-0 w-full z-[100] pointer-events-none"
       suppressHydrationWarning
     >
-      {/* LOGO: Syne bold lowercase - proper size hierarchy */}
-      <Link href="/" className="group" suppressHydrationWarning>
-        <span className="font-syne text-xl md:text-2xl font-bold lowercase text-foreground group-hover:text-foreground/80 transition-colors duration-200">
+      {/* Minimal logo - top left corner */}
+      <Link 
+        href="/" 
+        className="absolute top-6 left-6 md:top-8 md:left-8 pointer-events-auto group"
+        suppressHydrationWarning
+      >
+        <span className="font-syne text-lg md:text-xl font-bold lowercase text-foreground/80 group-hover:text-foreground transition-colors duration-200">
           ktg
         </span>
       </Link>
 
-      {/* NAV: Clean minimal navigation */}
-      <nav className="flex items-center gap-6 md:gap-8" suppressHydrationWarning>
+      {/* Optional: Minimal nav - only show when needed */}
+      {/* Uncomment when you add more pages */}
+      {/*
+      <nav className="absolute top-6 right-6 md:top-8 md:right-8 pointer-events-auto flex items-center gap-4">
         <Link
           href="/blog"
-          className="font-mono text-sm text-foreground/70 hover:text-foreground transition-colors duration-200 uppercase tracking-wider"
-          suppressHydrationWarning
+          className="font-mono text-xs text-foreground/50 hover:text-foreground/80 transition-colors duration-200 uppercase tracking-wider"
         >
           Blog
         </Link>
       </nav>
+      */}
     </header>
   );
 }

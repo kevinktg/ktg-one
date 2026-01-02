@@ -20,7 +20,7 @@ export async function getPosts(page = 1, perPage = 10) {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
     
     const response = await fetch(url, {
-      cache: 'no-store', // Force fresh data for dynamic pages
+      next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -40,7 +40,7 @@ export async function getPosts(page = 1, perPage = 10) {
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
           {
-            cache: 'no-store', // Force fresh data
+            next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
@@ -102,7 +102,7 @@ export async function getPostBySlug(slug) {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
     
     const response = await fetch(url, {
-      cache: 'no-store', // Force fresh data for dynamic pages
+      next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -122,7 +122,7 @@ export async function getPostBySlug(slug) {
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
           {
-            cache: 'no-store', // Force fresh data
+            next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
