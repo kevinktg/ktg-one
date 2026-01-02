@@ -11,6 +11,7 @@ export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
   const shutterRef = useRef(null);
+  const cardContainerRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -89,16 +90,15 @@ export function ValidationSection({ auditData }) {
     });
 
     // PHASE 3: CARD-ONLY SCROLLTRIGGER (Graphite.com pattern)
-    // Pin only the card container, not the entire section
-    const cardContainer = sectionRef.current?.querySelector('.sticky');
-    if (cardContainer && containerRef.current) {
+    // Pin only the card container using GSAP pin (removed CSS sticky to avoid conflict)
+    if (cardContainerRef.current && containerRef.current) {
       // Calculate horizontal scroll distance
       const contentWidth = containerRef.current.scrollWidth - containerRef.current.clientWidth;
       
       if (contentWidth > 0) {
-        // Pin the sticky card container
+        // Pin the card container using GSAP ScrollTrigger (not CSS sticky)
         ScrollTrigger.create({
-          trigger: cardContainer,
+          trigger: cardContainerRef.current,
           start: "top top",
           end: () => `+=${contentWidth + window.innerWidth}`,
           pin: true,
@@ -111,7 +111,7 @@ export function ValidationSection({ auditData }) {
           x: -contentWidth,
           ease: "none",
           scrollTrigger: {
-            trigger: cardContainer,
+            trigger: cardContainerRef.current,
             start: "top top",
             end: () => `+=${contentWidth + window.innerWidth}`,
             scrub: 1,
@@ -135,9 +135,10 @@ export function ValidationSection({ auditData }) {
       {/* Scroll Feature Container - matches Graphite pattern */}
       <div className="w-full scroll-feature-container">
         
-        {/* Sticky full-height container */}
+        {/* Full-height container - pinned by GSAP ScrollTrigger (not CSS sticky) */}
         <div 
-          className="h-dvh w-full sticky top-0 flex flex-col items-center gap-x-8 md:flex-row" 
+          ref={cardContainerRef}
+          className="h-dvh w-full flex flex-col items-center gap-x-8 md:flex-row" 
           style={{ 
             paddingTop: 'var(--header-height, 4rem)', 
             paddingBottom: 'var(--header-height, 4rem)' 
