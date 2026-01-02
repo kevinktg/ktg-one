@@ -45,7 +45,7 @@ export default async function Home() {
       */}
       <Header />
 
-      <main className="flex-grow" suppressHydrationWarning>
+      <main className="grow" suppressHydrationWarning>
 
         {/* HERO: Black Background */}
         <HeroSection />

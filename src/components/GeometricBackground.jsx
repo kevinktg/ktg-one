@@ -7,7 +7,7 @@ export function GeometricBackground() {
       */}
 
       {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px]" />
 
       {/* Floating geometric shapes */}
       <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white/10 rotate-45" />

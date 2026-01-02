@@ -73,7 +73,7 @@ export function GalleryFormation() {
             {hakiImages.map((item, index) => (
                 <div
                     key={index}
-                    className="relative aspect-[3/4] w-full bg-[#111] overflow-hidden border border-white/10 group rounded-sm"
+                    className="relative aspect-3/4 w-full bg-[#111] overflow-hidden border border-white/10 group rounded-sm"
                 >
                     <Image
                         src={item.src}
