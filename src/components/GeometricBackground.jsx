@@ -1,13 +1,47 @@
-export function GeometricBackground() {
-  return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-      {/* NOTE: 'absolute' is used instead of 'fixed' to ensure this background
-         stays contained within its parent section (Validation/Philosophy/etc)
-         and doesn't bleed into the White Expertise section.
-      */}
+'use client'
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-size-[40px_40px]" />
+import { useCursorPosition } from '@/hooks/useCursorPosition'
+
+export function GeometricBackground({ fixed = false }) {
+  const { cursorPos, isActive } = useCursorPosition()
+  
+  return (
+    <div 
+      className={`${fixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none z-0 overflow-hidden`} 
+      aria-hidden="true"
+      style={{
+        '--cursor-x': `${cursorPos.x}%`,
+        '--cursor-y': `${cursorPos.y}%`,
+      }}
+    >
+      {/* Faint gradient glow - reactive to cursor - using CSS variables for performance */}
+      <div 
+        className="absolute inset-0 will-change-[opacity]"
+        style={{
+          background: isActive
+            ? `radial-gradient(circle 600px at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 30%, transparent 70%)`
+            : 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)',
+          opacity: isActive ? 1 : 0.8,
+          transition: 'opacity 0.2s ease-out'
+        }}
+      />
+      
+      {/* Grid pattern overlay - reactive to cursor - optimized with CSS variables */}
+      <div 
+        className="absolute inset-0 will-change-[opacity]"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+          opacity: isActive ? 0.6 : 1,
+          maskImage: isActive 
+            ? `radial-gradient(circle 500px at var(--cursor-x) var(--cursor-y), black 0%, black 40%, transparent 70%)`
+            : 'none',
+          WebkitMaskImage: isActive
+            ? `radial-gradient(circle 500px at var(--cursor-x) var(--cursor-y), black 0%, black 40%, transparent 70%)`
+            : 'none',
+          transition: 'opacity 0.2s ease-out'
+        }}
+      />
 
       {/* Floating geometric shapes */}
       <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white/10 rotate-45" />

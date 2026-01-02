@@ -5,6 +5,7 @@ import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
+import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
 
 // Force dynamic rendering if you want new blog posts to appear instantly on refresh
@@ -39,7 +40,10 @@ export default async function Home() {
   // but this is where you would pass "heroData", "expertiseData", etc.
 
   return (
-    <div className="bg-background min-h-screen flex flex-col" suppressHydrationWarning>
+    <div className="bg-background min-h-screen flex flex-col relative" suppressHydrationWarning>
+      {/* Global background with gradient glow and grid - reactive to cursor */}
+      <GeometricBackground fixed />
+      
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}

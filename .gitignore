@@ -38,6 +38,7 @@ build_log.txt
 ._*
 .Spotlight-V100
 .Trashes
+trash/
 ehthumbs.db
 Thumbs.db
 Desktop.ini
@@ -98,10 +99,10 @@ claude-flow.config.json
 # Cursor/Claude IDE specific
 .cursor/
 .cursor/rules/
-openmemory.md
-AGENTS.md
-CLAUDE.md
-KTG_MEMORY_v3.md
+
+# Markdown files (except README.md)
+*.md
+!README.md
 
 # Screenshots and recordings
 screenshots/
@@ -123,5 +124,3 @@ styles/      # Using src/app/globals.css instead
 
 # OpenMemory - IDE/Assistant specific rules
 .cursor\rules\openmemory.mdc
-CLAUDE.md
-AGENTS.md

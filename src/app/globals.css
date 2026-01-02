@@ -16,8 +16,8 @@
 */
 @layer base {
   :root {
-    /* Graphite-inspired dark theme - softer blacks, better contrast */
-    --background: 0 0% 4%;
+    /* Pure black dark theme */
+    --background: 0 0% 0%;
     --foreground: 0 0% 98%;
     
     /* shadcn/ui variables - Graphite-inspired refined palette */
@@ -51,6 +51,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Performance optimizations */
+    contain: layout style paint;
   }
 
   /* Reset for consistent box sizing */
