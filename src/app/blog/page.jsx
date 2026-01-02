@@ -4,6 +4,7 @@ import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { GeometricBackground } from "@/components/GeometricBackground";
 
 export const metadata = {
   title: "Blog | .ktg - AI Anthropology & Prompt Engineering Insights",
@@ -61,13 +62,14 @@ export default async function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white" suppressHydrationWarning>
+      <GeometricBackground fixed />
       <Header />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
       />
-      <main className="pt-32 pb-20 px-6">
+      <main className="pt-32 pb-20 px-6" suppressHydrationWarning>
         <div className="max-w-4xl mx-auto">
           <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase">
             blog

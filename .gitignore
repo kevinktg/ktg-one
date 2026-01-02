@@ -124,3 +124,6 @@ styles/      # Using src/app/globals.css instead
 
 # OpenMemory - IDE/Assistant specific rules
 .cursor\rules\openmemory.mdc
+.cursor\rules\openmemory.mdc
+CLAUDE.md
+AGENTS.md

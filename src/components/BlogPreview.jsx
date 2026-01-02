@@ -15,12 +15,13 @@ export function BlogPreview({ posts = [] }) {
   const containerRef = useRef(null);
 
   useGSAP(() => {
+    // Set initial state - posts should be visible
+    gsap.set(".blog-post", { opacity: 1, y: 0 });
+    
     // Check if animation has already played this session
     const hasPlayed = sessionStorage.getItem('blog-animated') === 'true';
 
     if (hasPlayed) {
-      // Skip animation - set final states immediately
-      gsap.set(".blog-post", { opacity: 1, y: 0 });
       return;
     }
 
@@ -28,15 +29,18 @@ export function BlogPreview({ posts = [] }) {
     const blogPosts = gsap.utils.toArray(".blog-post");
     
     if (blogPosts.length > 0) {
-      gsap.from(blogPosts, {
-        opacity: 0,
-        y: 50,
+      // Start hidden, animate in on scroll
+      gsap.set(blogPosts, { opacity: 0, y: 50 });
+      
+      gsap.to(blogPosts, {
+        opacity: 1,
+        y: 0,
         duration: 0.8,
         stagger: 0.15,
         ease: "power2.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 80%",
+          start: "top 85%",
           toggleActions: "play none none reverse",
           onComplete: () => {
             sessionStorage.setItem('blog-animated', 'true');

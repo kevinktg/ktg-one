@@ -20,10 +20,7 @@ export async function getPosts(page = 1, perPage = 10) {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
     
     const response = await fetch(url, {
-      next: { 
-        revalidate: 300, // Cache for 5 minutes, then revalidate (60-80% faster repeat visits)
-        tags: ['wordpress-posts']
-      },
+      cache: 'no-store', // Force fresh data for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -43,10 +40,7 @@ export async function getPosts(page = 1, perPage = 10) {
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
           {
-            next: { 
-              revalidate: 300,
-              tags: ['wordpress-posts']
-            },
+            cache: 'no-store', // Force fresh data
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
@@ -108,10 +102,7 @@ export async function getPostBySlug(slug) {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
     
     const response = await fetch(url, {
-      next: { 
-        revalidate: 300, // Cache for 5 minutes, then revalidate
-        tags: ['wordpress-posts']
-      },
+      cache: 'no-store', // Force fresh data for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -131,10 +122,7 @@ export async function getPostBySlug(slug) {
         const fallbackResponse = await fetch(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}`,
           {
-            next: { 
-              revalidate: 300,
-              tags: ['wordpress-posts']
-            },
+            cache: 'no-store', // Force fresh data
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',

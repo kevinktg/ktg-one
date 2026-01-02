@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 // All components use this to avoid multiple event listeners
 export function useCursorPosition() {
   const [cursorPos, setCursorPos] = useState({ x: 50, y: 50 })
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(false) // Start as false - only true after cursor movement
   const rafIdRef = useRef(null)
   const latestEventRef = useRef(null)
   

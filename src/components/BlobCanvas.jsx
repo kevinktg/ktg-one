@@ -39,9 +39,10 @@ export function BlobCanvas({ onCanvasReady }) {
     
     const pointerRadius = 200 // pixels - increased for better visibility
     const fadeDuration = 2500 // ms
-    const blobThrottle = 50 // ms - only add blob every 50ms (20fps)
-    let lastBlobTime = 0
-    let lastBlobPos = { x: 0, y: 0 }
+    const blobThrottle = 30 // ms - reduced for more responsive effect
+    let lastBlobTime = 0 // Start at 0 to force first blob immediately
+    let lastBlobPos = { x: -1, y: -1 } // Initialize to invalid position to force first blob
+    let hasCreatedFirstBlob = false // Track if we've created the initial blob
     
     const render = (currentTime) => {
       if (!canvas || !ctx) return
@@ -57,21 +58,24 @@ export function BlobCanvas({ onCanvasReady }) {
       const currentCursorPos = cursorPosRef.current
       const currentIsActive = isActiveRef.current
       
-      // Add new blob if cursor is active and enough time has passed
+      // Always create blobs when cursor is active, less strict conditions
       if (currentIsActive) {
         const blobX = (currentCursorPos.x / 100) * width
         const blobY = (currentCursorPos.y / 100) * height
         
-        // Only add blob if:
-        // 1. Enough time has passed since last blob (throttle)
-        // 2. Cursor has moved significantly (at least 10px)
+        // Check if this is the first blob or if enough time/distance has passed
+        const isFirstBlob = !hasCreatedFirstBlob
         const timeSinceLastBlob = currentTime - lastBlobTime
-        const distanceFromLastBlob = Math.sqrt(
-          Math.pow(blobX - lastBlobPos.x, 2) + 
-          Math.pow(blobY - lastBlobPos.y, 2)
-        )
+        const distanceFromLastBlob = isFirstBlob
+          ? 999 // Force first blob immediately
+          : Math.sqrt(
+              Math.pow(blobX - lastBlobPos.x, 2) + 
+              Math.pow(blobY - lastBlobPos.y, 2)
+            )
         
-        if (timeSinceLastBlob >= blobThrottle && distanceFromLastBlob >= 10) {
+        // Add blob if: first blob OR (enough time passed AND moved enough)
+        // Reduced distance threshold from 10px to 5px for more responsive effect
+        if (isFirstBlob || (timeSinceLastBlob >= blobThrottle && distanceFromLastBlob >= 5)) {
           blobHistoryRef.current.push({
             x: blobX,
             y: blobY,
@@ -80,7 +84,14 @@ export function BlobCanvas({ onCanvasReady }) {
           })
           lastBlobTime = currentTime
           lastBlobPos = { x: blobX, y: blobY }
+          if (isFirstBlob) {
+            hasCreatedFirstBlob = true
+          }
         }
+      } else {
+        // Reset position when cursor becomes inactive so next movement creates blob
+        lastBlobPos = { x: -1, y: -1 }
+        hasCreatedFirstBlob = false // Reset so next active state creates blob
       }
       
       // Remove old blobs and draw current ones
@@ -113,13 +124,16 @@ export function BlobCanvas({ onCanvasReady }) {
       })
       
       animationFrameRef.current = requestAnimationFrame(render)
+      
+      // Call onCanvasReady after first frame renders
+      if (onCanvasReady && !canvas.dataset.ready) {
+        onCanvasReady(canvas)
+        canvas.dataset.ready = 'true'
+      }
     }
     
+    // Start render loop
     animationFrameRef.current = requestAnimationFrame(render)
-    
-    if (onCanvasReady) {
-      onCanvasReady(canvas)
-    }
     
     return () => {
       window.removeEventListener('resize', resize)

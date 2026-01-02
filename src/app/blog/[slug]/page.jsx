@@ -110,7 +110,7 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <div className="min-h-screen bg-black text-white" style={{ contain: "layout" }}>
-      <GeometricBackground />
+      <GeometricBackground fixed />
       <Header />
       <script
         type="application/ld+json"
