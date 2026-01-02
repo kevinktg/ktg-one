@@ -10,6 +10,17 @@ export function BlobCanvas({ onCanvasReady }) {
   const blobHistoryRef = useRef([]) // Array of {x, y, time, radius}
   const { cursorPos, isActive } = useCursorPosition()
   
+  // Store cursor state in refs to avoid effect re-runs
+  const cursorPosRef = useRef(cursorPos)
+  const isActiveRef = useRef(isActive)
+  
+  // Update refs when cursor changes (doesn't trigger effect re-run)
+  useEffect(() => {
+    cursorPosRef.current = cursorPos
+    isActiveRef.current = isActive
+  }, [cursorPos, isActive])
+  
+  // Setup effect - runs once, reads from refs
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -38,11 +49,15 @@ export function BlobCanvas({ onCanvasReady }) {
       // Clear canvas
       ctx.clearRect(0, 0, width, height)
       
+      // Read cursor state from refs (always current, no closure issues)
+      const currentCursorPos = cursorPosRef.current
+      const currentIsActive = isActiveRef.current
+      
       // Add new blob if cursor is active
-      if (isActive) {
+      if (currentIsActive) {
         blobHistoryRef.current.push({
-          x: (cursorPos.x / 100) * width,
-          y: (cursorPos.y / 100) * height,
+          x: (currentCursorPos.x / 100) * width,
+          y: (currentCursorPos.y / 100) * height,
           time: currentTime,
           radius: pointerRadius
         })
@@ -91,7 +106,7 @@ export function BlobCanvas({ onCanvasReady }) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [cursorPos, isActive, onCanvasReady])
+  }, [onCanvasReady]) // Only re-run if onCanvasReady changes
   
   return (
     <canvas
