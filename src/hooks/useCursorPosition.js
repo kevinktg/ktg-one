@@ -14,10 +14,11 @@ export function useCursorPosition() {
     const handlePointerMove = (e) => {
       latestEventRef.current = e
       
-      // Only queue one RAF update per frame
+      // Only queue one RAF update per frame for smooth 60fps
       if (!rafIdRef.current) {
         rafIdRef.current = requestAnimationFrame(() => {
           if (latestEventRef.current) {
+            // Calculate percentage position (0-100)
             const x = (latestEventRef.current.clientX / window.innerWidth) * 100
             const y = (latestEventRef.current.clientY / window.innerHeight) * 100
             
@@ -30,6 +31,11 @@ export function useCursorPosition() {
       }
     }
     
+    const handlePointerEnter = () => {
+      // Ensure cursor is tracked when entering viewport
+      setIsActive(true)
+    }
+    
     const handlePointerLeave = () => {
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current)
@@ -39,10 +45,12 @@ export function useCursorPosition() {
     }
     
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    window.addEventListener('pointerenter', handlePointerEnter, { passive: true })
     window.addEventListener('pointerleave', handlePointerLeave)
     
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerenter', handlePointerEnter)
       window.removeEventListener('pointerleave', handlePointerLeave)
       if (rafIdRef.current) {
         cancelAnimationFrame(rafIdRef.current)

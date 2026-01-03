@@ -381,7 +381,15 @@ export function HeroImages({
       className="absolute inset-0 z-10 pointer-events-auto w-full h-full"
       style={{
         contain: 'layout style paint',
-        aspectRatio: '16 / 9' // Reserve space to prevent CLS
+        width: '100%',
+        height: '100%',
+        minHeight: '100vh',
+        // Explicit dimensions to prevent CLS
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
       }}
     >
       <Canvas
@@ -389,15 +397,23 @@ export function HeroImages({
         gl={{
           antialias: true,
           alpha: true,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: true,
+          // Reduce initial load
+          preserveDrawingBuffer: false,
         }}
         style={{
           background: 'transparent',
           width: '100%',
           height: '100%',
-          display: 'block'
+          display: 'block',
+          // Prevent layout shift - explicit positioning
+          position: 'absolute',
+          top: 0,
+          left: 0,
         }}
-        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2}
+        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
       >
         <Scene
           topImage={topImage}

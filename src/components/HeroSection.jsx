@@ -48,7 +48,25 @@ export const HeroSection = forwardRef((props, ref) => {
     <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-background" suppressHydrationWarning>
 
       {/* Hero Images with Blob Reveal - Lando Norris Effect (lazy loaded) */}
-      <Suspense fallback={<div className="absolute inset-0 bg-background" />}>
+      {/* Properly sized fallback to prevent CLS - matches canvas dimensions exactly */}
+      <Suspense fallback={
+        <div 
+          className="absolute inset-0 bg-background z-10" 
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: '100vh',
+            contain: 'layout style paint',
+            // Match canvas positioning exactly
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+          aria-hidden="true"
+        />
+      }>
         <HeroImages
           topImage="/assets/top-hero.webp"
           bottomImage="/assets/bottom-hero.webp"

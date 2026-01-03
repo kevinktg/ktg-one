@@ -10,17 +10,26 @@ export function GeometricBackground({ fixed = false }) {
   const gridRef = useRef(null)
   const rafIdRef = useRef(null)
   
-  // Throttle mask updates to 60fps max - reduce layout thrashing
+  // Update mask and gradient position to follow cursor - direct pixel values for accuracy
   useEffect(() => {
-    if (!gradientRef.current || !gridRef.current) return
+    if (!gradientRef.current || !gridRef.current || !containerRef.current) return
     
-    const updateMask = () => {
-      if (isActive) {
-        // Use CSS custom properties for better performance
-        const maskValue = `radial-gradient(circle 600px at var(--cursor-x) var(--cursor-y), white 0%, white 35%, transparent 75%)`
+    const updateCursorEffect = () => {
+      if (isActive && containerRef.current) {
+        // Get container bounds for accurate pixel positioning
+        const rect = containerRef.current.getBoundingClientRect()
+        const cursorX = (cursorPos.x / 100) * rect.width
+        const cursorY = (cursorPos.y / 100) * rect.height
+        
+        // Create mask with pixel values - follows cursor accurately
+        const maskValue = `radial-gradient(circle 600px at ${cursorX}px ${cursorY}px, white 0%, white 35%, transparent 75%)`
+        
+        // Update gradient position to follow cursor
+        const gradientValue = `radial-gradient(circle 800px at ${cursorX}px ${cursorY}px, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.18) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%, transparent 100%)`
         
         // Batch DOM updates
         if (gradientRef.current) {
+          gradientRef.current.style.background = gradientValue
           gradientRef.current.style.maskImage = maskValue
           gradientRef.current.style.WebkitMaskImage = maskValue
         }
@@ -29,7 +38,7 @@ export function GeometricBackground({ fixed = false }) {
           gridRef.current.style.WebkitMaskImage = maskValue
         }
       } else {
-        // No mask when cursor inactive
+        // No mask when cursor inactive - hide effect
         if (gradientRef.current) {
           gradientRef.current.style.maskImage = 'none'
           gradientRef.current.style.WebkitMaskImage = 'none'
@@ -46,8 +55,8 @@ export function GeometricBackground({ fixed = false }) {
       cancelAnimationFrame(rafIdRef.current)
     }
     
-    // Schedule update on next frame
-    rafIdRef.current = requestAnimationFrame(updateMask)
+    // Schedule update on next frame for smooth 60fps
+    rafIdRef.current = requestAnimationFrame(updateCursorEffect)
     
     return () => {
       if (rafIdRef.current) {
@@ -62,19 +71,15 @@ export function GeometricBackground({ fixed = false }) {
         ref={containerRef}
         className={`${fixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none z-[-1] overflow-hidden bg-black`} 
         aria-hidden="true"
-        style={{
-          '--cursor-x': `${cursorPos.x}%`,
-          '--cursor-y': `${cursorPos.y}%`,
-        }}
       >
-        {/* Faint gradient glow - revealed at cursor position via mask */}
+        {/* Faint gradient glow - position updated via JS to follow cursor */}
         <div 
           ref={gradientRef}
-          className="absolute inset-0 will-change-[mask-image]"
+          className="absolute inset-0 will-change-[mask-image,background]"
           style={{
-            background: `radial-gradient(circle 800px at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.18) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%, transparent 100%)`,
             opacity: 1,
             contain: 'layout style paint',
+            // Background will be updated dynamically in useEffect
           }}
         />
         
