@@ -9,9 +9,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
-  const containerRef = useRef(null);
+  const horizontalScrollRef = useRef(null);
   const shutterRef = useRef(null);
-  const cardContainerRef = useRef(null);
+  const cardRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -51,7 +51,7 @@ export function ValidationSection({ auditData }) {
   };
 
   useGSAP(() => {
-    if (!containerRef.current) return;
+    if (!horizontalScrollRef.current) return;
     
     // Check if animation has already played this session
     const hasPlayed = sessionStorage.getItem('validation-animated') === 'true';
@@ -62,63 +62,92 @@ export function ValidationSection({ auditData }) {
         gsap.set(shutterRef.current.children, { scaleY: 0 });
       }
       gsap.set(".digital-text", { opacity: 1, x: 0 });
-      return;
+    } else {
+      // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
+      gsap.to(shutterRef.current?.children, {
+        scaleY: 0,
+        duration: 1,
+        stagger: 0.05,
+        ease: "power3.inOut",
+        transformOrigin: "bottom",
+        onComplete: () => {
+          sessionStorage.setItem('validation-animated', 'true');
+        }
+      });
+
+      // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
+      const textElements = gsap.utils.toArray(".digital-text");
+      textElements.forEach((text, index) => {
+        gsap.from(text, {
+          opacity: 0,
+          x: 30,
+          duration: 0.8,
+          ease: "power2.out",
+          delay: 0.8 + (index * 0.1), // Stagger after shutter animation
+        });
+      });
     }
 
-    // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
-    gsap.to(shutterRef.current?.children, {
-      scaleY: 0,
-      duration: 1,
-      stagger: 0.05,
-      ease: "power3.inOut",
-      transformOrigin: "bottom",
-      onComplete: () => {
-        sessionStorage.setItem('validation-animated', 'true');
-      }
-    });
-
-    // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
-    const textElements = gsap.utils.toArray(".digital-text");
-    textElements.forEach((text, index) => {
-      gsap.from(text, {
-        opacity: 0,
-        x: 30,
-        duration: 0.8,
-        ease: "power2.out",
-        delay: 0.8 + (index * 0.1), // Stagger after shutter animation
-      });
-    });
-
     // PHASE 3: CARD-ONLY SCROLLTRIGGER (Graphite.com pattern)
-    // Pin only the card container using GSAP pin (removed CSS sticky to avoid conflict)
-    if (cardContainerRef.current && containerRef.current) {
+    // Pin the card itself, scroll content horizontally inside
+    let pinTrigger = null;
+    let scrollTween = null;
+    let timeoutId = null;
+    
+    const setupScrollTrigger = () => {
+      if (!cardRef.current || !horizontalScrollRef.current) return;
+      
       // Calculate horizontal scroll distance
-      const contentWidth = containerRef.current.scrollWidth - containerRef.current.clientWidth;
+      const scrollWidth = horizontalScrollRef.current.scrollWidth;
+      const clientWidth = horizontalScrollRef.current.clientWidth;
+      const contentWidth = scrollWidth - clientWidth;
       
       if (contentWidth > 0) {
-        // Pin the card container using GSAP ScrollTrigger (not CSS sticky)
-        ScrollTrigger.create({
-          trigger: cardContainerRef.current,
+        // Pin the card container (like Graphite) - card stays fixed while content scrolls
+        pinTrigger = ScrollTrigger.create({
+          trigger: cardRef.current,
           start: "top top",
-          end: () => `+=${contentWidth + window.innerWidth}`,
+          end: () => `+=${contentWidth + window.innerWidth * 0.5}`,
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
         });
         
-        // Animate horizontal scroll
-        gsap.to(containerRef.current, {
+        // Animate horizontal scroll of content inside card
+        scrollTween = gsap.to(horizontalScrollRef.current, {
           x: -contentWidth,
           ease: "none",
           scrollTrigger: {
-            trigger: cardContainerRef.current,
+            trigger: cardRef.current,
             start: "top top",
-            end: () => `+=${contentWidth + window.innerWidth}`,
+            end: () => `+=${contentWidth + window.innerWidth * 0.5}`,
             scrub: 1,
+            invalidateOnRefresh: true,
           }
         });
       }
-    }
+    };
+    
+    // Delay calculation to ensure DOM is ready and content is measured
+    timeoutId = setTimeout(setupScrollTrigger, 100);
+    
+    // Also recalculate on resize
+    const handleResize = () => {
+      if (pinTrigger) pinTrigger.kill();
+      if (scrollTween) scrollTween.kill();
+      ScrollTrigger.refresh();
+      setupScrollTrigger();
+    };
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup function
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+      if (pinTrigger) pinTrigger.kill();
+      if (scrollTween) scrollTween.kill();
+    };
 
   }, { scope: sectionRef });
 
@@ -135,28 +164,29 @@ export function ValidationSection({ auditData }) {
       {/* Scroll Feature Container - matches Graphite pattern */}
       <div className="w-full scroll-feature-container">
         
-        {/* Full-height container - pinned by GSAP ScrollTrigger (not CSS sticky) */}
+        {/* Full-height wrapper for proper spacing */}
         <div 
-          ref={cardContainerRef}
-          className="h-dvh w-full flex flex-col items-center gap-x-8 md:flex-row" 
+          className="h-dvh w-full flex flex-col items-center justify-center" 
           style={{ 
             paddingTop: 'var(--header-height, 4rem)', 
             paddingBottom: 'var(--header-height, 4rem)' 
           }}
         >
           
-          {/* Single Card Container with Horizontal Scroll - Graphite style */}
-          <div className="h-full max-h-[720px] relative flex p-4 border border-border rounded-2xl gap-4 w-full mx-4 md:mx-auto max-w-7xl overflow-hidden">
+          {/* Card Container - This gets pinned by ScrollTrigger (Graphite style) */}
+          <div 
+            ref={cardRef}
+            className="h-full max-h-[720px] w-full mx-4 md:mx-auto max-w-7xl relative flex p-4 md:p-12 border border-border rounded-2xl overflow-hidden bg-card/50"
+          >
             
-            {/* Content wrapper - flex column for proper layout */}
-            <div className="flex-0 w-full order-1 md:flex-[1_1_100%] relative gap-4 flex flex-col min-w-0 h-full">
-              
-              {/* Horizontal Scrolling Content */}
-              <div 
-                ref={containerRef} 
-                className="flex gap-6 overflow-x-auto custom-scrollbar flex-1 min-w-max"
-                style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
-              >
+            {/* Horizontal Scrolling Content - Scrolls inside pinned card */}
+            <div 
+              ref={horizontalScrollRef} 
+              className="flex gap-6 md:gap-12 min-w-max h-full items-center"
+              style={{ 
+                willChange: 'transform',
+              }}
+            >
                   
                   {/* 01. INTRO */}
                   <div className="w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0 digital-text">
@@ -252,7 +282,6 @@ export function ValidationSection({ auditData }) {
                 {/* END SPACER */}
                 <div className="w-[10vw] shrink-0" />
                 
-              </div>
             </div>
           </div>
         </div>
