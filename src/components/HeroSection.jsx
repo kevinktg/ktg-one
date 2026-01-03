@@ -4,100 +4,71 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef, forwardRef, lazy, Suspense } from "react";
 
-// Lazy load Three.js component to avoid blocking initial page load
+// Lazy load Three.js component
 const HeroImages = lazy(() => import("@/components/HeroImages").then(mod => ({ default: mod.HeroImages })));
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
   const internalRef = ref || heroRef;
-  const titleRef = useRef(null);
+  const marqueeRef = useRef(null);
 
   useGSAP(() => {
-    // Check if animation has already played this session
     const hasPlayed = sessionStorage.getItem('hero-animated') === 'true';
 
-    if (!titleRef.current) return;
+    if (!marqueeRef.current) return;
 
-    // Fade in only on first load
     if (!hasPlayed) {
-      gsap.from(titleRef.current, {
+      gsap.from(marqueeRef.current, {
         opacity: 0,
-        duration: 0.8,
+        y: -20, // Slide down from top
+        duration: 1,
         ease: "power2.out",
         onComplete: () => {
           sessionStorage.setItem('hero-animated', 'true');
         }
       });
     } else {
-      // Already played: Set opacity immediately
-      gsap.set(titleRef.current, { opacity: 1 });
+      gsap.set(marqueeRef.current, { opacity: 1, y: 0 });
     }
-
-    // Always start the infinite scroll animation
-    // Move by 50% (half width) where the duplicate content starts for seamless loop
-    gsap.to(titleRef.current, {
-      x: "-50%",
-      duration: 30,
-      ease: "none",
-      repeat: -1, // Infinite loop
-    });
-
   }, { scope: heroRef });
 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-background" suppressHydrationWarning>
+    <section 
+      ref={internalRef} 
+      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden" 
+      style={{ background: 'transparent' }} 
+      suppressHydrationWarning
+    >
 
-      {/* Hero Images with Blob Reveal - Lando Norris Effect (lazy loaded) */}
-      {/* Properly sized fallback to prevent CLS - matches canvas dimensions exactly */}
-      <Suspense fallback={
-        <div 
-          className="absolute inset-0 bg-background z-10" 
-          style={{
-            width: '100%',
-            height: '100%',
-            minHeight: '100vh',
-            contain: 'layout style paint',
-            // Match canvas positioning exactly
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
-          aria-hidden="true"
-        />
-      }>
+      <Suspense fallback={<div className="absolute inset-0 z-10 bg-transparent" />}>
         <HeroImages
           topImage="/assets/top-hero.webp"
           bottomImage="/assets/bottom-hero.webp"
         />
       </Suspense>
 
-      {/* Scrolling word banner at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 overflow-hidden py-5 md:py-6 border-t border-border bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap">
-          {/* Single scrolling container with duplicated content for seamless loop */}
-          <div ref={titleRef} className="flex items-center gap-8 md:gap-12">
-            {/* Original content */}
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Context Continuation</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Frameworks</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
-            {/* Duplicate for seamless loop */}
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Top 0.01%</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Prompt Engineer</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Context Continuation</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Frameworks</span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="font-mono text-sm md:text-base text-muted-foreground uppercase tracking-wider">Arxiv-Ready Research</span>
+      {/* Marquee Banner (Top) */}
+      <div 
+        ref={marqueeRef}
+        // pointer-events-none lets mouse pass through to the blob canvas
+        className="absolute top-0 left-0 right-0 z-50 pointer-events-none overflow-hidden py-5 md:py-6 border-b border-white/10 bg-black/20 backdrop-blur-md"
+      >
+        <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
+          <div className="flex items-center gap-8 md:gap-12 animate-scroll will-change-transform">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Cognitive Architect</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Top 0.01%</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Context Sovereignty</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Framework Verification</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Arxiv-Ready Research</span>
+                <span className="text-white/20">•</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -106,4 +77,3 @@ export const HeroSection = forwardRef((props, ref) => {
 });
 
 HeroSection.displayName = "HeroSection";
-
