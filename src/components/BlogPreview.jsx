@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getFeaturedImage, formatDate } from "@/lib/wordpress";
@@ -14,13 +14,16 @@ export function BlogPreview({ posts = [] }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
 
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('blog-animated') === 'true';
+  }, []);
+
   useGSAP(() => {
     // Set initial state - posts should be visible
     gsap.set(".blog-post", { opacity: 1, y: 0 });
     
-    // Check if animation has already played this session
-    const hasPlayed = sessionStorage.getItem('blog-animated') === 'true';
-
     if (hasPlayed) {
       return;
     }

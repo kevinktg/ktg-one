@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
@@ -39,10 +39,13 @@ export function ExpertiseSection({ expertiseData }) {
     },
   ];
 
-  useGSAP(() => {
-    // Check if animation has already played this session
-    const hasPlayed = sessionStorage.getItem('expertise-revealed') === 'true';
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('expertise-revealed') === 'true';
+  }, []);
 
+  useGSAP(() => {
     if (hasPlayed) {
       // Skip animation - just hide shutters immediately and set final states
       if (shutterRef.current?.children) {
@@ -103,9 +106,14 @@ export function ExpertiseSection({ expertiseData }) {
     <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30">
 
       {/* SHUTTERS (Transition Layer) */}
+      {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
          {[...Array(5)].map((_, i) => (
-           <div key={i} className="w-1/5 h-full bg-black border-r border-white/10 will-change-transform" style={{ contain: 'strict' }} />
+           <div 
+             key={i} 
+             className={`w-1/5 h-full bg-black border-r border-white/10 ${!hasPlayed ? 'will-change-transform' : ''}`} 
+             style={{ contain: 'strict' }} 
+           />
          ))}
       </div>
 

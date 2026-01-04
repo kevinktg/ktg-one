@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
+import { useRef, useMemo, useCallback } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -50,11 +50,15 @@ export function ValidationSection({ auditData }) {
     }
   };
 
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('validation-animated') === 'true';
+  }, []);
+
+
   useGSAP(() => {
     if (!horizontalScrollRef.current) return;
-    
-    // Check if animation has already played this session
-    const hasPlayed = sessionStorage.getItem('validation-animated') === 'true';
 
     if (hasPlayed) {
       // Skip animation - set final states immediately
@@ -92,8 +96,10 @@ export function ValidationSection({ auditData }) {
     // Pin the card itself, scroll content horizontally inside
     let pinTrigger = null;
     let scrollTween = null;
-    let timeoutId = null;
+    let resizeTimeout = null;
     
+    // OPTIMIZATION: Setup immediately - DOM is ready via useGSAP scope
+    // Removed setTimeout delay - useGSAP ensures DOM is ready
     const setupScrollTrigger = () => {
       if (!cardRef.current || !horizontalScrollRef.current) return;
       
@@ -129,21 +135,25 @@ export function ValidationSection({ auditData }) {
       }
     };
     
-    // Delay calculation to ensure DOM is ready and content is measured
-    timeoutId = setTimeout(setupScrollTrigger, 100);
+    // Setup immediately - useGSAP ensures DOM readiness
+    setupScrollTrigger();
     
-    // Also recalculate on resize
+    // OPTIMIZATION: Debounced resize handler to prevent excessive recalculations
     const handleResize = () => {
-      if (pinTrigger) pinTrigger.kill();
-      if (scrollTween) scrollTween.kill();
-      ScrollTrigger.refresh();
-      setupScrollTrigger();
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (pinTrigger) pinTrigger.kill();
+        if (scrollTween) scrollTween.kill();
+        ScrollTrigger.refresh();
+        setupScrollTrigger();
+      }, 150);
     };
+    
     window.addEventListener('resize', handleResize);
     
     // Cleanup function
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
       window.removeEventListener('resize', handleResize);
       if (pinTrigger) pinTrigger.kill();
       if (scrollTween) scrollTween.kill();
@@ -155,9 +165,14 @@ export function ValidationSection({ auditData }) {
     <section ref={sectionRef} className="relative w-full py-8 overflow-hidden z-40 bg-background">
 
       {/* SHUTTERS (White -> Black Swoop) */}
+      {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
          {[...Array(5)].map((_, i) => (
-           <div key={i} className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" style={{ contain: 'strict' }} />
+           <div 
+             key={i} 
+             className={`w-1/5 h-full bg-white border-r border-black/5 ${!hasPlayed ? 'will-change-transform' : ''}`} 
+             style={{ contain: 'strict' }} 
+           />
          ))}
       </div>
 
@@ -180,12 +195,10 @@ export function ValidationSection({ auditData }) {
           >
             
             {/* Horizontal Scrolling Content - Scrolls inside pinned card */}
+            {/* OPTIMIZATION: will-change applied conditionally - only when scrolling */}
             <div 
               ref={horizontalScrollRef} 
               className="flex gap-6 md:gap-12 min-w-max h-full items-center"
-              style={{ 
-                willChange: 'transform',
-              }}
             >
                   
                   {/* 01. INTRO */}

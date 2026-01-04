@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 // Ensure this path is correct based on your folder structure
 import { GeometricBackground } from "@/components/GeometricBackground";
 
@@ -39,10 +39,13 @@ export function PhilosophySection({ philosophyData }) {
     ]
   };
 
-  useGSAP(() => {
-    // Check if animation has already played this session
-    const hasPlayed = sessionStorage.getItem('philosophy-animated') === 'true';
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('philosophy-animated') === 'true';
+  }, []);
 
+  useGSAP(() => {
     if (hasPlayed) {
       // Skip animation - set final states immediately
       if (textRef.current) gsap.set(textRef.current, { opacity: 1, y: 0 });

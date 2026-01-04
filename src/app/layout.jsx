@@ -18,9 +18,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  metadataBase: new URL('https://ktg.one'), // Update this to your production URL
+  metadataBase: new URL('https://ktg.one'), 
   title: {
-    default: ".ktg | Top 0.01% Prompt Engineer",
+    default: ".ktg | Distinguished Cognitive Architect",
     template: "%s | .ktg"
   },
   description: "Portfolio of a top 0.01% prompt engineer. Cognitive Software Engineering & Cross-world reasoning across 7 careers.",
@@ -28,25 +28,23 @@ export const metadata = {
     icon: "/assets/ktg.svg",
     shortcut: "/assets/ktg.svg",
   },
-  // Social Preview Cards
   openGraph: {
     title: ".ktg | Top 0.01% Prompt Engineer",
     description: "Context continuation solve. Frameworks. Arxiv-ready papers.",
     type: "website",
     locale: "en_AU",
-    siteName: "KTG Portfolio",
+    siteName: ".ktg Portfolio",
     images: [
       {
-        url: "/assets/og-image.jpg", // Add a 1200x630 image at this path for best results
+        url: "/assets/og-image.jpg", 
         width: 1200,
         height: 630,
-        alt: "KTG Portfolio Preview",
+        alt: "ktg Portfolio Preview",
       },
     ],
   },
 };
 
-// Next.js 16+ requires viewport to be a separate export
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -55,20 +53,15 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="bg-black">
       <body
-        className={`
-          ${syne.variable}
-          ${inter.variable}
-          antialiased
-          bg-background
-          text-foreground
-          overflow-x-hidden
-          selection:bg-white
-          selection:text-black
-        `}
+        className={`${syne.variable} ${inter.variable} antialiased text-foreground overflow-x-hidden selection:bg-white selection:text-black`}
         suppressHydrationWarning
       >
+        {/* NOTE: bg-background was removed from body. 
+            The black floor is handled by 'html' in globals.css 
+            or the 'bg-black' class on the html tag above.
+        */}
         <ClientLayout>
           {children}
           <SpeedInsights />

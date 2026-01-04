@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef, forwardRef, lazy, Suspense } from "react";
+import { useRef, forwardRef, lazy, Suspense, useMemo } from "react";
 
 // Lazy load Three.js component
 const HeroImages = lazy(() => import("@/components/HeroImages").then(mod => ({ default: mod.HeroImages })));
@@ -12,9 +12,13 @@ export const HeroSection = forwardRef((props, ref) => {
   const internalRef = ref || heroRef;
   const marqueeRef = useRef(null);
 
-  useGSAP(() => {
-    const hasPlayed = sessionStorage.getItem('hero-animated') === 'true';
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('hero-animated') === 'true';
+  }, []);
 
+  useGSAP(() => {
     if (!marqueeRef.current) return;
 
     if (!hasPlayed) {
