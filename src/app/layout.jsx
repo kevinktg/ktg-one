@@ -2,6 +2,8 @@ import { Syne, Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
+import { GeometricBackground } from "@/components/GeometricBackground";
+import { CursorDot } from "@/components/CursorDot";
 
 // OPTIMIZATION: Use 'swap' to ensure branding fonts load even on slower connections.
 // fallback ensures graceful degradation if Google Fonts fails
@@ -58,16 +60,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning className="bg-black">
       <body
-        className={`${syne.variable} ${inter.variable} antialiased text-foreground overflow-x-hidden selection:bg-white selection:text-black`}
+        className={`${syne.variable} ${inter.variable} antialiased text-foreground overflow-x-hidden selection:bg-white selection:text-black relative`}
         suppressHydrationWarning
       >
-        {/* NOTE: bg-background was removed from body. 
-            The black floor is handled by 'html' in globals.css 
-            or the 'bg-black' class on the html tag above.
-        */}
         <ClientLayout>
+          {/* Global GeometricBackground - always visible on all pages, behind all content */}
+          <GeometricBackground fixed />
+
           {children}
           <SpeedInsights />
+
+          {/* Global CursorDot - MUST be last to stay on top of all stacking contexts */}
+          <CursorDot />
         </ClientLayout>
       </body>
     </html>

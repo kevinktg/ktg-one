@@ -2,14 +2,14 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, forwardRef } from "react";
 
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
   <div className="text-center expertise-group">
-    <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">{label}</div>
+    <div className="font-mono text-xs text-white/50 mb-2 tracking-widest">{label}</div>
     <div
-      className="text-4xl md:text-5xl font-syne font-bold stat-counter"
+      className="text-4xl md:text-5xl font-syne font-bold stat-counter text-white"
       data-val={value}
       data-is-float={isFloat}
       data-suffix={suffix}
@@ -19,9 +19,10 @@ const StatBox = ({ label, value, isFloat, suffix }) => (
   </div>
 );
 
-export function ExpertiseSection({ expertiseData }) {
+export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
   const containerRef = useRef(null);
   const shutterRef = useRef(null);
+  const internalRef = ref || containerRef;
 
   // Default Fallback Data
   const data = expertiseData || [
@@ -103,7 +104,7 @@ export function ExpertiseSection({ expertiseData }) {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30 content-visibility-auto">
+    <section ref={internalRef} className="relative min-h-screen text-white overflow-hidden py-20" style={{ background: 'transparent', backgroundColor: 'rgba(0, 0, 0, 0)', backgroundImage: 'none' }}>
 
       {/* SHUTTERS (Transition Layer) */}
       {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
@@ -119,16 +120,16 @@ export function ExpertiseSection({ expertiseData }) {
 
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none z-10 select-none overflow-hidden">
-         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/10 rotate-45 opacity-60" />
-         <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/5" />
-         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/10 rounded-full opacity-50" />
-         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white/10 rotate-45 opacity-60" />
+         <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-white/5" />
+         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-white/10 rounded-full opacity-50" />
+         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
       <div className="relative z-20 max-w-7xl mx-auto px-6 flex flex-col justify-center h-full">
 
         {/* Header */}
-        <h2 className="expertise-title mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter text-black">
+        <h2 className="expertise-title mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter text-white">
           expertise_matrix
         </h2>
 
@@ -137,14 +138,14 @@ export function ExpertiseSection({ expertiseData }) {
           {data.map((area) => (
             <div key={area.category} className="expertise-group relative">
               <div className="mb-8 relative pl-4">
-                <div className="absolute left-0 top-0 w-1 h-full bg-black/30" />
-                <h3 className="font-mono tracking-wider font-bold text-sm uppercase">{area.category}</h3>
-                <div className="mt-2 w-24 h-0.5 bg-black" />
+                <div className="absolute left-0 top-0 w-1 h-full bg-white/30" />
+                <h3 className="font-mono tracking-wider font-bold text-sm uppercase text-white">{area.category}</h3>
+                <div className="mt-2 w-24 h-0.5 bg-white" />
               </div>
               <ul className="space-y-3">
                 {area.skills.map((skill, i) => (
-                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed text-base">
-                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-black/30 rotate-45" />
+                  <li key={i} className="relative pl-6 text-white/70 leading-relaxed text-base">
+                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-white/30 rotate-45" />
                     {skill}
                   </li>
                 ))}
@@ -154,13 +155,13 @@ export function ExpertiseSection({ expertiseData }) {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-black/10 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 py-12">
           <StatBox label="PERCENTILE" value="0.01" isFloat suffix="%" />
           <StatBox label="CAREERS" value="7" />
 
           <div className="text-center expertise-group">
-            <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">DOMAINS</div>
-            <div className="text-4xl md:text-5xl font-syne font-bold">∞</div>
+            <div className="font-mono text-xs text-white/50 mb-2 tracking-widest">DOMAINS</div>
+            <div className="text-4xl md:text-5xl font-syne font-bold text-white">∞</div>
           </div>
 
           <StatBox label="APPROACH" value="1" />
@@ -168,4 +169,6 @@ export function ExpertiseSection({ expertiseData }) {
       </div>
     </section>
   );
-}
+});
+
+ExpertiseSection.displayName = "ExpertiseSection";
