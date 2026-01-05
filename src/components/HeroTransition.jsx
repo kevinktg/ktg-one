@@ -109,7 +109,7 @@ export function HeroTransition() {
 
       {/* Bottom gradient for smooth blend into next section */}
       <div
-        className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-transparent to-transparent pointer-events-none z-10"
+        className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
     </div>
