@@ -13,6 +13,10 @@ import { getPosts } from "@/lib/wordpress";
 // or use 'export const revalidate = 3600' to cache for 1 hour.
 export const revalidate = 60;
 
+/**
+ * Render the Home page, fetching recent blog posts on the server and composing the page sections.
+ * @returns {JSX.Element} The Home page React element containing the global background, header, hero, transition, content sections, blog preview (with server-fetched posts), and footer.
+ */
 export default async function Home() {
   // 1. FETCH DATA ON SERVER
   // This runs on the server before the page is sent to the browser.

@@ -8,8 +8,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * HeroTransition - Creates wipe effect from hero to geometric background
- * Uses clip-path for smooth reveal effect
+ * Render a scroll-synced wipe transition that reveals a geometric grid background from a hero section.
+ *
+ * The component displays a black overlay that is clipped away while a subtle grid fades in as the user scrolls.
+ * After the user leaves the trigger area the component records playback in sessionStorage so the final revealed
+ * state is applied immediately on subsequent visits during the same session.
+ *
+ * @returns {JSX.Element} The transition container element with overlay and background layers.
  */
 export function HeroTransition() {
   const containerRef = useRef(null);
