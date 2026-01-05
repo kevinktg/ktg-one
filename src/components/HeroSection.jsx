@@ -34,13 +34,13 @@ export const HeroSection = forwardRef((props, ref) => {
     } else {
       gsap.set(marqueeRef.current, { opacity: 1, y: 0 });
     }
-  { scope: heroRef });
- }, 
+  }, { scope: heroRef }); 
   return (
-    <section 
-      ref={internalRef} 
-      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden" 
-      style={{ background: 'transparent' }} 
+    <section
+      ref={internalRef}
+      data-cursor-zone="hero"
+      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden"
+      style={{ background: 'transparent' }}
       suppressHydrationWarning
     >
 

@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
+import { HeroTransition } from "@/components/HeroTransition";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
@@ -51,10 +52,13 @@ export default async function Home() {
 
       <main className="grow" suppressHydrationWarning>
 
-        {/* HERO: Black Background */}
+        {/* HERO: Black Background with blob reveal cursor */}
         <HeroSection />
 
-        {/* EXPERTISE: White Background (Scrolls over Hero) */}
+        {/* TRANSITION: Wipe from hero to geometric background */}
+        <HeroTransition />
+
+        {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
         <ExpertiseSection />
 
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
