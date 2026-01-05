@@ -1,128 +1,64 @@
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
-.yarn/install-state.gz
-
-# Testing
-coverage/
-*.test.js.snap
-
-# Next.js
-.next/
-out/
-.vercel/
-next-env.d.ts
-*.tsbuildinfo
-
-# Production builds
-build/
-dist/
-
-# Environment variables
+venv/
+.venv/
 .env
-.env*.local
-.env.production
+.env.local
+.env.*
 
-# Logs
+# Logs and temp files
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-build_log.txt
+*.tmp
+*.swp
 
-# OS files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-trash/
-ehthumbs.db
-Thumbs.db
-Desktop.ini
-
-# IDE and editors
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
-*.sublime-project
-*.sublime-workspace
 
-# Temporary files
-*.tmp
-*.temp
-*.cache
-.cache/
+# OS
+.DS_Store
+Thumbs.db
 
-# Development tools and scripts
-record-scroll.js
-record-with-screenshots.js
-scripts/
-context.json
-project_index.json
-claude-flow.cmd
-claude_desktop_config.json
-*.make
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# Database files
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-*.sqlite-shm
-in-memoria.db
-in-memoria-vectors.db/
+# Python specific
+.mypy_cache/
+.pytest_cache/
 
-# Memory and coordination (AI/Claude specific)
-memory/
-coordination/
-.mcp.json
-claude-flow.config.json
-.claude/
-.agent/
-.auto-claude/
-.swarm/
-.hive-mind/
-.claude-flow/
-.auto-claude/
-
-# Cursor/Claude IDE specific
-.cursor/
-.cursor/rules/
-
-# Markdown files (except README.md)
-*.md
-!README.md
-
-# Screenshots and recordings
-screenshots/
-capsule-screenshots/
-capsule-scroll-record/
-
-# Old/unused directories
-components/  # Root level components (using src/components instead)
-styles/      # Using src/app/globals.css instead
-
-# In Memoria
-.in-memoria/
-.in-memoria/cache/
-.in-memoria/.env
-
-# Package manager locks (keep package-lock.json, ignore others if switching)
-# yarn.lock
-# pnpm-lock.yaml
-
-# OpenMemory - IDE/Assistant specific rules
-.cursor\rules\openmemory.mdc
-CLAUDE.md
-AGENTS.md
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+```

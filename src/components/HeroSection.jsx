@@ -34,8 +34,8 @@ export const HeroSection = forwardRef((props, ref) => {
     } else {
       gsap.set(marqueeRef.current, { opacity: 1, y: 0 });
     }
-  }, { scope: heroRef });
-
+  { scope: heroRef });
+ }, 
   return (
     <section 
       ref={internalRef} 

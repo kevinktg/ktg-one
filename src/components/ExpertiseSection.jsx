@@ -103,7 +103,7 @@ export function ExpertiseSection({ expertiseData }) {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30">
+    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30 content-visibility-auto">
 
       {/* SHUTTERS (Transition Layer) */}
       {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
