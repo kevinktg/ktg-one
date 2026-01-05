@@ -54,57 +54,65 @@ export function ValidationSection({ auditData }) {
     const container = containerRef.current;
     if (!container) return;
 
-    // MASTER TIMELINE
-    // This handles both the "Swoop" transition AND the horizontal scroll
-    // effectively pinning the user in place until both are done.
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top", // Pin immediately when it hits the top
-        // Total scroll distance = Window Height (for transition) + Scroll Width (for movement)
-        end: () => `+=${container.scrollWidth + window.innerHeight}`,
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      }
-    });
-
     // PHASE 1: THE SWOOP (White -> Black)
     // Shutters shrink to reveal the black background.
-    // This happens *before* horizontal movement starts.
-    tl.to(shutterRef.current.children, {
+    gsap.to(shutterRef.current.children, {
       scaleY: 0,
       duration: 1, // Relative duration (short and punchy)
       stagger: 0.05,
       ease: "power3.inOut",
-      transformOrigin: "bottom" // "Swoop" down
+      transformOrigin: "bottom", // "Swoop" down
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "center top",
+        scrub: 1,
+        invalidateOnRefresh: true,
+      }
     });
 
-    // PHASE 2: HORIZONTAL SCROLL
-    // Now that black is revealed, we scroll sideways.
-    const scrollTween = tl.to(container, {
+    // Get all the card elements
+    const cards = gsap.utils.toArray('.validation-card');
+    
+    // Create a master timeline that pins the entire section and moves the container
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: () => `+=${container.scrollWidth + window.innerHeight}`, // Account for both horizontal scroll and vertical height
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+      }
+    });
+
+    // Move the container horizontally as we scroll
+    tl.to(container, {
       x: () => -(container.scrollWidth - window.innerWidth),
-      ease: "none",
-      duration: 5 // Relative duration (5x longer than the swoop)
+      ease: "power2.inOut"
     });
 
-    // 3. TEXT REVEAL ANIMATIONS
-    // These trigger based on the horizontal scroll position
+    // TEXT REVEAL ANIMATIONS for each card
     gsap.utils.toArray(".digital-text").forEach((text) => {
-        gsap.from(text, {
-            opacity: 0,
-            x: 50,
-            duration: 0.8,
-            ease: "power2.out",
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: text,
-                containerAnimation: scrollTween, // Link to the horizontal part of the timeline
-                start: "left 90%",
-                toggleActions: "play none none reverse"
-            }
-        });
+      gsap.fromTo(text, 
+        { 
+          opacity: 0,
+          x: 50 
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: text,
+            start: "center 80%",
+            end: "center 20%",
+            scrub: 1,
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
     });
 
   }, { scope: sectionRef });
@@ -142,7 +150,7 @@ export function ValidationSection({ auditData }) {
         <div ref={containerRef} className="flex gap-20 md:gap-40 px-6 md:px-20 w-fit items-center">
 
             {/* 01. INTRO MANIFESTO */}
-            <div className="w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0">
+            <div className="validation-card w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0">
                 <div className="mb-8 w-12 h-12 border-l border-t border-white/50" />
                 <p className="font-mono text-white/60 text-lg md:text-xl leading-relaxed">
                     <span className="text-white font-bold">{data.intro.title}</span>
@@ -159,7 +167,7 @@ export function ValidationSection({ auditData }) {
             </div>
 
             {/* 02. VERTEX AUDIT CARD */}
-            <div className="relative w-[90vw] md:w-[750px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
+            <div className="validation-card relative w-[90vw] md:w-[750px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
                 <CardCorners />
                 <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
                     <div>
@@ -185,7 +193,7 @@ export function ValidationSection({ auditData }) {
             </div>
 
             {/* 03. PERCENTILE RANK CARD */}
-            <div className="relative w-[90vw] md:w-[600px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
+            <div className="validation-card relative w-[90vw] md:w-[600px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
                 <CardCorners inverted />
                 <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
                     <div>
@@ -206,7 +214,7 @@ export function ValidationSection({ auditData }) {
             </div>
 
             {/* 04. THE EVIDENCE CARD */}
-            <div className="relative w-[90vw] md:w-[600px] h-[70vh] bg-[#0A0A0A] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col justify-center">
+            <div className="validation-card relative w-[90vw] md:w-[600px] h-[70vh] bg-[#0A0A0A] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col justify-center">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/10 via-white/50 to-white/10" />
                 <div className="mb-8">
                     <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.evidence.id}</div>
@@ -221,7 +229,7 @@ export function ValidationSection({ auditData }) {
             </div>
 
             {/* 05. THE FINAL VERDICT (WHITE CARD) */}
-            <div className="relative w-[90vw] md:w-[800px] h-[70vh] bg-white text-black p-8 md:p-14 shrink-0 flex flex-col justify-center">
+            <div className="validation-card relative w-[90vw] md:w-[800px] h-[70vh] bg-white text-black p-8 md:p-14 shrink-0 flex flex-col justify-center">
                 <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
                 <div className="digital-text space-y-10">
                     <h3 className="text-4xl md:text-6xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>

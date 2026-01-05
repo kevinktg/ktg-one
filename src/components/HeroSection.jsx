@@ -87,16 +87,16 @@ export const HeroSection = forwardRef((props, ref) => {
       scrollTrigger: {
         trigger: heroRef.current,
         start: "top top",
-        end: "bottom+=100% top", // Extended scroll range for slower fade
-        scrub: true,
+        end: "bottom+=200% top", // Extended scroll range for slower fade
+        scrub: 1.5, // Slower scrub for smoother transition
       }
     });
 
     tl2.to(heroRef.current, {
       opacity: 0,
-      scale: 1.1,
-      y: -100,
-      ease: "power1.inOut"
+      scale: 1.05,
+      y: -50,
+      ease: "power2.inOut"
     });
 
     // Cleanup - MUST be at end, not in middle!
