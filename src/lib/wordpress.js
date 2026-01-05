@@ -39,9 +39,9 @@ export async function testWordPressConnection() {
 export async function getPosts(page = 1, perPage = 10) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
-
-    const response = await fetchWithTimeout(url, {
-      cache: 'no-store', // No caching - always fresh (Next.js 16 compatible)
+    
+    const response = await fetch(url, {
+      next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -61,7 +61,7 @@ export async function getPosts(page = 1, perPage = 10) {
         const fallbackResponse = await fetchWithTimeout(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?per_page=${perPage}&page=${page}`,
           {
-            cache: 'no-store',
+            next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',
@@ -79,7 +79,33 @@ export async function getPosts(page = 1, perPage = 10) {
     }
 
     const data = await response.json();
-    console.log(`Successfully fetched ${data.length} posts from WordPress`);
+    
+    // Validate response is an array
+    if (!Array.isArray(data)) {
+      console.error('WordPress API returned non-array response:', typeof data);
+      return [];
+    }
+    
+    console.log(`✅ Successfully fetched ${data.length} posts from WordPress`);
+    
+    // Debug: Log first post structure if available
+    if (data.length > 0) {
+      console.log('📝 Sample post structure:', {
+        id: data[0].id,
+        title: data[0].title?.rendered || data[0].title,
+        slug: data[0].slug,
+        hasExcerpt: !!(data[0].excerpt?.rendered || data[0].excerpt),
+        hasEmbedded: !!data[0]._embedded,
+        hasFeaturedImage: !!getFeaturedImage(data[0]),
+        date: data[0].date,
+      });
+    } else {
+      console.warn('⚠️ WordPress API returned empty array. Check:');
+      console.warn('   - Are there published posts in WordPress?');
+      console.warn('   - Is the REST API enabled?');
+      console.warn('   - Are posts publicly accessible?');
+    }
+    
     return data;
   } catch (error) {
     if (error.name === 'AbortError') {
@@ -97,10 +123,10 @@ export async function getPosts(page = 1, perPage = 10) {
 // Fetch a single post by slug
 export async function getPostBySlug(slug) {
   try {
-    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`;
-
-    const response = await fetchWithTimeout(url, {
-      cache: 'no-store',
+    const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
+    
+    const response = await fetch(url, {
+      next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
         'Accept': 'application/json',
@@ -120,7 +146,7 @@ export async function getPostBySlug(slug) {
         const fallbackResponse = await fetchWithTimeout(
           `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}`,
           {
-            cache: 'no-store',
+            next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds
             headers: {
               'User-Agent': 'Next.js WordPress Client',
               'Accept': 'application/json',

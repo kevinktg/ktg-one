@@ -1,50 +1,42 @@
 import Link from "next/link";
-import { getPosts } from "@/lib/wordpress";
-import { formatDate, getFeaturedImage } from "@/lib/wordpress";
 import Image from "next/image";
+import { getPosts, formatDate, getFeaturedImage } from "@/lib/wordpress";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { GeometricBackground } from "@/components/GeometricBackground";
+
+// OPTIMIZATION: 
+// Switch from 'force-dynamic' to ISR (60 seconds).
+// This serves the page INSTANTLY from cache, then updates in background.
+// Huge boost for TTFB (Time to First Byte).
+export const revalidate = 60; 
 
 export const metadata = {
   title: "Blog | .ktg - AI Anthropology & Prompt Engineering Insights",
-  description: "Thoughts, insights, and updates on AI anthropology, prompt engineering, LLM optimization, and the future of human-AI collaboration. Top 0.01% prompt engineer's perspective.",
-  keywords: ["AI anthropology", "prompt engineering", "LLM optimization", "AI insights", "machine learning", "artificial intelligence"],
+  description: "Thoughts, insights, and updates on AI anthropology, prompt engineering, LLM optimization, and the future of human-AI collaboration.",
+  keywords: ["AI anthropology", "prompt engineering", "LLM optimization", "AI insights", "machine learning"],
   openGraph: {
-    title: "Blog | .ktg - AI Anthropology & Prompt Engineering",
-    description: "Thoughts, insights, and updates on AI anthropology and prompt engineering from a top 0.01% prompt engineer.",
+    title: "Blog | .ktg",
+    description: "Insights from a top 0.01% prompt engineer.",
     type: "website",
     siteName: ".ktg",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Blog | .ktg",
-    description: "AI Anthropology & Prompt Engineering Insights",
-  },
 };
-
-// Force dynamic rendering to avoid build-time API failures
-export const dynamic = 'force-dynamic';
-export const revalidate = 0; // No caching - always fresh
 
 export default async function BlogPage() {
   let posts = [];
-  let error = null;
   
   try {
+    // 1. Fetch posts (now safely cached for 60s)
     posts = await getPosts();
-    if (!Array.isArray(posts)) {
-      posts = [];
-    }
-  } catch (err) {
-    console.error('Error loading blog posts:', err);
-    error = err instanceof Error ? err.message : 'Unknown error';
+  } catch (error) {
+    console.error('Error loading blog posts:', error);
+    // Graceful fallback so the page doesn't crash
     posts = [];
   }
-  
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ktg.one';
 
-  // Structured data for blog listing
+  // 2. JSON-LD for SEO (Google Rich Results)
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -59,7 +51,7 @@ export default async function BlogPage() {
         url: `${siteUrl}/assets/ktg-one.svg`,
       },
     },
-    blogPost: posts.filter(post => post && post.title).map((post) => ({
+    blogPost: posts.filter(p => p?.title).map((post) => ({
       "@type": "BlogPosting",
       headline: post.title?.rendered || post.title || 'Untitled',
       url: `${siteUrl}/blog/${post.slug || post.id}`,
@@ -69,39 +61,43 @@ export default async function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white" style={{ contain: "layout" }}>
-      <GeometricBackground />
+    <div className="flex flex-col min-h-screen relative w-full bg-transparent">
       <Header />
+      
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
       />
-      <main className="pt-32 pb-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase">
-            blog
-          </h1>
-          <p className="text-white/60 mb-12 font-mono">
-            thoughts, insights, and updates
-          </p>
 
+      <main className="flex-1 pt-32 pb-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          
+          {/* Header Section */}
+          <div className="mb-16">
+            <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase text-white">
+              blog
+            </h1>
+            <p className="text-white/60 font-mono text-lg">
+              thoughts, insights, and updates
+            </p>
+          </div>
+
+          {/* Posts List */}
           {posts.length === 0 ? (
-            <div className="py-20 text-center">
-              <p className="text-white/40 mb-4">No posts found.</p>
-              {error && (
-                <p className="text-red-400/60 text-sm mb-2">Error: {error}</p>
-              )}
-              <p className="text-white/30 text-sm">
-                {error ? 'There was an error loading posts.' : 'Make sure NEXT_PUBLIC_WORDPRESS_URL is set correctly in your environment variables.'}
+            <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl">
+              <p className="text-white/40 mb-2">No posts found.</p>
+              <p className="text-white/30 text-sm font-mono">
+                System awaiting input from WordPress...
               </p>
             </div>
           ) : (
-            <div className="space-y-12">
+            <div className="space-y-16">
               {posts.map((post) => {
-                if (!post || !post.title || !post.excerpt) {
-                  return null;
-                }
+                if (!post?.title) return null;
+
                 const featuredImage = getFeaturedImage(post);
+                const title = post.title?.rendered || post.title || 'Untitled';
+                // Strip HTML tags for the preview text
                 const excerpt = (post.excerpt?.rendered || post.excerpt || '')
                   .replace(/<[^>]*>/g, "")
                   .substring(0, 150) + "...";
@@ -109,44 +105,47 @@ export default async function BlogPage() {
                 return (
                   <article
                     key={post.id}
-                    className="border-b border-white/10 pb-12 last:border-0"
-                    itemScope
-                    itemType="https://schema.org/BlogPosting"
+                    className="group relative flex flex-col md:flex-row gap-8 pb-12 border-b border-white/10 last:border-0"
                   >
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="group block"
-                      itemProp="url"
-                    >
-                      {featuredImage && (
-                        <div className="mb-6 overflow-hidden rounded-lg">
-                          <Image
-                            src={featuredImage}
-                            alt={post.title?.rendered || post.title || 'Blog post'}
-                            width={800}
-                            height={400}
-                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      )}
-                      <h2 className="font-syne text-3xl md:text-4xl font-bold mb-3 group-hover:text-white/80 transition-colors lowercase" itemProp="headline">
-                        {post.title?.rendered || post.title || 'Untitled'}
-                      </h2>
-                      {post.date && (
-                        <div className="text-white/40 text-sm font-mono mb-4">
-                          <time dateTime={new Date(post.date).toISOString()} itemProp="datePublished">
+                    {/* OPTIMIZATION: Image container */}
+                    {featuredImage && (
+                      <div className="w-full md:w-1/3 shrink-0 overflow-hidden rounded-xl bg-neutral-900">
+                        <Image
+                          src={featuredImage}
+                          alt={title}
+                          width={600}
+                          height={400}
+                          className="w-full h-56 md:h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          // OPTIMIZATION: 'sizes' helps browser download smaller images on mobile
+                          sizes="(max-width: 768px) 100vw, 300px"
+                        />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="flex-1 flex flex-col justify-center">
+                      <Link href={`/blog/${post.slug}`} className="block focus:outline-none">
+                        <h2 className="font-syne text-3xl font-bold mb-3 text-white group-hover:text-white/70 transition-colors lowercase">
+                          {title}
+                        </h2>
+                        
+                        <div className="text-white/40 text-sm font-mono mb-4 flex items-center gap-2">
+                          <time dateTime={post.date}>
                             {formatDate(post.date)}
                           </time>
+                          <span>•</span>
+                          <span>ai anthropology</span>
                         </div>
-                      )}
-                      <div
-                        className="text-white/70 prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: excerpt }}
-                      />
-                      <p className="mt-4 text-white/50 font-mono text-sm group-hover:text-white/70 transition-colors">
-                        read more →
-                      </p>
-                    </Link>
+
+                        <p className="text-white/70 leading-relaxed mb-4">
+                          {excerpt}
+                        </p>
+
+                        <span className="inline-block text-sm font-mono text-white/50 border-b border-transparent group-hover:border-white/50 transition-all">
+                          read full entry →
+                        </span>
+                      </Link>
+                    </div>
                   </article>
                 );
               })}
@@ -154,8 +153,8 @@ export default async function BlogPage() {
           )}
         </div>
       </main>
+
       <Footer />
     </div>
   );
 }
-

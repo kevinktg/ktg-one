@@ -2,328 +2,77 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Image from "next/image";
-import { useRef, forwardRef, useEffect } from "react";
+import { useRef, forwardRef, lazy, Suspense, useMemo } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
+// Lazy load Three.js component
+const HeroImages = lazy(() => import("@/components/HeroImages").then(mod => ({ default: mod.HeroImages })));
 
 export const HeroSection = forwardRef((props, ref) => {
   const heroRef = useRef(null);
   const internalRef = ref || heroRef;
-  const titleRef = useRef(null);
-  const subtitleRef = useRef(null);
-  const imageRef = useRef(null);
-  const maskRef = useRef(null);
-  const canvasRef = useRef(null);
+  const marqueeRef = useRef(null);
 
-  useGSAP(() => {
-    // 1. INTERACTIVE FLOATING SHAPES - Follow mouse with parallax using quickSetter
-    const shapes = [
-      { el: '.hero-shape-1', speedX: 20, speedY: 20 },
-      { el: '.hero-shape-2', speedX: -30, speedY: 15 },
-      { el: '.hero-shape-3', speedX: 15, speedY: -25 },
-      { el: '.hero-shape-4', speedX: -25, speedY: 20 },
-    ];
-
-    // Create quickSetters for performance
-    const setters = shapes.map(({ el, speedX, speedY }) => {
-      const element = document.querySelector(el);
-      if (!element) return null;
-      return {
-        x: gsap.quickSetter(element, 'x', 'px'),
-        y: gsap.quickSetter(element, 'y', 'px'),
-        speedX,
-        speedY
-      };
-    }).filter(Boolean);
-
-    // Animate on mouse move (outside GSAP context)
-    const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-
-      setters.forEach(({ x: setX, y: setY, speedX, speedY }) => {
-        setX(x * speedX);
-        setY(y * speedY);
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // 2. ENTRANCE ANIMATION
-    const tl = gsap.timeline();
-
-    if (titleRef.current) {
-      tl.from(titleRef.current, {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-    }
-
-    if (subtitleRef.current) {
-      tl.from(subtitleRef.current, {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      }, "-=0.4");
-    }
-
-    if (imageRef.current) {
-      tl.from(imageRef.current, {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-      }, "-=0.4");
-    }
-
-    // 3. SCROLL TRANSITION TO EXPERTISE SECTION
-    // Slow fade to give time to read white expertise section
-    const tl2 = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "top top",
-        end: "bottom+=200% top", // Extended scroll range for slower fade
-        scrub: 1.5, // Slower scrub for smoother transition
-      }
-    });
-
-    tl2.to(heroRef.current, {
-      opacity: 0,
-      scale: 1.05,
-      y: -50,
-      ease: "power2.inOut"
-    });
-
-    // Cleanup - MUST be at end, not in middle!
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-
-  }, { scope: heroRef });
-
-  // FLUID SPLASH CURSOR WITH PARTICLES
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const mask = maskRef.current;
-    if (!canvas || !mask) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Performance: Detect mobile/low-power devices
-    const isMobile = window.innerWidth < 768;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Skip particle animation entirely for reduced motion preference
-    if (prefersReducedMotion) return;
-
-    const particles = [];
-    const revealedCircles = [];
-    let mouse = { x: 0, y: 0, lastX: 0, lastY: 0 };
-    let animationId = null;
-    let isActive = true;
-
-    // Performance settings based on device
-    const maxParticles = isMobile ? 50 : 200;
-    const maxCircles = isMobile ? 50 : 100;
-    const particleSize = isMobile ? 40 : 80;
-
-    // Setup canvas dimensions
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resizeCanvas();
-
-    // Particle class for fluid effect
-    class Particle {
-      constructor(x, y, vx, vy) {
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.life = 1;
-        this.size = Math.random() * 60 + particleSize;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= 0.95; // Friction
-        this.vy *= 0.95;
-        this.life -= 0.015;
-        this.size *= 0.98;
-      }
-
-      draw(ctx) {
-        if (this.size <= 0) return;
-        const gradient = ctx.createRadialGradient(
-          this.x, this.y, 0,
-          this.x, this.y, this.size
-        );
-        // Brighter, more visible purple particles
-        gradient.addColorStop(0, `rgba(138, 43, 226, ${this.life})`);
-        gradient.addColorStop(0.5, `rgba(138, 43, 226, ${this.life * 0.6})`);
-        gradient.addColorStop(1, 'rgba(138, 43, 226, 0)');
-
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // Mouse tracking
-    const handleMove = (e) => {
-      mouse.lastX = mouse.x;
-      mouse.lastY = mouse.y;
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-
-      // Calculate mouse velocity
-      const vx = (mouse.x - mouse.lastX) * 0.5;
-      const vy = (mouse.y - mouse.lastY) * 0.5;
-
-      // Spawn particles based on movement
-      const speed = Math.sqrt(vx * vx + vy * vy);
-      if (speed > 1) {
-        const spawnCount = Math.min(3, Math.floor(speed / 2));
-        for (let i = 0; i < spawnCount; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const velocity = Math.random() * 2;
-          particles.push(new Particle(
-            mouse.x,
-            mouse.y,
-            Math.cos(angle) * velocity + vx * 0.1,
-            Math.sin(angle) * velocity + vy * 0.1
-          ));
-        }
-      }
-
-      // Add to revealed areas for masking (limit array size for memory)
-      revealedCircles.push({ x: mouse.x, y: mouse.y, r: 100 });
-      if (revealedCircles.length > maxCircles) {
-        revealedCircles.shift();
-      }
-    };
-
-    // Animation loop with proper tracking
-    const animate = () => {
-      if (!isActive) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Update and draw particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update();
-        particles[i].draw(ctx);
-
-        if (particles[i].life <= 0) {
-          particles.splice(i, 1);
-        }
-      }
-
-      // Limit particle count to prevent memory issues
-      while (particles.length > maxParticles) {
-        particles.shift();
-      }
-
-      // Update mask
-      if (revealedCircles.length > 0) {
-        const circles = revealedCircles.map(c =>
-          `circle(${c.r}px at ${c.x}px ${c.y}px)`
-        ).join(', ');
-
-        mask.style.webkitMaskImage = circles;
-        mask.style.maskImage = circles;
-        mask.style.webkitMaskComposite = 'xor';
-        mask.style.maskComposite = 'exclude';
-      }
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('resize', resizeCanvas);
-    animationId = requestAnimationFrame(animate);
-
-    return () => {
-      isActive = false;
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('resize', resizeCanvas);
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-      // Clear particles array
-      particles.length = 0;
-      revealedCircles.length = 0;
-    };
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('hero-animated') === 'true';
   }, []);
 
+  useGSAP(() => {
+    if (!marqueeRef.current) return;
+
+    if (!hasPlayed) {
+      gsap.from(marqueeRef.current, {
+        opacity: 0,
+        y: -20, // Slide down from top
+        duration: 1,
+        ease: "power2.out",
+        onComplete: () => {
+          sessionStorage.setItem('hero-animated', 'true');
+        }
+      });
+    } else {
+      gsap.set(marqueeRef.current, { opacity: 1, y: 0 });
+    }
+  { scope: heroRef });
+ }, 
   return (
-    <section ref={internalRef} className="hero relative min-h-screen flex items-center justify-center px-6 overflow-hidden z-20 bg-black">
+    <section 
+      ref={internalRef} 
+      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden" 
+      style={{ background: 'transparent' }} 
+      suppressHydrationWarning
+    >
 
-      {/* Layer 1: Revealed Background (shown when logo is wiped away) */}
-      <div className="absolute inset-0 z-10">
-        <div className="cyberpunk-background" />
-        <Image
-          src="/assets/profile.svg"
-          alt="cyberpunk avatar"
-          width={400}
-          height={400}
-          className="avatar-revealed"
-          priority
+      <Suspense fallback={<div className="absolute inset-0 z-10 bg-transparent" />}>
+        <HeroImages
+          topImage="/assets/top-hero.webp"
+          bottomImage="/assets/bottom-hero.webp"
         />
-      </div>
+      </Suspense>
 
-      {/* Layer 2: Geometric Shapes */}
-      <div className="absolute inset-0 pointer-events-none" style={{ contain: "strict" }}>
-        <div className="hero-shape-1 absolute top-20 right-20 w-64 h-64 border-2 border-white/20 rotate-45 will-change-transform" />
-        <div className="hero-shape-2 absolute top-1/4 left-10 w-48 h-48 border-2 border-white/10 will-change-transform" />
-        <div className="hero-shape-3 absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white/20 rounded-full will-change-transform" />
-        <div className="hero-shape-4 absolute bottom-20 left-20 w-56 h-56 border-2 border-white/10 rotate-12 will-change-transform" />
-      </div>
-
-      {/* Layer 3: Logo Mask (will be clipped by blob cursor) - Sibling to section */}
-      <div ref={maskRef} className="absolute inset-0 z-30 flex items-center justify-center" style={{ willChange: 'clip-path' }}>
-        <Image
-          src="/assets/ktg.svg"
-          alt="ktg logo"
-          width={800}
-          height={800}
-          className="w-auto h-screen object-contain"
-          priority
-        />
-      </div>
-
-      {/* Layer 3.5: Blob Cursor Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
-        style={{ zIndex: 35 }}
-      />
-
-      {/* Layer 4: Text content (keep existing) */}
-      <div className="relative z-40 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        <div className="hero__title-wrapper space-y-6">
-          <h1 ref={titleRef} className="hero__title tracking-tight font-syne font-bold text-5xl md:text-7xl lg:text-8xl lowercase text-white">
-            <span className="block">top 0.01%</span>
-            <span className="block mt-2 text-white/80">prompt</span>
-            <span className="block mt-2">engineer</span>
-          </h1>
-          <p ref={subtitleRef} className="monospace text-xl md:text-2xl text-white/70 tracking-wide font-light">
-            context continuation solve.<br />
-            frameworks. arxiv-ready papers.
-          </p>
-          <div className="pt-8 flex gap-4 opacity-50">
-            <div className="w-20 h-1 bg-white" />
-            <div className="w-12 h-1 bg-white/50" />
-            <div className="w-8 h-1 bg-white/30" />
+      {/* Marquee Banner (Top) */}
+      <div 
+        ref={marqueeRef}
+        // pointer-events-none lets mouse pass through to the blob canvas
+        className="absolute top-0 left-0 right-0 z-50 pointer-events-none overflow-hidden py-5 md:py-6 border-b border-white/10 bg-black/20 backdrop-blur-md"
+      >
+        <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
+          <div className="flex items-center gap-8 md:gap-12 animate-scroll will-change-transform">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Cognitive Architect</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Top 0.01%</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Context Sovereignty</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Framework Verification</span>
+                <span className="text-white/20">•</span>
+                <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Arxiv-Ready Research</span>
+                <span className="text-white/20">•</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

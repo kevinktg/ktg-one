@@ -3,137 +3,127 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef } from "react";
-import { formatDate, getFeaturedImage } from "@/lib/wordpress";
-import { GeometricBackground } from "@/components/GeometricBackground";
+import { getFeaturedImage, formatDate } from "@/lib/wordpress";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function BlogPreview({ posts }) {
+export function BlogPreview({ posts = [] }) {
   const sectionRef = useRef(null);
-  const titleRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('blog-animated') === 'true';
+  }, []);
 
   useGSAP(() => {
-    // Animate title
-    if (titleRef.current) {
-      gsap.from(titleRef.current, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1,
-        },
-        opacity: 0,
-        y: 50,
-        duration: 1.2,
-        ease: "power2.out",
-      });
+    // Set initial state - posts should be visible
+    gsap.set(".blog-post", { opacity: 1, y: 0 });
+    
+    if (hasPlayed) {
+      return;
     }
 
-    // Animate blog cards
-    const cards = gsap.utils.toArray(
-      sectionRef.current?.querySelectorAll(".blog-card") || []
-    );
-
-    cards.forEach((card, index) => {
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top 85%",
-          end: "top 60%",
-          scrub: 1,
-        },
-        opacity: 0,
-        y: 60,
-        duration: 1,
-        delay: index * 0.1,
+    // Stagger animation for blog posts
+    const blogPosts = gsap.utils.toArray(".blog-post");
+    
+    if (blogPosts.length > 0) {
+      // Start hidden, animate in on scroll
+      gsap.set(blogPosts, { opacity: 0, y: 50 });
+      
+      gsap.to(blogPosts, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.15,
         ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+          toggleActions: "play none none reverse",
+          onComplete: () => {
+            sessionStorage.setItem('blog-animated', 'true');
+          }
+        }
       });
-    });
+    }
   }, { scope: sectionRef });
 
-  if (posts.length === 0) return null;
+  // Default fallback message
+  if (!posts || posts.length === 0) {
+    return (
+      <section ref={sectionRef} className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
+        <div ref={containerRef} className="max-w-7xl mx-auto">
+          <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
+          <p className="text-muted-foreground font-mono">No posts available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 overflow-hidden content-visibility-auto" style={{ contain: "layout paint" }}>
-      {/* Geometric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0" style={{ contain: "strict layout paint" }}>
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 grid-pattern" />
+    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
+      <div ref={containerRef} className="max-w-7xl mx-auto">
+        <h2 className="font-syne text-4xl md:text-5xl font-bold mb-12 lowercase">blog</h2>
         
-        {/* Floating geometric shapes */}
-        <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white opacity-15 rotate-45" />
-        <div className="absolute top-1/4 left-10 w-48 h-48 border-2 border-white opacity-12" />
-        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 border-2 border-white opacity-15 rounded-full" />
-        <div className="absolute bottom-20 left-20 w-56 h-56 border-2 border-white opacity-12 rotate-12" />
-        
-        {/* Additional circles */}
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 border border-white opacity-8 rounded-full" />
-        <div className="absolute bottom-1/3 left-1/3 w-40 h-40 border-2 border-white opacity-10 rounded-full" />
-        <div className="absolute top-2/3 right-1/2 w-32 h-32 border border-white opacity-8 rounded-full" />
-        
-        {/* Diagonal lines */}
-        <div className="absolute top-0 right-0 w-1/2 h-1/2 diagonal-lines" />
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 diagonal-lines" />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Title */}
-        <div ref={titleRef} className="mb-16 text-center">
-          <div className="monospace text-sm text-white/40 mb-4 tracking-widest">
-            LATEST INSIGHTS
-          </div>
-          <h2 className="font-syne text-5xl md:text-6xl font-bold mb-6 lowercase">
-            blog
-          </h2>
-          <p className="text-white/60 text-lg font-mono max-w-2xl mx-auto">
-            thoughts, insights, and updates on AI anthropology and prompt engineering
-          </p>
-        </div>
-
-        {/* Blog Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {posts.slice(0, 6).map((post) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map((post, index) => {
+            if (!post || !post.title) return null;
+            
             const featuredImage = getFeaturedImage(post);
-            const rawExcerpt = post.excerpt?.rendered || '';
-            const excerpt = rawExcerpt
+            const excerpt = (post.excerpt?.rendered || post.excerpt || '')
               .replace(/<[^>]*>/g, "")
-              .substring(0, 120) + (rawExcerpt.length > 120 ? "..." : "");
-            const postTitle = post.title?.rendered || post.title || 'Untitled';
+              .substring(0, 120) + "...";
+            const title = post.title?.rendered || post.title || 'Untitled';
 
             return (
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="blog-card group block"
+                className="blog-post group block"
               >
-                <article className="h-full border border-white/10 hover:border-white/30 transition-all duration-300 bg-white/5 hover:bg-white/10">
+                <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-colors duration-300 bg-black/80 backdrop-blur-sm">
                   {featuredImage && (
-                    <div className="mb-6 overflow-hidden rounded-lg" style={{ aspectRatio: "2/1", contain: "layout paint" }}>
+                    <div className="relative w-full h-48 overflow-hidden">
                       <Image
                         src={featuredImage}
-                        alt={postTitle}
-                        width={800}
-                        height={400}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        alt={title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading={index < 3 ? "eager" : "lazy"}
+                        priority={index === 0}
                       />
                     </div>
                   )}
-                  <div className="p-6">
-                    <div className="monospace text-xs text-white/40 mb-3">
-                      {formatDate(post.date)}
-                    </div>
-                    <h3 className="font-syne text-2xl font-bold mb-3 lowercase group-hover:text-white/80 transition-colors line-clamp-2">
-                      {postTitle}
+                  
+                  <div className="p-6 flex-1 flex flex-col">
+                    {post.date && (
+                      <time 
+                        className="text-muted-foreground text-xs font-mono mb-3"
+                        dateTime={new Date(post.date).toISOString()}
+                      >
+                        {formatDate(post.date)}
+                      </time>
+                    )}
+                    
+                    <h3 className="font-syne text-xl md:text-2xl font-bold mb-3 lowercase group-hover:text-foreground/80 transition-colors line-clamp-2">
+                      {title}
                     </h3>
-                    <p className="text-white/60 text-sm line-clamp-3 mb-4">
-                      {excerpt}
-                    </p>
-                    <div className="monospace text-xs text-white/50 group-hover:text-white transition-colors">
+                    
+                    {excerpt && (
+                      <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-1">
+                        {excerpt}
+                      </p>
+                    )}
+                    
+                    <span className="text-muted-foreground font-mono text-xs group-hover:text-foreground/70 transition-colors mt-auto">
                       read more →
-                    </div>
+                    </span>
                   </div>
                 </article>
               </Link>
@@ -141,15 +131,16 @@ export function BlogPreview({ posts }) {
           })}
         </div>
 
-        {/* View All Link */}
-        <div className="text-center">
-          <Link
-            href="/blog"
-            className="inline-block monospace text-sm border border-white/20 hover:border-white/40 px-8 py-4 transition-all duration-300 hover:bg-white/5"
-          >
-            view all posts
-          </Link>
-        </div>
+        {posts.length > 0 && (
+          <div className="mt-12 text-center">
+            <Link
+              href="/blog"
+              className="inline-block font-mono text-sm text-muted-foreground hover:text-foreground transition-colors border-b border-transparent hover:border-foreground/30"
+            >
+              view all posts →
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

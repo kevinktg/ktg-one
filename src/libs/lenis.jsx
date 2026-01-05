@@ -60,6 +60,9 @@ export function ReactLenis({
         smoothWheel: true,
         wheelMultiplier: 1,
         touchMultiplier: 2,
+        // CRITICAL: Normalize scroll container for GSAP ScrollTrigger
+        wrapper: typeof window !== 'undefined' ? window : undefined,
+        content: typeof window !== 'undefined' ? document.documentElement : undefined,
         ...options,
       }}
       {...props}

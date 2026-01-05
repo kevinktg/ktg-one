@@ -5,6 +5,7 @@ import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
+import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
 
 // Force dynamic rendering if you want new blog posts to appear instantly on refresh
@@ -18,9 +19,19 @@ export default async function Home() {
   try {
     // Attempt to fetch posts. If WP is down, it won't crash the whole site.
     blogPosts = await getPosts(1, 6);
+    console.log(`[Home] Fetched ${blogPosts?.length || 0} posts from WordPress`);
+    
+    // Debug: Log if posts array is empty
+    if (!blogPosts || blogPosts.length === 0) {
+      console.warn("[Home] No posts returned from WordPress API. Check:");
+      console.warn("1. WordPress URL:", process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com');
+      console.warn("2. WordPress REST API is enabled");
+      console.warn("3. Posts exist and are published");
+    }
   } catch (error) {
-    console.error("Failed to fetch posts:", error);
-    // Component will use the fallback 'DEMO_POSTS' we added earlier
+    console.error("[Home] Failed to fetch posts:", error);
+    console.error("[Home] Error details:", error.message);
+    // Continue - BlogPreview will show loading state
   }
 
   // 2. DEFINE DATA FOR OTHER SECTIONS (Optional)
@@ -29,13 +40,16 @@ export default async function Home() {
   // but this is where you would pass "heroData", "expertiseData", etc.
 
   return (
-    <div className="bg-black min-h-screen flex flex-col">
+    <div className="bg-background min-h-screen flex flex-col relative" suppressHydrationWarning>
+      {/* Global background with gradient glow and grid - reactive to cursor */}
+      <GeometricBackground fixed />
+      
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}
       <Header />
 
-      <main className="flex-grow">
+      <main className="grow" suppressHydrationWarning>
 
         {/* HERO: Black Background */}
         <HeroSection />

@@ -1,0 +1,37 @@
+{
+  "project_type": "single",
+  "services": {
+    "main": {
+      "path": ".",
+      "tech_stack": ["javascript", "next.js", "react", "tailwindcss", "gsap"],
+      "port": 3000,
+      "dev_command": "npm run dev",
+      "build_command": "npm run build",
+      "test_command": "npm run lint"
+    }
+  },
+  "infrastructure": {
+    "docker": false,
+    "database": null,
+    "hosting": "vercel",
+    "ci_cd": "vercel"
+  },
+  "conventions": {
+    "linter": "eslint",
+    "formatter": "prettier",
+    "testing": "manual",
+    "component_pattern": "forwardRef with useGSAP",
+    "styling": "tailwind-only",
+    "animation_library": "gsap"
+  },
+  "key_directories": {
+    "pages": "src/app/",
+    "components": "src/components/",
+    "utilities": "src/lib/",
+    "assets": "public/assets/"
+  },
+  "entry_points": {
+    "main_page": "src/app/page.jsx",
+    "layout": "src/app/layout.jsx"
+  }
+}

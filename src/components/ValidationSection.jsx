@@ -3,15 +3,15 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
-import { GeometricBackground } from "@/components/GeometricBackground";
+import { useRef, useMemo, useCallback } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
-  const containerRef = useRef(null);
+  const horizontalScrollRef = useRef(null);
   const shutterRef = useRef(null);
+  const cardRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -50,211 +50,255 @@ export function ValidationSection({ auditData }) {
     }
   };
 
+  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  const hasPlayed = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem('validation-animated') === 'true';
+  }, []);
+
+
   useGSAP(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (!horizontalScrollRef.current) return;
 
-    // PHASE 1: THE SWOOP (White -> Black)
-    // Shutters shrink to reveal the black background.
-    gsap.to(shutterRef.current.children, {
-      scaleY: 0,
-      duration: 1, // Relative duration (short and punchy)
-      stagger: 0.05,
-      ease: "power3.inOut",
-      transformOrigin: "bottom", // "Swoop" down
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: "center top",
-        scrub: 1,
-        invalidateOnRefresh: true,
+    if (hasPlayed) {
+      // Skip animation - set final states immediately
+      if (shutterRef.current?.children) {
+        gsap.set(shutterRef.current.children, { scaleY: 0 });
       }
-    });
+      gsap.set(".digital-text", { opacity: 1, x: 0 });
+    } else {
+      // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
+      gsap.to(shutterRef.current?.children, {
+        scaleY: 0,
+        duration: 1,
+        stagger: 0.05,
+        ease: "power3.inOut",
+        transformOrigin: "bottom",
+        onComplete: () => {
+          sessionStorage.setItem('validation-animated', 'true');
+        }
+      });
 
-    // Get all the card elements
-    const cards = gsap.utils.toArray('.validation-card');
-    
-    // Create a master timeline that pins the entire section and moves the container
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: () => `+=${container.scrollWidth + window.innerHeight}`, // Account for both horizontal scroll and vertical height
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-      }
-    });
-
-    // Move the container horizontally as we scroll
-    tl.to(container, {
-      x: () => -(container.scrollWidth - window.innerWidth),
-      ease: "power2.inOut"
-    });
-
-    // TEXT REVEAL ANIMATIONS for each card
-    gsap.utils.toArray(".digital-text").forEach((text) => {
-      gsap.fromTo(text, 
-        { 
+      // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
+      const textElements = gsap.utils.toArray(".digital-text");
+      textElements.forEach((text, index) => {
+        gsap.from(text, {
           opacity: 0,
-          x: 50 
-        },
-        {
-          opacity: 1,
-          x: 0,
+          x: 30,
           duration: 0.8,
           ease: "power2.out",
+          delay: 0.8 + (index * 0.1), // Stagger after shutter animation
+        });
+      });
+    }
+
+    // PHASE 3: CARD-ONLY SCROLLTRIGGER (Graphite.com pattern)
+    // Pin the card itself, scroll content horizontally inside
+    let pinTrigger = null;
+    let scrollTween = null;
+    let resizeTimeout = null;
+    
+    // OPTIMIZATION: Setup immediately - DOM is ready via useGSAP scope
+    // Removed setTimeout delay - useGSAP ensures DOM is ready
+    const setupScrollTrigger = () => {
+      if (!cardRef.current || !horizontalScrollRef.current) return;
+      
+      // Calculate horizontal scroll distance
+      const scrollWidth = horizontalScrollRef.current.scrollWidth;
+      const clientWidth = horizontalScrollRef.current.clientWidth;
+      const contentWidth = scrollWidth - clientWidth;
+      
+      if (contentWidth > 0) {
+        // Pin the card container (like Graphite) - card stays fixed while content scrolls
+        pinTrigger = ScrollTrigger.create({
+          trigger: cardRef.current,
+          start: "top top",
+          end: () => `+=${contentWidth + window.innerWidth * 0.5}`,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        });
+        
+        // Animate horizontal scroll of content inside card
+        scrollTween = gsap.to(horizontalScrollRef.current, {
+          x: -contentWidth,
+          ease: "none",
           scrollTrigger: {
-            trigger: text,
-            start: "center 80%",
-            end: "center 20%",
+            trigger: cardRef.current,
+            start: "top top",
+            end: () => `+=${contentWidth + window.innerWidth * 0.5}`,
             scrub: 1,
-            toggleActions: "play none none reverse"
+            invalidateOnRefresh: true,
           }
-        }
-      );
-    });
+        });
+      }
+    };
+    
+    // Setup immediately - useGSAP ensures DOM readiness
+    setupScrollTrigger();
+    
+    // OPTIMIZATION: Debounced resize handler to prevent excessive recalculations
+    const handleResize = () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (pinTrigger) pinTrigger.kill();
+        if (scrollTween) scrollTween.kill();
+        ScrollTrigger.refresh();
+        setupScrollTrigger();
+      }, 150);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup function
+    return () => {
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      window.removeEventListener('resize', handleResize);
+      if (pinTrigger) pinTrigger.kill();
+      if (scrollTween) scrollTween.kill();
+    };
 
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative h-screen bg-black text-white overflow-hidden z-40" style={{ contain: "paint layout" }}>
+    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden z-40 bg-background">
 
-      {/* ============================================ */}
-      {/* SHUTTERS (The "Swoop" Layer)                 */}
-      {/* These start FULL HEIGHT (white screen) and   */}
-      {/* animate down to reveal the black content.    */}
-      {/* ============================================ */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full">
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform" />
-         <div className="w-1/5 h-full bg-white will-change-transform" />
+      {/* SHUTTERS (White -> Black Swoop) */}
+      {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
+      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
+         {[...Array(5)].map((_, i) => (
+           <div 
+             key={i} 
+             className={`w-1/5 h-full bg-white border-r border-black/5 ${!hasPlayed ? 'will-change-transform' : ''}`} 
+             style={{ contain: 'strict' }} 
+           />
+         ))}
       </div>
 
-      {/* Background Component */}
-      <div className="absolute inset-0 z-0">
-          <GeometricBackground />
-      </div>
-
-      {/* Sticky Header */}
-      <div className="absolute top-32 left-6 md:left-12 z-20 mix-blend-difference pointer-events-none">
-          <h2 className="text-4xl md:text-6xl font-syne font-bold lowercase">
-             system_<span className="text-white/30">audits</span>
-          </h2>
-      </div>
-
-      {/* Horizontal Container */}
-      <div className="relative h-full flex items-center z-10 will-change-transform">
-        <div ref={containerRef} className="flex gap-20 md:gap-40 px-6 md:px-20 w-fit items-center">
-
-            {/* 01. INTRO MANIFESTO */}
-            <div className="validation-card w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0">
-                <div className="mb-8 w-12 h-12 border-l border-t border-white/50" />
-                <p className="font-mono text-white/60 text-lg md:text-xl leading-relaxed">
-                    <span className="text-white font-bold">{data.intro.title}</span>
-                    <br/><br/>
-                    {data.intro.desc}
-                    <br/><br/>
-                    {data.intro.note}
-                </p>
-                <div className="mt-12 flex gap-4">
-                    <div className="px-4 py-2 border border-white/20 rounded-full font-mono text-xs text-green-400 bg-green-900/10">
+      {/* Scroll Feature Container - matches Graphite pattern */}
+      <div className="w-full scroll-feature-container">
+        
+        {/* Full-height wrapper for proper spacing */}
+        <div 
+          className="h-dvh w-full flex flex-col items-center justify-center" 
+          style={{ 
+            paddingTop: 'var(--header-height, 4rem)', 
+            paddingBottom: 'var(--header-height, 4rem)' 
+          }}
+        >
+          
+          {/* Card Container - This gets pinned by ScrollTrigger (Graphite style) */}
+          <div 
+            ref={cardRef}
+            className="h-full max-h-[720px] w-full mx-4 md:mx-auto max-w-7xl relative flex p-4 md:p-12 border border-border rounded-2xl overflow-hidden bg-card/50"
+          >
+            
+            {/* Horizontal Scrolling Content - Scrolls inside pinned card */}
+            {/* OPTIMIZATION: will-change applied conditionally - only when scrolling */}
+            <div 
+              ref={horizontalScrollRef} 
+              className="flex gap-6 md:gap-12 min-w-max h-full items-center"
+            >
+                  
+                  {/* 01. INTRO */}
+                  <div className="w-[85vw] md:w-[500px] flex flex-col justify-center shrink-0 digital-text">
+                    <div className="mb-8 w-12 h-12 border-l border-t border-foreground/20" />
+                    <p className="font-mono text-muted-foreground text-base md:text-lg leading-relaxed">
+                      <span className="text-foreground font-semibold">{data.intro.title}</span>
+                      <br/><br/>
+                      {data.intro.desc}
+                      <br/><br/>
+                      <span className="text-muted-foreground/80">{data.intro.note}</span>
+                    </p>
+                    <div className="mt-12 flex gap-4">
+                      <div className="px-4 py-2 border border-border rounded-full font-mono text-xs text-foreground bg-card">
                         AUDIT STATUS: {data.intro.status}
+                      </div>
                     </div>
-                </div>
-            </div>
+                  </div>
 
-            {/* 02. VERTEX AUDIT CARD */}
-            <div className="validation-card relative w-[90vw] md:w-[750px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
-                <CardCorners />
-                <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
-                    <div>
-                        <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.audit.id}</div>
+                  {/* 02. VERTEX AUDIT */}
+                  <div className="w-[85vw] md:w-[600px] shrink-0 digital-text">
+                    <div className="border-b border-border pb-6 mb-6">
+                      <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.audit.id}</div>
+                      <div className="flex justify-between items-start">
                         <h3 className="text-2xl md:text-3xl font-syne font-bold">{data.audit.title}</h3>
+                        <div className="text-sm font-bold text-foreground bg-card px-3 py-1 font-mono whitespace-nowrap border border-border">{data.audit.badge}</div>
+                      </div>
                     </div>
-                    <div className="text-sm md:text-xl font-bold text-white bg-white/10 px-3 py-1 font-mono whitespace-nowrap">{data.audit.badge}</div>
-                </div>
-                <div className="space-y-8 font-mono text-base md:text-lg flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="my-6 border-l-4 border-white/20 pl-6 py-2 digital-text">
-                        <span className="text-white/40 block mb-2 text-xs tracking-widest">FINDINGS:</span>
-                        <p className="leading-relaxed text-white/90">{data.audit.findings}</p>
-                    </div>
-                    <div className="space-y-4 text-sm md:text-base text-white/70">
+                    <div className="space-y-6 font-mono text-base md:text-lg">
+                      <div className="border-l-4 border-border pl-6 py-2">
+                        <span className="text-muted-foreground block mb-2 text-xs tracking-widest uppercase">FINDINGS:</span>
+                        <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
+                      </div>
+                      <ul className="space-y-3 text-base text-muted-foreground">
                         {data.audit.checklist.map((item, i) => (
-                             <li key={i} className="flex gap-4 digital-text items-start">
-                                <span className="text-green-500 mt-1">✓</span>
-                                <span><strong className="text-white">{item.label}:</strong> {item.desc}</span>
-                            </li>
+                          <li key={i} className="flex gap-3 items-start">
+                            <span className="text-foreground mt-1">✓</span>
+                            <span><strong className="text-foreground">{item.label}:</strong> {item.desc}</span>
+                          </li>
                         ))}
+                      </ul>
                     </div>
-                </div>
-            </div>
+                  </div>
 
-            {/* 03. PERCENTILE RANK CARD */}
-            <div className="validation-card relative w-[90vw] md:w-[600px] h-[70vh] bg-[#050505] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col">
-                <CardCorners inverted />
-                <div className="flex justify-between items-start border-b border-white/10 pb-8 mb-8">
-                    <div>
-                        <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.percentile.id}</div>
-                        <h3 className="text-3xl font-syne font-bold">Percentile</h3>
+                  {/* 03. PERCENTILE RANK */}
+                  <div className="w-[85vw] md:w-[500px] shrink-0 digital-text">
+                    <div className="border-b border-border pb-6 mb-6">
+                      <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.percentile.id}</div>
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-2xl font-syne font-bold">Percentile</h3>
+                        <div className="text-4xl font-bold text-foreground font-mono">{data.percentile.rank}</div>
+                      </div>
                     </div>
-                    <div className="text-4xl font-bold text-white font-mono">{data.percentile.rank}</div>
-                </div>
-                <div className="space-y-8 font-mono text-base md:text-lg flex-1">
-                    <div className="bg-white/5 p-8 rounded border border-white/10 digital-text">
-                        <div className="text-xs text-white/40 mb-3 tracking-widest">JUSTIFICATION: DEPTH</div>
-                        <p className="leading-relaxed">{data.percentile.justification}</p>
-                    </div>
-                    <p className="text-white/60 text-sm italic border-l-2 border-white/20 pl-4 digital-text">
+                    <div className="space-y-6 font-mono text-base md:text-lg">
+                      <div className="bg-card/50 p-6 rounded border border-border">
+                        <div className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">JUSTIFICATION: DEPTH</div>
+                        <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
+                      </div>
+                      <p className="text-muted-foreground text-base italic border-l-2 border-border pl-4">
                         "{data.percentile.quote}"
-                    </p>
-                </div>
-            </div>
-
-            {/* 04. THE EVIDENCE CARD */}
-            <div className="validation-card relative w-[90vw] md:w-[600px] h-[70vh] bg-[#0A0A0A] border border-white/20 p-8 md:p-14 shrink-0 group hover:border-white/40 transition-colors flex flex-col justify-center">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white/10 via-white/50 to-white/10" />
-                <div className="mb-8">
-                    <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.evidence.id}</div>
-                    <h3 className="text-3xl font-syne font-bold">The Evidence</h3>
-                </div>
-                <div className="digital-text">
-                    <p className="font-mono text-xl md:text-2xl leading-relaxed text-white">"{data.evidence.quote1}"</p>
-                    <div className="mt-8 p-6 border border-white/10 bg-white/5 rounded-lg">
-                        <p className="font-mono text-lg text-white/80 leading-relaxed">"{data.evidence.quote2}"</p>
+                      </p>
                     </div>
-                </div>
-            </div>
+                  </div>
 
-            {/* 05. THE FINAL VERDICT (WHITE CARD) */}
-            <div className="validation-card relative w-[90vw] md:w-[800px] h-[70vh] bg-white text-black p-8 md:p-14 shrink-0 flex flex-col justify-center">
-                <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
-                <div className="digital-text space-y-10">
-                    <h3 className="text-4xl md:text-6xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
-                    <p className="font-mono text-xl md:text-3xl border-l-4 border-black pl-8 py-2">
+                  {/* 04. THE EVIDENCE */}
+                  <div className="w-[85vw] md:w-[550px] shrink-0 digital-text">
+                    <div className="mb-6">
+                      <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.evidence.id}</div>
+                      <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
+                    </div>
+                    <div className="space-y-6">
+                      <p className="font-mono text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
+                      <div className="p-6 border border-border bg-card/50 rounded-lg">
+                        <p className="font-mono text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 05. THE FINAL VERDICT */}
+                  <div className="relative w-[85vw] md:w-[700px] shrink-0 digital-text bg-foreground text-background p-8 md:p-12">
+                    <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
+                    <div className="space-y-8">
+                      <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
+                      <p className="font-mono text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
                         {data.verdict.subtitle}
-                    </p>
-                    <div className="pt-10 border-t border-black/10 flex items-center gap-6">
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                        <span className="font-mono text-lg font-bold tracking-widest uppercase">{data.verdict.status}</span>
+                      </p>
+                      <div className="pt-8 border-t border-background/20 flex items-center gap-4">
+                        <div className="w-3 h-3 bg-green-500 rounded-full" />
+                        <span className="font-mono text-base font-bold tracking-widest uppercase">{data.verdict.status}</span>
+                      </div>
                     </div>
-                </div>
+                  </div>
+                
+                {/* END SPACER */}
+                <div className="w-[10vw] shrink-0" />
+                
             </div>
-
-            {/* END SPACER */}
-            <div className="w-[10vw] shrink-0" />
+          </div>
         </div>
       </div>
     </section>
   );
 }
-
-// Sub-component for decorative corners
-const CardCorners = ({ inverted = false }) => (
-    <>
-        <div className={`absolute top-0 ${inverted ? 'right-0 border-r' : 'left-0 border-l'} w-4 h-4 border-t border-white opacity-50`} />
-        <div className={`absolute bottom-0 ${inverted ? 'left-0 border-l' : 'right-0 border-r'} w-4 h-4 border-b border-white opacity-50`} />
-    </>
-);

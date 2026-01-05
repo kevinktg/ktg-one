@@ -1,4 +1,4 @@
-import { Syne, Ubuntu_Mono } from "next/font/google";
+import { Syne, Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
@@ -6,24 +6,24 @@ import { ClientLayout } from "@/components/ClientLayout";
 // OPTIMIZATION: Use 'swap' to ensure branding fonts load even on slower connections.
 // fallback ensures graceful degradation if Google Fonts fails
 const syne = Syne({
+  weight: ["400", "700", "800"],
   subsets: ["latin"],
   variable: "--font-syne",
   display: "swap",
   fallback: ["system-ui", "Arial", "sans-serif"],
 });
 
-const ubuntuMono = Ubuntu_Mono({
-  weight: ["400", "700"],
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-inter",
   display: "swap",
   fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
 });
 
 export const metadata = {
-  metadataBase: new URL('https://ktg.one'), // Update this to your production URL
+  metadataBase: new URL('https://ktg.one'), 
   title: {
-    default: ".ktg | Top 0.01% Prompt Engineer",
+    default: ".ktg | Distinguished Cognitive Architect",
     template: "%s | .ktg"
   },
   description: "Portfolio of a top 0.01% prompt engineer. Cognitive Software Engineering & Cross-world reasoning across 7 careers.",
@@ -31,45 +31,40 @@ export const metadata = {
     icon: "/assets/ktg.svg",
     shortcut: "/assets/ktg.svg",
   },
-  // Social Preview Cards
   openGraph: {
     title: ".ktg | Top 0.01% Prompt Engineer",
     description: "Context continuation solve. Frameworks. Arxiv-ready papers.",
     type: "website",
     locale: "en_AU",
-    siteName: "KTG Portfolio",
+    siteName: ".ktg Portfolio",
     images: [
       {
-        url: "/assets/og-image.jpg", // Add a 1200x630 image at this path for best results
+        url: "/assets/og-image.jpg", 
         width: 1200,
         height: 630,
-        alt: "KTG Portfolio Preview",
+        alt: "ktg Portfolio Preview",
       },
     ],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="bg-black">
       <body
-        className={`
-          ${syne.variable}
-          ${ubuntuMono.variable}
-          antialiased
-          bg-black
-          text-white
-          overflow-x-hidden
-          selection:bg-white
-          selection:text-black
-        `}
+        className={`${syne.variable} ${inter.variable} antialiased text-foreground overflow-x-hidden selection:bg-white selection:text-black`}
         suppressHydrationWarning
       >
+        {/* NOTE: bg-background was removed from body. 
+            The black floor is handled by 'html' in globals.css 
+            or the 'bg-black' class on the html tag above.
+        */}
         <ClientLayout>
           {children}
           <SpeedInsights />
