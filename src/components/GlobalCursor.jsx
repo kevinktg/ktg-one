@@ -4,9 +4,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 
 /**
- * GlobalCursor - Context-aware cursor system
- * - Hidden on hero section (blob reveal takes over)
- * - Visible dot + follower on all other sections
+ * Render a context-aware global cursor consisting of a main dot and a lagging follower.
+ *
+ * The cursor is hidden while an element annotated with `data-cursor-zone="hero"` occupies more than 50% of the viewport; otherwise both cursor elements are visible. The main dot tracks the pointer position immediately and the follower smoothly trails the main dot. Event listeners and observers are cleaned up on unmount.
+ *
+ * @returns {JSX.Element} Two positioned, non-interactive divs: the main cursor dot and its follower.
  */
 export function GlobalCursor() {
   const cursorRef = useRef(null);
