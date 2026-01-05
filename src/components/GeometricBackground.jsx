@@ -3,10 +3,9 @@ import { memo } from 'react';
 // Memoized to prevent unnecessary re-renders - this is a static decorative component
 export const GeometricBackground = memo(function GeometricBackground() {
   return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden contain-strict" aria-hidden="true">
-      {/* NOTE: 'absolute' is used instead of 'fixed' to ensure this background
-         stays contained within its parent section (Validation/Philosophy/etc)
-         and doesn't bleed into the White Expertise section.
+    <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden contain-strict" aria-hidden="true">
+      {/* NOTE: 'fixed' is used instead of 'absolute' to ensure this background
+         covers the entire viewport as a global background
       */}
 
       {/* Grid pattern overlay */}
