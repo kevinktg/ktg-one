@@ -65,7 +65,15 @@ export function ExpertiseSection({ expertiseData }) {
       // If played, set final state immediately
       gsap.set(".expertise-title", { opacity: 1, y: 0 });
       gsap.set(".expertise-group", { opacity: 1, y: 0 });
-      // ... stats setup (abbreviated for brevity as this path is just fallback)
+
+      // Set stats to final values
+      const stats = gsap.utils.toArray(".stat-counter");
+      stats.forEach((stat) => {
+        const targetVal = parseFloat(stat.getAttribute("data-val"));
+        const isFloat = stat.getAttribute("data-is-float") === "true";
+        const suffix = stat.getAttribute("data-suffix") || "";
+        stat.textContent = isFloat ? targetVal.toFixed(2) + suffix : Math.floor(targetVal) + suffix;
+      });
       return;
     }
 
