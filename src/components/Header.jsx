@@ -13,10 +13,18 @@ import {
 
 export function Header() {
   return (
-    <header className="fixed top-0 right-0 z-50 p-6 flex justify-end items-start pointer-events-none">
+    <header className="fixed top-0 right-0 z-[100] p-6 flex justify-end items-start pointer-events-none">
       <div className="pointer-events-auto">
         <NavigationMenu>
           <NavigationMenuList className="gap-2">
+
+            <NavigationMenuItem>
+              <Link href="/" legacyBehavior passHref>
+                 <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-white/50 hover:text-white font-mono tracking-widest text-xs")}>
+                   HOME
+                 </NavigationMenuLink>
+               </Link>
+             </NavigationMenuItem>
 
             <NavigationMenuItem>
               <Link href="/blog" legacyBehavior passHref>
@@ -26,17 +34,6 @@ export function Header() {
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
-
-            {/* Placeholder for future links if needed */}
-            {/*
-            <NavigationMenuItem>
-              <Link href="/about" legacyBehavior passHref>
-                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-white/50 hover:text-white")}>
-                  ABOUT
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            */}
 
           </NavigationMenuList>
         </NavigationMenu>
