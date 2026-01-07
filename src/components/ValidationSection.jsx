@@ -3,21 +3,26 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
-gsap.registerPlugin(ScrollTrigger);
+// Register ScrollTrigger safely
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
- * ValidationSection - Graphite.com style stacking cards
- * Cards pin and stack as user scrolls, creating depth effect
+ * ValidationSection - Graphite.com Style Stacking Cards
+ *
+ * Strategy:
+ * 1. Pin the parent section.
+ * 2. Cards are absolute positioned (except the first one, or handled via GSAP).
+ * 3. As user scrolls, animate subsequent cards from y: "100%" to y: 0.
+ * 4. This creates a smooth "stacking" effect where new cards slide over previous ones.
  */
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
-  const shutterRef = useRef(null);
-  const cardsContainerRef = useRef(null);
-  const cardRefs = useRef([]);
-  const [isReady, setIsReady] = useState(false);
+  const containerRef = useRef(null);
 
   // Default Data
   const data = auditData || {
@@ -56,21 +61,21 @@ export function ValidationSection({ auditData }) {
     }
   };
 
-  // Cards array for rendering
   const cards = useMemo(() => [
     {
       id: 'intro',
+      bg: "bg-[#f5f5f5]", // Almost white
+      text: "text-black",
       content: (
-        <div className="flex flex-col justify-center h-full">
-          <div className="mb-8 w-12 h-12 border-l-2 border-t-2 border-foreground/20" />
-          <p className="font-mono text-muted-foreground text-lg md:text-xl leading-relaxed max-w-xl">
-            <span className="text-foreground font-semibold text-2xl md:text-3xl block mb-4">{data.intro.title}</span>
-            {data.intro.desc}
-            <br /><br />
-            <span className="text-muted-foreground/80 text-base">{data.intro.note}</span>
-          </p>
+        <div className="flex flex-col justify-center h-full max-w-2xl">
+          <div className="mb-8 w-12 h-12 border-l-2 border-t-2 border-black/20" />
+          <div className="font-mono text-black/60 text-lg md:text-xl leading-relaxed">
+            <h3 className="text-black font-syne font-bold text-3xl md:text-5xl mb-6">{data.intro.title}</h3>
+            <p className="mb-8">{data.intro.desc}</p>
+            <p className="text-sm border-l-2 border-black/10 pl-4 py-2">{data.intro.note}</p>
+          </div>
           <div className="mt-12 flex gap-4">
-            <div className="px-4 py-2 border border-border rounded-full font-mono text-xs text-foreground bg-card">
+            <div className="px-4 py-2 border border-black/10 rounded-full font-mono text-xs text-black bg-white">
               AUDIT STATUS: {data.intro.status}
             </div>
           </div>
@@ -79,27 +84,32 @@ export function ValidationSection({ auditData }) {
     },
     {
       id: 'audit',
+      bg: "bg-[#e5e5e5]", // Light gray
+      text: "text-black",
       content: (
-        <div className="h-full">
-          <div className="border-b border-border pb-6 mb-6">
-            <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.audit.id}</div>
-            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-              <h3 className="text-2xl md:text-4xl font-syne font-bold">{data.audit.title}</h3>
-              <div className="text-sm font-bold text-foreground bg-card px-3 py-1 font-mono whitespace-nowrap border border-border self-start">
-                {data.audit.badge}
-              </div>
+        <div className="h-full flex flex-col">
+          <div className="border-b border-black/10 pb-6 mb-8 flex justify-between items-end">
+            <div>
+              <div className="text-xs font-mono text-black/40 mb-2">LOG ID: {data.audit.id}</div>
+              <h3 className="text-3xl md:text-5xl font-syne font-bold">{data.audit.title}</h3>
+            </div>
+            <div className="hidden md:block text-xs font-bold text-white bg-black px-3 py-1 font-mono">
+              {data.audit.badge}
             </div>
           </div>
-          <div className="space-y-6 font-mono text-base md:text-lg">
-            <div className="border-l-4 border-border pl-6 py-2">
-              <span className="text-muted-foreground block mb-2 text-xs tracking-widest uppercase">FINDINGS:</span>
-              <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
+
+          <div className="space-y-8 font-mono text-base md:text-lg">
+            <div className="border-l-4 border-black pl-6 py-1">
+              <span className="text-black/40 block mb-2 text-xs tracking-widest uppercase">FINDINGS:</span>
+              <p className="leading-relaxed text-black font-medium">{data.audit.findings}</p>
             </div>
-            <ul className="space-y-3 text-base text-muted-foreground">
+            <ul className="space-y-4 pt-4">
               {data.audit.checklist.map((item, i) => (
-                <li key={i} className="flex gap-3 items-start">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span><strong className="text-foreground">{item.label}:</strong> {item.desc}</span>
+                <li key={i} className="flex gap-4 items-start group">
+                  <span className="text-black/30 mt-1 group-hover:text-black transition-colors">✓</span>
+                  <span className="text-black/70 group-hover:text-black transition-colors">
+                    <strong>{item.label}:</strong> {item.desc}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -109,64 +119,72 @@ export function ValidationSection({ auditData }) {
     },
     {
       id: 'percentile',
+      bg: "bg-[#1a1a1a]", // Dark gray
+      text: "text-white",
       content: (
-        <div className="h-full">
-          <div className="border-b border-border pb-6 mb-6">
-            <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.percentile.id}</div>
-            <div className="flex justify-between items-start">
-              <h3 className="text-2xl md:text-3xl font-syne font-bold">Percentile Ranking</h3>
-              <div className="text-5xl md:text-6xl font-bold text-foreground font-mono">{data.percentile.rank}</div>
+        <div className="h-full flex flex-col justify-center">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 border-b border-white/10 pb-8">
+            <div>
+              <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.percentile.id}</div>
+              <h3 className="text-3xl md:text-5xl font-syne font-bold">Percentile Ranking</h3>
+            </div>
+            <div className="text-6xl md:text-8xl font-bold text-white font-mono mt-4 md:mt-0 tracking-tighter">
+              {data.percentile.rank}
             </div>
           </div>
-          <div className="space-y-6 font-mono text-base md:text-lg">
-            <div className="bg-card/50 p-6 rounded-lg border border-border">
-              <div className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">JUSTIFICATION: DEPTH</div>
-              <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            <div className="font-mono text-white/70 text-lg leading-relaxed">
+               <div className="text-xs text-white/30 mb-3 tracking-widest uppercase">JUSTIFICATION</div>
+               {data.percentile.justification}
             </div>
-            <p className="text-muted-foreground text-base italic border-l-2 border-border pl-4">
+            <div className="font-syne text-2xl md:text-3xl font-bold text-white leading-tight">
               "{data.percentile.quote}"
-            </p>
+            </div>
           </div>
         </div>
       ),
     },
     {
       id: 'evidence',
+      bg: "bg-black", // Pure black
+      text: "text-white",
       content: (
-        <div className="h-full">
-          <div className="mb-6">
-            <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.evidence.id}</div>
-            <h3 className="text-2xl md:text-3xl font-syne font-bold">The Evidence</h3>
+        <div className="h-full flex flex-col justify-center">
+          <div className="mb-12">
+            <div className="text-xs font-mono text-white/40 mb-2">LOG ID: {data.evidence.id}</div>
+            <h3 className="text-4xl md:text-6xl font-syne font-bold">The Evidence</h3>
           </div>
-          <div className="space-y-8">
-            <p className="font-mono text-xl md:text-2xl leading-relaxed text-foreground">
+
+          <div className="space-y-12">
+            <blockquote className="font-mono text-xl md:text-3xl leading-relaxed text-white/90 pl-8 border-l-2 border-white/20">
               "{data.evidence.quote1}"
-            </p>
-            <div className="p-6 border border-border bg-card/50 rounded-lg">
-              <p className="font-mono text-base md:text-lg text-foreground leading-relaxed">
-                "{data.evidence.quote2}"
-              </p>
-            </div>
+            </blockquote>
+            <blockquote className="font-mono text-lg md:text-2xl leading-relaxed text-white/60 pl-8 border-l-2 border-white/10">
+              "{data.evidence.quote2}"
+            </blockquote>
           </div>
         </div>
       ),
     },
     {
       id: 'verdict',
-      variant: 'inverted',
+      bg: "bg-white", // Contrast pop
+      text: "text-black",
       content: (
-        <div className="h-full flex flex-col justify-center">
-          <div className="absolute top-4 right-4 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
-          <div className="space-y-8">
-            <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">
-              "{data.verdict.title}"
+        <div className="h-full flex flex-col justify-center items-center text-center">
+          <div className="absolute top-8 right-8 font-mono text-xs opacity-30 tracking-widest">FINAL_TRANSMISSION</div>
+
+          <div className="space-y-8 max-w-4xl">
+            <h3 className="text-4xl md:text-7xl font-syne font-bold leading-[0.9] tracking-tight">
+              {data.verdict.title}
             </h3>
-            <p className="font-mono text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
+            <p className="font-mono text-xl md:text-3xl text-black/60">
               {data.verdict.subtitle}
             </p>
-            <div className="pt-8 border-t border-background/20 flex items-center gap-4">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-              <span className="font-mono text-base font-bold tracking-widest uppercase">{data.verdict.status}</span>
+            <div className="pt-12 flex flex-col items-center gap-4">
+              <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-[0_0_20px_rgba(34,197,94,0.5)]" />
+              <span className="font-mono text-lg font-bold tracking-[0.3em] uppercase">{data.verdict.status}</span>
             </div>
           </div>
         </div>
@@ -174,166 +192,91 @@ export function ValidationSection({ auditData }) {
     },
   ], [data]);
 
-  // Session-based entrance animation check
-  const hasPlayedEntrance = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem('validation-entrance-played') === 'true';
-  }, []);
-
-  // Set refs array
-  const setCardRef = (el, index) => {
-    cardRefs.current[index] = el;
-  };
-
-  useEffect(() => {
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(() => setIsReady(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
   useGSAP(() => {
-    if (!isReady || !sectionRef.current) return;
+    // 1. Calculate height based on number of cards to scroll through
+    // The first card is static, the rest slide in.
+    const numberOfCards = cards.length;
+    const scrollHeight = numberOfCards * 100; // 100vh per card scroll
 
-    // PHASE 1: Entrance shutter animation (once per session, ScrollTrigger-based)
-    if (hasPlayedEntrance) {
-      // Skip shutter animation - hide immediately
-      if (shutterRef.current?.children) {
-        gsap.set(shutterRef.current.children, { scaleY: 0 });
-      }
-    } else {
-      // Hide shutters initially, then reveal on scroll into view
-      gsap.set(shutterRef.current?.children, { scaleY: 1 });
-
-      // Trigger shutter animation when section enters viewport
-      gsap.to(shutterRef.current?.children, {
-        scaleY: 0,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power3.inOut",
-        transformOrigin: "bottom",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          toggleActions: "play none none none",
-          once: true, // Only play once
-          onComplete: () => {
-            sessionStorage.setItem('validation-entrance-played', 'true');
-          }
-        }
-      });
-    }
-
-    // PHASE 2: Card stacking ScrollTrigger (graphite.com pattern)
-    // Each card pins in place, creating a stacking effect
-    const validCards = cardRefs.current.filter(Boolean);
-
-    validCards.forEach((card, index) => {
-      // Each card gets pinned with a slight offset to show stacking
-      const isLast = index === validCards.length - 1;
-
-      ScrollTrigger.create({
-        trigger: card,
-        start: () => `top ${80 + index * 10}px`, // Staggered pin positions
-        end: () => isLast ? 'bottom bottom' : `+=${window.innerHeight * 0.8}`,
-        pin: !isLast, // Don't pin the last card
-        pinSpacing: !isLast,
+    // 2. Setup the timeline
+    // We pin the container and scrub the animation of cards sliding up
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: `+=${numberOfCards * 100}%`, // Scroll distance proportional to cards
+        pin: true,
+        scrub: 1, // Smooth scrubbing
         anticipatePin: 1,
-        invalidateOnRefresh: true,
-        // Add subtle scale/opacity effect as cards stack
-        onUpdate: (self) => {
-          if (!isLast && self.progress > 0.8) {
-            const fadeProgress = (self.progress - 0.8) / 0.2;
-            gsap.set(card, {
-              scale: 1 - fadeProgress * 0.05,
-              opacity: 1 - fadeProgress * 0.3,
-            });
-          } else if (!isLast) {
-            gsap.set(card, { scale: 1, opacity: 1 });
-          }
-        },
-      });
-
-      // Entrance animation for each card
-      if (!hasPlayedEntrance) {
-        gsap.from(card.querySelector('.card-content'), {
-          y: 60,
-          opacity: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        });
       }
     });
 
-    return () => {
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger && cardRefs.current.includes(st.trigger)) {
-          st.kill();
+    // 3. Animate cards 1...N (skipping index 0 which is the base)
+    // We select all cards except the first one
+    const cardElements = gsap.utils.toArray(".validation-card");
+
+    cardElements.forEach((card, index) => {
+      if (index === 0) return; // First card is already visible
+
+      // Animate from bottom (100vh) to covering the previous card (0)
+      tl.fromTo(card,
+        {
+          yPercent: 100,
+          scale: 0.9, // Start slightly smaller for depth
+          brightness: 0.5
+        },
+        {
+          yPercent: 0,
+          scale: 1,
+          brightness: 1,
+          ease: "none", // Scrub controls the easing
+          duration: 1
         }
-      });
-    };
-  }, { scope: sectionRef, dependencies: [isReady, hasPlayedEntrance] });
+      );
+    });
+
+  }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative w-full z-40 bg-background">
-      {/* SHUTTERS (White -> Black Swoop) - Only visible during entrance */}
-      {!hasPlayedEntrance && (
-        <div
-          ref={shutterRef}
-          className="absolute inset-0 z-[60] flex pointer-events-none overflow-hidden"
-          style={{ contain: 'layout paint' }}
-        >
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="w-1/5 h-full bg-white border-r border-black/5 will-change-transform"
-              style={{ contain: 'strict' }}
-            />
-          ))}
-        </div>
-      )}
+    <section
+      ref={sectionRef}
+      className="relative w-full h-screen overflow-hidden bg-black"
+    >
+      <div ref={containerRef} className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-8">
 
-      {/* Section Header */}
-      <div className="relative z-10 py-16 px-6 max-w-7xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-syne font-bold text-center mb-4 text-foreground">
-          validation_protocol
-        </h2>
-        <p className="text-muted-foreground text-center font-mono text-sm max-w-2xl mx-auto">
-          Scroll to review audit findings
-        </p>
-      </div>
-
-      {/* Stacking Cards Container */}
-      <div ref={cardsContainerRef} className="relative z-20 px-4 md:px-8">
+        {/* Render Cards */}
         {cards.map((card, index) => (
           <div
             key={card.id}
-            ref={(el) => setCardRef(el, index)}
             className={cn(
-              "min-h-[80vh] w-full max-w-5xl mx-auto mb-4 rounded-2xl overflow-hidden",
-              "border shadow-2xl",
-              card.variant === 'inverted'
-                ? "bg-foreground text-background border-foreground"
-                : "bg-card border-border"
+              "validation-card absolute inset-0 w-full h-full p-4 md:p-8 flex items-center justify-center",
+              // Z-index ensures stacking order
             )}
             style={{
-              // Subtle z-index stacking
-              zIndex: 10 + index,
+              zIndex: index + 10,
+              // First card is visible, others are pushed down via GSAP initially (or let GSAP handle it)
+              // We'll let GSAP's .fromTo handle the positioning
             }}
           >
-            <div className="card-content relative p-8 md:p-12 h-full min-h-[60vh]">
-              {card.content}
+            {/* Inner Card Surface */}
+            <div className={cn(
+              "w-full h-full rounded-3xl shadow-2xl overflow-hidden p-6 md:p-12 relative flex flex-col",
+              card.bg,
+              card.text
+            )}>
+              {/* Optional Noise Overlay for Texture */}
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+              />
+
+              <div className="relative z-10 h-full">
+                {card.content}
+              </div>
             </div>
           </div>
         ))}
-      </div>
 
-      {/* Bottom spacer */}
-      <div className="h-[20vh]" />
+      </div>
     </section>
   );
 }
