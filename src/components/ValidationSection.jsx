@@ -190,29 +190,8 @@ export function ValidationSection({ auditData }) {
     },
   ], [data]);
 
-  useGSAP(() => {
-    // Optional: Visual polish for entering cards
-    // The "Stacking" is handled by CSS sticky.
-    // We just want to make them scale in slightly or fade the previous ones.
-
-    const cardsElements = gsap.utils.toArray(".validation-card");
-
-    cardsElements.forEach((card, index) => {
-      // Create a trigger for each card as it enters the viewport
-      gsap.from(card.querySelector('.card-inner'), {
-        scale: 0.95,
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: card,
-          start: "top bottom-=100", // Start slightly before it hits view
-          toggleActions: "play none none reverse"
-        }
-      });
-    });
-
-  }, { scope: containerRef });
+  // Removed GSAP entrance animation to prevent flashing conflicts.
+  // CSS Sticky handles the layout perfectly.
 
   return (
     <section
