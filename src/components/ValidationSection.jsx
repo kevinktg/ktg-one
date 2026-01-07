@@ -14,14 +14,12 @@ if (typeof window !== "undefined") {
 /**
  * ValidationSection - Graphite.com Style Stacking Cards
  *
- * Strategy:
- * 1. Pin the parent section.
- * 2. Cards are absolute positioned (except the first one, or handled via GSAP).
- * 3. As user scrolls, animate subsequent cards from y: "100%" to y: 0.
- * 4. This creates a smooth "stacking" effect where new cards slide over previous ones.
+ * Strategy (Refactored to CSS Sticky):
+ * 1. Use native CSS `position: sticky` for robust stacking.
+ * 2. This prevents "flashing" issues caused by JavaScript pinning conflicts.
+ * 3. GSAP is used ONLY for the visual "scale/brightness" entrance effects.
  */
 export function ValidationSection({ auditData }) {
-  const sectionRef = useRef(null);
   const containerRef = useRef(null);
 
   // Default Data
@@ -193,74 +191,53 @@ export function ValidationSection({ auditData }) {
   ], [data]);
 
   useGSAP(() => {
-    // 1. Calculate height based on number of cards to scroll through
-    // The first card is static, the rest slide in.
-    const numberOfCards = cards.length;
-    const scrollHeight = numberOfCards * 100; // 100vh per card scroll
+    // Optional: Visual polish for entering cards
+    // The "Stacking" is handled by CSS sticky.
+    // We just want to make them scale in slightly or fade the previous ones.
 
-    // 2. Setup the timeline
-    // We pin the container and scrub the animation of cards sliding up
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top top",
-        end: `+=${numberOfCards * 100}%`, // Scroll distance proportional to cards
-        pin: true,
-        scrub: 1, // Smooth scrubbing
-        anticipatePin: 1,
-      }
-    });
+    const cardsElements = gsap.utils.toArray(".validation-card");
 
-    // 3. Animate cards 1...N (skipping index 0 which is the base)
-    // We select all cards except the first one
-    const cardElements = gsap.utils.toArray(".validation-card");
-
-    cardElements.forEach((card, index) => {
-      if (index === 0) return; // First card is already visible
-
-      // Animate from bottom (100vh) to covering the previous card (0)
-      tl.fromTo(card,
-        {
-          yPercent: 100,
-          scale: 0.9, // Start slightly smaller for depth
-          brightness: 0.5
-        },
-        {
-          yPercent: 0,
-          scale: 1,
-          brightness: 1,
-          ease: "none", // Scrub controls the easing
-          duration: 1
+    cardsElements.forEach((card, index) => {
+      // Create a trigger for each card as it enters the viewport
+      gsap.from(card.querySelector('.card-inner'), {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: card,
+          start: "top bottom-=100", // Start slightly before it hits view
+          toggleActions: "play none none reverse"
         }
-      );
+      });
     });
 
-  }, { scope: sectionRef });
+  }, { scope: containerRef });
 
   return (
     <section
-      ref={sectionRef}
-      className="relative w-full h-screen overflow-hidden bg-black"
+      ref={containerRef}
+      className="relative w-full bg-black pt-20 pb-40" // Padding ensures space for scrolling
     >
-      <div ref={containerRef} className="relative w-full h-full max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
 
         {/* Render Cards */}
         {cards.map((card, index) => (
           <div
             key={card.id}
             className={cn(
-              "validation-card absolute inset-0 w-full h-full p-4 md:p-8 flex items-center justify-center",
-              // Z-index ensures stacking order
+              "validation-card sticky top-0 w-full h-screen flex items-center justify-center py-8",
+              // Sticky behavior handles the stacking automatically
             )}
             style={{
               zIndex: index + 10,
-              // First card is visible, others are pushed down via GSAP initially (or let GSAP handle it)
-              // We'll let GSAP's .fromTo handle the positioning
+              // Offset slightly so they don't perfectly overlap until the end, or just overlap
+              top: `${index * 10}px`
             }}
           >
             {/* Inner Card Surface */}
             <div className={cn(
-              "w-full h-full rounded-3xl shadow-2xl overflow-hidden p-6 md:p-12 relative flex flex-col",
+              "card-inner w-full h-full max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden p-6 md:p-12 relative flex flex-col",
               card.bg,
               card.text
             )}>
@@ -269,7 +246,7 @@ export function ValidationSection({ auditData }) {
                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
               />
 
-              <div className="relative z-10 h-full">
+              <div className="relative z-10 h-full overflow-y-auto custom-scrollbar">
                 {card.content}
               </div>
             </div>

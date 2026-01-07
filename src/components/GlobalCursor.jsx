@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 /**
@@ -14,54 +14,45 @@ export function GlobalCursor() {
   const positionRef = useRef({ x: 0, y: 0 });
   const followerPositionRef = useRef({ x: 0, y: 0 });
   const animationRef = useRef(null);
-  const [isHeroActive, setIsHeroActive] = useState(true); // Start hidden (hero first)
+  const [isVisible, setIsVisible] = useState(false); // Start hidden (hero first)
 
-  // IntersectionObserver to detect hero section visibility
+  // Improved Visibility Logic: Check scroll position rather than just intersection
+  // This is more robust against "flashing" or stuck intersection observers
   useEffect(() => {
-    const heroSection = document.querySelector('[data-cursor-zone="hero"]');
-    if (!heroSection) {
-      // No hero section found, show cursor
-      setIsHeroActive(false);
-      return;
-    }
+    const handleScroll = () => {
+      // Hero section is approx 100vh. We show cursor once we scroll past 80% of it.
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // Hero is considered "active" when it occupies >50% of viewport
-          setIsHeroActive(entry.intersectionRatio > 0.5);
-        });
-      },
-      {
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-        rootMargin: '0px',
+      const shouldShow = scrollY > (viewportHeight * 0.8);
+
+      if (shouldShow !== isVisible) {
+        setIsVisible(shouldShow);
       }
-    );
-
-    observer.observe(heroSection);
-
-    return () => {
-      observer.disconnect();
     };
-  }, []);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Check initial state
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isVisible]);
 
   // Animate cursor visibility changes
   useEffect(() => {
     if (!cursorRef.current || !followerRef.current) return;
 
     gsap.to([cursorRef.current, followerRef.current], {
-      opacity: isHeroActive ? 0 : 1,
-      scale: isHeroActive ? 0.5 : 1,
+      opacity: isVisible ? 1 : 0,
+      scale: isVisible ? 1 : 0.5,
       duration: 0.3,
       ease: 'power2.out',
     });
-  }, [isHeroActive]);
+  }, [isVisible]);
 
   useEffect(() => {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
-
-    if (!cursor || !follower) return;
 
     // Mouse move handler
     const handleMouseMove = (e) => {
@@ -72,8 +63,7 @@ export function GlobalCursor() {
     const animate = () => {
       // Update main cursor position immediately
       if (cursor) {
-        cursor.style.left = `${positionRef.current.x}px`;
-        cursor.style.top = `${positionRef.current.y}px`;
+        cursor.style.transform = `translate(${positionRef.current.x}px, ${positionRef.current.y}px) translate(-50%, -50%)`;
       }
 
       // Update follower with smooth transition
@@ -84,8 +74,7 @@ export function GlobalCursor() {
       followerPositionRef.current.y += dy * 0.15;
 
       if (follower) {
-        follower.style.left = `${followerPositionRef.current.x}px`;
-        follower.style.top = `${followerPositionRef.current.y}px`;
+        follower.style.transform = `translate(${followerPositionRef.current.x}px, ${followerPositionRef.current.y}px) translate(-50%, -50%)`;
       }
 
       animationRef.current = requestAnimationFrame(animate);
@@ -111,10 +100,9 @@ export function GlobalCursor() {
       {/* Main cursor dot */}
       <div
         ref={cursorRef}
-        className="fixed w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 w-3 h-3 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
         style={{
-          transform: 'translate(-50%, -50%)',
-          opacity: 0, // Start hidden
+          opacity: 0, // Controlled by GSAP
         }}
         aria-hidden="true"
       />
@@ -122,10 +110,9 @@ export function GlobalCursor() {
       {/* Follower cursor */}
       <div
         ref={followerRef}
-        className="fixed w-6 h-6 border border-white rounded-full pointer-events-none z-[9998] mix-blend-difference opacity-70"
+        className="fixed top-0 left-0 w-8 h-8 border border-white rounded-full pointer-events-none z-[9998] mix-blend-difference opacity-70"
         style={{
-          transform: 'translate(-50%, -50%)',
-          opacity: 0, // Start hidden
+          opacity: 0, // Controlled by GSAP
         }}
         aria-hidden="true"
       />
