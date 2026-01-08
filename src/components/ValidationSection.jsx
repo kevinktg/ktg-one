@@ -14,13 +14,15 @@ if (typeof window !== "undefined") {
 /**
  * ValidationSection - Graphite.com Style Stacking Cards
  *
- * Strategy (Refactored to CSS Sticky):
- * 1. Use native CSS `position: sticky` for robust stacking.
- * 2. This prevents "flashing" issues caused by JavaScript pinning conflicts.
- * 3. GSAP is used ONLY for the visual "scale/brightness" entrance effects.
+ * Strategy (Restored GSAP Pinning for authentic Graphite feel):
+ * 1. Pin the entire section.
+ * 2. Animate cards entering from bottom-to-top.
+ * 3. Use 'anticipatePin' and background colors to prevent flashing.
  */
 export function ValidationSection({ auditData }) {
+  const sectionRef = useRef(null);
   const containerRef = useRef(null);
+  const cardsRef = useRef([]);
 
   // Default Data
   const data = auditData || {
@@ -62,7 +64,7 @@ export function ValidationSection({ auditData }) {
   const cards = useMemo(() => [
     {
       id: 'intro',
-      bg: "bg-[#f5f5f5]", // Almost white
+      bg: "bg-white", // Pure white for max contrast
       text: "text-black",
       content: (
         <div className="flex flex-col justify-center h-full max-w-2xl">
@@ -82,7 +84,7 @@ export function ValidationSection({ auditData }) {
     },
     {
       id: 'audit',
-      bg: "bg-[#e5e5e5]", // Light gray
+      bg: "bg-neutral-200", // Standard light gray
       text: "text-black",
       content: (
         <div className="h-full flex flex-col">
@@ -117,7 +119,7 @@ export function ValidationSection({ auditData }) {
     },
     {
       id: 'percentile',
-      bg: "bg-[#1a1a1a]", // Dark gray
+      bg: "bg-neutral-900", // Standard dark gray
       text: "text-white",
       content: (
         <div className="h-full flex flex-col justify-center">
@@ -190,37 +192,74 @@ export function ValidationSection({ auditData }) {
     },
   ], [data]);
 
-  // Removed GSAP entrance animation to prevent flashing conflicts.
-  // CSS Sticky handles the layout perfectly.
+  useGSAP(() => {
+    // 1. Setup Master Timeline with PINNING
+    // This pins the entire section container while we iterate through cards
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "+=" + (cards.length * 100) + "%", // Pin duration depends on card count
+        pin: true,
+        scrub: 1, // Smooth scrubbing
+        anticipatePin: 1, // Prevents flashing on pin start
+        invalidateOnRefresh: true,
+      }
+    });
+
+    // 2. Animate Cards
+    // Cards 1..N enter from bottom and stack on top
+    cardsRef.current.forEach((card, i) => {
+      if (i === 0) return; // First card is static base
+
+      tl.fromTo(card,
+        { yPercent: 100, scale: 0.95, opacity: 0 },
+        {
+          yPercent: 0,
+          scale: 1,
+          opacity: 1,
+          ease: "none", // Scrub controls easing
+          duration: 1
+        }
+      );
+
+      // Optional: Parallax/Fade out previous card slightly
+      if (i > 0) {
+        tl.to(cardsRef.current[i-1], {
+          scale: 0.95,
+          filter: "brightness(0.5)",
+          duration: 1
+        }, "<");
+      }
+    });
+
+  }, { scope: sectionRef });
 
   return (
     <section
-      ref={containerRef}
-      className="relative w-full bg-black pt-20 pb-40" // Padding ensures space for scrolling
+      ref={sectionRef}
+      className="relative w-full h-screen overflow-hidden bg-black"
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="relative w-full h-full flex items-center justify-center">
+        {/* Card Container */}
+        <div ref={containerRef} className="relative w-full max-w-7xl px-4 md:px-8 h-full flex items-center justify-center">
 
-        {/* Render Cards */}
-        {cards.map((card, index) => (
-          <div
-            key={card.id}
-            className={cn(
-              "validation-card sticky top-0 w-full h-screen flex items-center justify-center py-8",
-              // Sticky behavior handles the stacking automatically
-            )}
-            style={{
-              zIndex: index + 10,
-              // Offset slightly so they don't perfectly overlap until the end, or just overlap
-              top: `${index * 10}px`
-            }}
-          >
-            {/* Inner Card Surface */}
-            <div className={cn(
-              "card-inner w-full h-full max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden p-6 md:p-12 relative flex flex-col",
-              card.bg,
-              card.text
-            )}>
-              {/* Optional Noise Overlay for Texture */}
+          {cards.map((card, index) => (
+            <div
+              key={card.id}
+              ref={(el) => cardsRef.current[index] = el}
+              className={cn(
+                "absolute inset-0 m-auto w-full max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden p-6 md:p-12 flex flex-col",
+                card.bg,
+                card.text
+              )}
+              style={{
+                zIndex: index, // Ensure stacking order
+                // Initial state handled by GSAP, but good to have sensible defaults
+                transform: index === 0 ? 'none' : 'translateY(100%)'
+              }}
+            >
+              {/* Optional Noise Overlay */}
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
               />
@@ -229,9 +268,9 @@ export function ValidationSection({ auditData }) {
                 {card.content}
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
+        </div>
       </div>
     </section>
   );

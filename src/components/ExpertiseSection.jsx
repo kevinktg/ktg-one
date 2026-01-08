@@ -154,7 +154,7 @@ export function ExpertiseSection({ expertiseData }) {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden py-12 z-30 content-visibility-auto flex flex-col justify-center">
+    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden py-12 z-30 flex flex-col justify-center">
 
       {/* SHUTTERS (Transition Layer) */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
