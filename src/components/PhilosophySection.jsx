@@ -80,47 +80,53 @@ export function PhilosophySection({ philosophyData }) {
       );
     }
 
-    // 2. QUOTES SLIDE-IN - Stagger with Parallax
-    quoteRefs.current.forEach((quote, index) => {
-      if (!quote) return;
+    // 2. QUOTES SLIDE-IN - Batching ScrollTriggers for Performance
+    ScrollTrigger.batch(quoteRefs.current.filter(q => q), {
+      onEnter: (batch) => {
+        batch.forEach((quote, i) => {
+          // Determine direction based on original index logic (we need the index relative to all quotes)
+          // Since we filter, we might lose exact index if some are null, but assuming they are valid:
+          const originalIndex = quoteRefs.current.indexOf(quote);
+          const xVal = originalIndex % 2 === 0 ? -100 : 100;
 
-      // Determine direction based on index (even = left, odd = right)
-      // Increased offset for more drama
-      const xVal = index % 2 === 0 ? -100 : 100;
-
-      // Slide In
-      gsap.fromTo(quote,
-        { opacity: 0, x: xVal },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 1.5,
-          ease: "expo.out",
-          scrollTrigger: {
-            trigger: quote,
-            start: "top 85%",
-            once: true
-          },
-          onComplete: () => {
-            if (index === quoteRefs.current.length - 1) {
-              sessionStorage.setItem('philosophy-animated', 'true');
+          gsap.fromTo(quote,
+            { opacity: 0, x: xVal },
+            {
+              opacity: 1,
+              x: 0,
+              duration: 1.5,
+              ease: "expo.out",
+              overwrite: true,
+              onComplete: () => {
+                if (originalIndex === quoteRefs.current.length - 1) {
+                  sessionStorage.setItem('philosophy-animated', 'true');
+                }
+              }
             }
-          }
-        }
-      );
+          );
+        });
+      },
+      start: "top 85%",
+      once: true
+    });
 
-      // Subtle Parallax Effect on Scroll (scrub)
-      // Moves the quotes slightly up as you scroll past them
-      gsap.to(quote, {
-        y: -50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: quote,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1
-        }
-      });
+    // 3. Parallax Effect (Separate Batch or Loop)
+    // We can keep the scrub effect separate as it behaves differently (scrub vs trigger)
+    // To optimize, we can just use a single loop for scrub triggers if we want,
+    // or batch them if they shared the same start/end, but parallax usually needs individual tracking.
+    // However, given the "Consolidate" request, let's keep it simple and efficient.
+    quoteRefs.current.forEach((quote) => {
+        if (!quote) return;
+        gsap.to(quote, {
+            y: -50,
+            ease: "none",
+            scrollTrigger: {
+                trigger: quote,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
     });
 
   }, { scope: sectionRef });

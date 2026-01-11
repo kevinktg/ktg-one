@@ -121,7 +121,7 @@ class FluidRevealMaterial extends ShaderMaterial {
 
 extend({ FluidRevealMaterial })
 
-function RevealPlane({ topImagePath, bottomImagePath }) {
+function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
   const materialRef = useRef()
   const { viewport } = useThree()
   const [textures, setTextures] = useState({ top: null, bottom: null })
@@ -136,8 +136,9 @@ function RevealPlane({ topImagePath, bottomImagePath }) {
       top.anisotropy = ani;
       bottom.anisotropy = ani;
       setTextures({ top, bottom })
+      if (onLoaded) onLoaded();
     })
-  }, [topImagePath, bottomImagePath])
+  }, [topImagePath, bottomImagePath, onLoaded])
   
   useFrame((state) => {
     if (!materialRef.current) return
@@ -170,14 +171,15 @@ export function HeroImages({ topImage, bottomImage }) {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // Simple timeout to ensure textures have started loading and avoid harsh pop-in.
-    // In a production app, we might use onLoad callbacks from the texture loader,
-    // but a small delay + CSS transition is often smoother for UX.
-    const timer = setTimeout(() => setIsReady(true), 100);
+    // If mobile, we are using a background image, so set ready quickly.
+    // For Desktop, isReady is triggered by the onLoaded callback in RevealPlane
+    if (window.innerWidth < 768) {
+        const timer = setTimeout(() => setIsReady(true), 100);
+        return () => clearTimeout(timer);
+    }
 
     return () => {
       window.removeEventListener('resize', checkMobile);
-      clearTimeout(timer);
     };
   }, []);
 
@@ -195,17 +197,21 @@ export function HeroImages({ topImage, bottomImage }) {
   }
 
   return (
-    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-neutral-900 transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
         dpr={[1, 2]} 
         gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
         camera={{ position: [0, 0, 1], fov: 75 }}
-        style={{ background: 'transparent' }}
+        style={{ background: '#171717' }}
       >
         <Suspense fallback={null}>
-          <RevealPlane topImagePath={topImage} bottomImagePath={bottomImage} />
+          <RevealPlane
+            topImagePath={topImage}
+            bottomImagePath={bottomImage}
+            onLoaded={() => setIsReady(true)}
+          />
         </Suspense>
       </Canvas>
     </div>
