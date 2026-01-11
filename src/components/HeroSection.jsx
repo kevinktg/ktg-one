@@ -39,12 +39,11 @@ export const HeroSection = forwardRef((props, ref) => {
     <section
       ref={internalRef}
       data-cursor-zone="hero"
-      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden"
-      style={{ background: 'transparent' }}
+      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden bg-neutral-900"
       suppressHydrationWarning
     >
 
-      <Suspense fallback={<div className="absolute inset-0 z-10 bg-transparent" />}>
+      <Suspense fallback={<div className="absolute inset-0 z-10 bg-neutral-900" />}>
         <HeroImages
           topImage="/assets/top-hero.webp"
           bottomImage="/assets/bottom-hero.webp"
