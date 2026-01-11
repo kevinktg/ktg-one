@@ -166,6 +166,9 @@ export function HeroImages({ topImage, bottomImage }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isReady, setIsReady] = useState(false); // New state for fade-in
 
+  // OPTIMIZATION: Memoize callback to prevent re-render loop/double-loading in RevealPlane
+  const handleLoaded = useRef(() => setIsReady(true)).current;
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -173,20 +176,21 @@ export function HeroImages({ topImage, bottomImage }) {
 
     // If mobile, we are using a background image, so set ready quickly.
     // For Desktop, isReady is triggered by the onLoaded callback in RevealPlane
+    let timer;
     if (window.innerWidth < 768) {
-        const timer = setTimeout(() => setIsReady(true), 100);
-        return () => clearTimeout(timer);
+        timer = setTimeout(() => setIsReady(true), 100);
     }
 
     return () => {
       window.removeEventListener('resize', checkMobile);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
   if (isMobile) {
     return (
       <div 
-        className={`absolute inset-0 z-10 w-full h-full bg-neutral-900 transition-opacity duration-1000 ${isReady ? 'opacity-50' : 'opacity-0'}`}
+        className={`absolute inset-0 z-10 w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-50' : 'opacity-0'}`}
         style={{ 
            backgroundImage: `url(${topImage})`, 
            backgroundSize: 'cover', 
@@ -197,20 +201,20 @@ export function HeroImages({ topImage, bottomImage }) {
   }
 
   return (
-    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-neutral-900 transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
         dpr={[1, 2]} 
         gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
         camera={{ position: [0, 0, 1], fov: 75 }}
-        style={{ background: '#171717' }}
+        style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
           <RevealPlane
             topImagePath={topImage}
             bottomImagePath={bottomImage}
-            onLoaded={() => setIsReady(true)}
+            onLoaded={handleLoaded}
           />
         </Suspense>
       </Canvas>
