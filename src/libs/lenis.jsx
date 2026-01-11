@@ -65,6 +65,7 @@ export function ReactLenis({
         content: typeof window !== 'undefined' ? document.documentElement : undefined,
         ...options,
       }}
+      autoRaf={false}
       {...props}
     >
       {children}
