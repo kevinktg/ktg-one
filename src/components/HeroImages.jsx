@@ -65,7 +65,7 @@ const fluidRevealFragmentShader = `
     // 3. Generate Noise
     // We animate the noise with uTime
     float noiseValue = snoise(vUv * 5.0 + uTime * 0.5);
-    
+
     // 4. Distortion - distort the texture lookup based on mouse proximity
     // The closer to the mouse, the more we distort the UVs
     float influence = smoothstep(0.5, 0.0, dist);
@@ -163,30 +163,39 @@ function RevealPlane({ topImagePath, bottomImagePath }) {
 
 export function HeroImages({ topImage, bottomImage }) {
   const [isMobile, setIsMobile] = useState(false);
+  const [isReady, setIsReady] = useState(false); // New state for fade-in
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+
+    // Simple timeout to ensure textures have started loading and avoid harsh pop-in.
+    // In a production app, we might use onLoad callbacks from the texture loader,
+    // but a small delay + CSS transition is often smoother for UX.
+    const timer = setTimeout(() => setIsReady(true), 100);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      clearTimeout(timer);
+    };
   }, []);
 
   if (isMobile) {
     return (
       <div 
-        className="absolute inset-0 z-10 w-full h-full bg-neutral-900"
+        className={`absolute inset-0 z-10 w-full h-full bg-neutral-900 transition-opacity duration-1000 ${isReady ? 'opacity-50' : 'opacity-0'}`}
         style={{ 
            backgroundImage: `url(${topImage})`, 
            backgroundSize: 'cover', 
            backgroundPosition: 'center',
-           opacity: 0.5 
         }}
       />
     );
   }
 
   return (
-    <div className="absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent">
+    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"

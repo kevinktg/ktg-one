@@ -27,6 +27,7 @@ const StatBox = ({ label, value, isFloat, suffix }) => (
 
 export function ExpertiseSection({ expertiseData }) {
   const containerRef = useRef(null);
+  const contentRef = useRef(null); // Wrapper for pinned content
   const shutterRef = useRef(null);
 
   // Default Fallback Data
@@ -52,20 +53,20 @@ export function ExpertiseSection({ expertiseData }) {
   }, []);
 
   useGSAP(() => {
-    // 1. Initial Setters
-    // Ensure shutters are visible initially if not played
+    // 1. Initial State
     if (!hasPlayed) {
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 1, transformOrigin: "top" });
       }
     } else {
-      // If played, ensure content is visible and shutters hidden
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 0 });
       }
+      // If played, set final state immediately
       gsap.set(".expertise-title", { opacity: 1, y: 0 });
       gsap.set(".expertise-group", { opacity: 1, y: 0 });
-      
+
+      // Set stats to final values
       const stats = gsap.utils.toArray(".stat-counter");
       stats.forEach((stat) => {
         const targetVal = parseFloat(stat.getAttribute("data-val"));
@@ -76,65 +77,63 @@ export function ExpertiseSection({ expertiseData }) {
       return;
     }
 
-    // 2. Shutter Animation
-    // More cinematic easing
-    gsap.to(shutterRef.current?.children, {
-      scaleY: 0,
-      duration: 1.2,
-      stagger: 0.05,
-      ease: "power4.inOut",
+    // 2. Main Timeline with Pinning
+    // We pin the section for 150% of viewport height to force user to dwell
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 75%", // Start a bit earlier
-        once: true
-      },
-      onComplete: () => {
-        sessionStorage.setItem('expertise-revealed', 'true');
+        start: "top top",
+        end: "+=150%", // Pin for 1.5 screen heights
+        pin: true,
+        scrub: 0.5, // Smooth scrubbing
+        onLeave: () => {
+           sessionStorage.setItem('expertise-revealed', 'true');
+        }
       }
     });
 
-    // 3. Content Animation
-    // Batch animations for better performance and coordinated entry
-    ScrollTrigger.batch(".expertise-group", {
-      start: "top 85%",
-      onEnter: (elements) => {
-        gsap.to(elements, {
-          y: 0,
-          opacity: 1,
-          stagger: 0.15,
-          duration: 1.2,
-          ease: "power4.out",
-          overwrite: true
-        });
-      },
-      once: true
+    // STEP A: Shutter Reveal (0% - 30% of scroll)
+    tl.to(shutterRef.current?.children, {
+      scaleY: 0,
+      stagger: 0.05,
+      ease: "power2.inOut",
+      duration: 2 // Relative duration in the scrub timeline
     });
 
-    // Title specific animation
-    gsap.fromTo(".expertise-title",
-      { y: 100, opacity: 0 },
+    // STEP B: Title Reveal (20% - 50%)
+    tl.fromTo(".expertise-title",
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, ease: "power2.out", duration: 2 },
+      "-=1.5"
+    );
+
+    // STEP C: Skills Reveal (40% - 80%)
+    const groups = gsap.utils.toArray(".expertise-group");
+    tl.fromTo(groups,
+      { y: 50, opacity: 0 },
       {
         y: 0,
         opacity: 1,
-        duration: 1.5,
-        ease: "power4.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 60%",
-          once: true
-        }
-      }
+        stagger: 0.5, // Stagger them in as user scrolls
+        ease: "power2.out",
+        duration: 3
+      },
+      "-=1"
     );
 
-    // 4. Counter Animation
-    // Trigger when stats row comes into view
-    ScrollTrigger.create({
-      trigger: ".stat-counter", // Use first counter as trigger
-      start: "top 90%",
-      once: true,
-      onEnter: () => {
+    // STEP D: Stats Counter Animation (independent trigger or part of timeline?)
+    // Let's make stats animate automatically once we reach the end of the pin
+    // We'll use a separate trigger for the counters themselves to ensure they play smoothly
+    // regardless of scrub speed, but triggered by the timeline progression
+
+    // Instead of timeline scrub for numbers (which looks weird if you scroll back),
+    // we use a call() at the end of the timeline
+    tl.call(() => {
         const stats = gsap.utils.toArray(".stat-counter");
         stats.forEach((stat) => {
+          // Only animate if not already done
+          if (stat.getAttribute("data-animated") === "true") return;
+
           const targetVal = parseFloat(stat.getAttribute("data-val"));
           const isFloat = stat.getAttribute("data-is-float") === "true";
           const suffix = stat.getAttribute("data-suffix") || "";
@@ -142,20 +141,20 @@ export function ExpertiseSection({ expertiseData }) {
 
           gsap.to(proxy, {
             val: targetVal,
-            duration: 2.5, // Slower, more deliberate count up
+            duration: 2,
             ease: "power3.out",
             onUpdate: () => {
               stat.textContent = isFloat ? proxy.val.toFixed(2) + suffix : Math.floor(proxy.val) + suffix;
             }
           });
+          stat.setAttribute("data-animated", "true");
         });
-      }
-    });
+    }, null, "-=1"); // Trigger slightly before end
 
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-24 md:py-32 z-30 content-visibility-auto">
+    <section ref={containerRef} className="relative h-screen bg-white text-black overflow-hidden py-12 z-30 flex flex-col justify-center">
 
       {/* SHUTTERS (Transition Layer) */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
@@ -168,7 +167,7 @@ export function ExpertiseSection({ expertiseData }) {
          ))}
       </div>
 
-      {/* Background Decor - Subtle Parallax */}
+      {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none z-10 select-none overflow-hidden">
          <div className="absolute top-20 right-20 w-64 h-64 border border-black/5 rotate-45 opacity-60" />
          <div className="absolute top-1/3 right-1/4 w-48 h-48 border border-black/5" />
@@ -176,24 +175,24 @@ export function ExpertiseSection({ expertiseData }) {
          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-20 max-w-7xl mx-auto px-6 flex flex-col justify-center h-full">
+      <div ref={contentRef} className="relative z-20 max-w-7xl w-full mx-auto px-6 flex flex-col justify-center h-full">
 
         {/* Header */}
-        <div className="mb-24 text-center overflow-hidden">
+        <div className="mb-12 md:mb-20 text-center overflow-hidden shrink-0">
           <h2 className="expertise-title inline-block text-5xl md:text-7xl font-syne font-bold lowercase tracking-tighter text-black opacity-0">
             expertise_matrix
           </h2>
         </div>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-3 gap-16 mb-32">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-16 mb-12 md:mb-24 grow-0">
           {data.map((area) => (
             <div key={area.category} className="expertise-group relative opacity-0 translate-y-12">
-              <div className="mb-8 relative pl-6 border-l border-black/20">
+              <div className="mb-6 md:mb-8 relative pl-6 border-l border-black/20">
                 <h3 className="font-mono tracking-[0.2em] font-bold text-xs uppercase text-black/80 mb-2">{area.category}</h3>
                 <div className="w-12 h-px bg-black/40" />
               </div>
-              <ul className="space-y-4">
+              <ul className="space-y-3 md:space-y-4">
                 {area.skills.map((skill, i) => (
                   <li key={i} className="relative pl-0 text-black/70 leading-loose text-sm md:text-base font-light hover:text-black transition-colors duration-300">
                     {skill}
@@ -205,7 +204,7 @@ export function ExpertiseSection({ expertiseData }) {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-black/5 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 border-t border-black/5 py-8 md:py-16 shrink-0">
           <StatBox label="PERCENTILE" value="0.01" isFloat suffix="%" />
           <StatBox label="CAREERS" value="7" />
 

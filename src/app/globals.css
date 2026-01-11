@@ -78,7 +78,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    contain: layout style paint;
   }
 
   * {
@@ -97,7 +96,27 @@
   h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
   h3 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
 
-  p { font-family: var(--font-inter), sans-serif; line-height: 1.7; }
+  p {
+    font-family: var(--font-inter), sans-serif;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* Add better spacing for blog content */
+  article p {
+    margin-bottom: 2rem;
+    font-size: 1.125rem;
+  }
+
+  article ul, article ol {
+    margin-bottom: 2rem;
+    padding-left: 1.5rem;
+  }
+
+  article li {
+    margin-bottom: 0.5rem;
+  }
 
   .monospace, code {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
