@@ -2,12 +2,12 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef, useMemo, forwardRef } from "react";
+import { useRef, useMemo } from "react";
 
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
   <div className="text-center expertise-group">
-    <div className="font-mono text-xs text-white/50 mb-2 tracking-widest">{label}</div>
+    <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">{label}</div>
     <div
       className="text-4xl md:text-5xl font-syne font-bold stat-counter text-white"
       data-val={value}
@@ -21,6 +21,7 @@ const StatBox = ({ label, value, isFloat, suffix }) => (
 
 export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
   const containerRef = useRef(null);
+  const contentRef = useRef(null); // Wrapper for pinned content
   const shutterRef = useRef(null);
   const internalRef = ref || containerRef;
 
@@ -40,22 +41,27 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
     },
   ];
 
-  // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
+  // OPTIMIZATION: Cache sessionStorage check
   const hasPlayed = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return sessionStorage.getItem('expertise-revealed') === 'true';
   }, []);
 
   useGSAP(() => {
-    if (hasPlayed) {
-      // Skip animation - just hide shutters immediately and set final states
+    // 1. Initial State
+    if (!hasPlayed) {
+      if (shutterRef.current?.children) {
+        gsap.set(shutterRef.current.children, { scaleY: 1, transformOrigin: "top" });
+      }
+    } else {
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 0 });
       }
+      // If played, set final state immediately
       gsap.set(".expertise-title", { opacity: 1, y: 0 });
       gsap.set(".expertise-group", { opacity: 1, y: 0 });
-      
-      // Set counters to final values immediately
+
+      // Set stats to final values
       const stats = gsap.utils.toArray(".stat-counter");
       stats.forEach((stat) => {
         const targetVal = parseFloat(stat.getAttribute("data-val"));
@@ -66,86 +72,124 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
       return;
     }
 
-    // SHUTTER REVEAL - Run immediately on mount
-    gsap.to(shutterRef.current?.children, {
-      scaleY: 0,
-      duration: 1.5,
-      stagger: 0.1,
-      ease: "power3.inOut",
-      transformOrigin: "top",
-      onComplete: () => {
-        sessionStorage.setItem('expertise-revealed', 'true');
+    // 2. Main Timeline with Pinning
+    // We pin the section for 150% of viewport height to force user to dwell
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "+=150%", // Pin for 1.5 screen heights
+        pin: true,
+        scrub: 0.5, // Smooth scrubbing
+        onLeave: () => {
+           sessionStorage.setItem('expertise-revealed', 'true');
+        }
       }
     });
 
-    // CONTENT ENTRANCE - Start slightly after shutters begin
-    const tl = gsap.timeline({ delay: 0.3 });
-    tl.from(".expertise-title", { y: 50, opacity: 0, duration: 1.2, ease: "power4.out" })
-      .from(".expertise-group", { y: 40, opacity: 0, duration: 1, stagger: 0.15, ease: "power2.out" }, "-=0.6");
-
-    // COUNTERS - Animate after content appears
-    const stats = gsap.utils.toArray(".stat-counter");
-    stats.forEach((stat) => {
-      const targetVal = parseFloat(stat.getAttribute("data-val"));
-      const isFloat = stat.getAttribute("data-is-float") === "true";
-      const suffix = stat.getAttribute("data-suffix") || "";
-      const proxy = { val: 0 };
-
-      gsap.to(proxy, {
-        val: targetVal,
-        duration: 2,
-        delay: 1.5, // Start after content animation
-        ease: "power2.out",
-        onUpdate: () => {
-          stat.textContent = isFloat ? proxy.val.toFixed(2) + suffix : Math.floor(proxy.val) + suffix;
-        }
-      });
+    // STEP A: Shutter Reveal (0% - 30% of scroll)
+    tl.to(shutterRef.current?.children, {
+      scaleY: 0,
+      stagger: 0.05,
+      ease: "power2.inOut",
+      duration: 2 // Relative duration in the scrub timeline
     });
+
+    // STEP B: Title Reveal (20% - 50%)
+    tl.fromTo(".expertise-title",
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, ease: "power2.out", duration: 2 },
+      "-=1.5"
+    );
+
+    // STEP C: Skills Reveal (40% - 80%)
+    const groups = gsap.utils.toArray(".expertise-group");
+    tl.fromTo(groups,
+      { y: 50, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        stagger: 0.5, // Stagger them in as user scrolls
+        ease: "power2.out",
+        duration: 3
+      },
+      "-=1"
+    );
+
+    // STEP D: Stats Counter Animation (independent trigger or part of timeline?)
+    // Let's make stats animate automatically once we reach the end of the pin
+    // We'll use a separate trigger for the counters themselves to ensure they play smoothly
+    // regardless of scrub speed, but triggered by the timeline progression
+
+    // Instead of timeline scrub for numbers (which looks weird if you scroll back),
+    // we use a call() at the end of the timeline
+    tl.call(() => {
+        const stats = gsap.utils.toArray(".stat-counter");
+        stats.forEach((stat) => {
+          // Only animate if not already done
+          if (stat.getAttribute("data-animated") === "true") return;
+
+          const targetVal = parseFloat(stat.getAttribute("data-val"));
+          const isFloat = stat.getAttribute("data-is-float") === "true";
+          const suffix = stat.getAttribute("data-suffix") || "";
+          const proxy = { val: 0 };
+
+          gsap.to(proxy, {
+            val: targetVal,
+            duration: 2,
+            ease: "power3.out",
+            onUpdate: () => {
+              stat.textContent = isFloat ? proxy.val.toFixed(2) + suffix : Math.floor(proxy.val) + suffix;
+            }
+          });
+          stat.setAttribute("data-animated", "true");
+        });
+    }, null, "-=1"); // Trigger slightly before end
+
   }, { scope: containerRef });
 
   return (
-    <section ref={internalRef} className="relative min-h-screen text-white overflow-hidden py-20" style={{ background: 'transparent', backgroundColor: 'rgba(0, 0, 0, 0)', backgroundImage: 'none' }}>
+    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30 content-visibility-auto">
 
       {/* SHUTTERS (Transition Layer) */}
-      {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
          {[...Array(5)].map((_, i) => (
            <div 
              key={i} 
              className={`w-1/5 h-full bg-black border-r border-white/10 ${!hasPlayed ? 'will-change-transform' : ''}`} 
-             style={{ contain: 'strict' }} 
+             style={{ contain: 'strict', transformOrigin: 'top' }}
            />
          ))}
       </div>
 
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none z-10 select-none overflow-hidden">
-         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-white/10 rotate-45 opacity-60" />
-         <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-white/5" />
-         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-white/10 rounded-full opacity-50" />
-         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/10 rotate-45 opacity-60" />
+         <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/5" />
+         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/10 rounded-full opacity-50" />
+         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-20 max-w-7xl mx-auto px-6 flex flex-col justify-center h-full">
+      <div ref={contentRef} className="relative z-20 max-w-7xl w-full mx-auto px-6 flex flex-col justify-center h-full">
 
         {/* Header */}
-        <h2 className="expertise-title mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter text-white">
+        <h2 className="expertise-title mb-20 text-center text-4xl md:text-6xl font-syne font-bold lowercase tracking-tighter text-black">
           expertise_matrix
         </h2>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-3 gap-12 mb-24">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-16 mb-12 md:mb-24 grow-0">
           {data.map((area) => (
             <div key={area.category} className="expertise-group relative">
               <div className="mb-8 relative pl-4">
-                <div className="absolute left-0 top-0 w-1 h-full bg-white/30" />
-                <h3 className="font-mono tracking-wider font-bold text-sm uppercase text-white">{area.category}</h3>
-                <div className="mt-2 w-24 h-0.5 bg-white" />
+                <div className="absolute left-0 top-0 w-1 h-full bg-black/30" />
+                <h3 className="font-mono tracking-wider font-bold text-sm uppercase">{area.category}</h3>
+                <div className="mt-2 w-24 h-0.5 bg-black" />
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-3 md:space-y-4">
                 {area.skills.map((skill, i) => (
-                  <li key={i} className="relative pl-6 text-white/70 leading-relaxed text-base">
-                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-white/30 rotate-45" />
+                  <li key={i} className="relative pl-6 text-black/60 leading-relaxed text-base">
+                    <span className="absolute left-0 top-2.5 w-1.5 h-1.5 bg-black/30 rotate-45" />
                     {skill}
                   </li>
                 ))}
@@ -155,13 +199,13 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-black/10 py-12">
           <StatBox label="PERCENTILE" value="0.01" isFloat suffix="%" />
           <StatBox label="CAREERS" value="7" />
 
           <div className="text-center expertise-group">
-            <div className="font-mono text-xs text-white/50 mb-2 tracking-widest">DOMAINS</div>
-            <div className="text-4xl md:text-5xl font-syne font-bold text-white">∞</div>
+            <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">DOMAINS</div>
+            <div className="text-4xl md:text-5xl font-syne font-bold">∞</div>
           </div>
 
           <StatBox label="APPROACH" value="1" />

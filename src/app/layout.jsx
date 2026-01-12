@@ -59,6 +59,9 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning className="bg-black">
+      <head>
+        <link rel="preload" href="/assets/top-hero.webp" as="image" />
+      </head>
       <body
         className={`${syne.variable} ${inter.variable} antialiased text-foreground overflow-x-hidden selection:bg-white selection:text-black relative`}
         suppressHydrationWarning

@@ -1,20 +1,28 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export function Header() {
   return (
-    <header className="fixed top-0 right-0 z-50 p-6 pointer-events-none">
-      {/* Pointer events auto allows clicking the button, but lets you click through the header area */}
-      <Link 
-        href="/blog" 
-        className="pointer-events-auto inline-flex items-center px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full hover:bg-white/10 hover:border-emerald-500/50 transition-all duration-300 group"
-      >
-        <span className="w-2 h-2 rounded-full bg-emerald-500 mr-3 animate-pulse" />
-        <span className="font-mono text-xs font-bold text-white tracking-widest group-hover:text-emerald-400">
-          INSIGHTS
-        </span>
-      </Link>
+    <header className="fixed top-0 right-0 z-[9999] p-6 flex justify-end items-start pointer-events-none">
+      <div className="pointer-events-auto flex gap-4">
+
+        <Button variant="ghost" asChild className="text-white/50 hover:text-white font-mono tracking-widest text-xs cursor-pointer">
+          <Link href="/">
+            HOME
+          </Link>
+        </Button>
+
+        <Button variant="outline" asChild className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:text-white text-white/80 transition-all duration-300 font-mono tracking-widest text-xs h-9 px-4 rounded-full">
+          <Link href="/blog">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse" />
+            INSIGHTS
+          </Link>
+        </Button>
+
+      </div>
     </header>
   );
 }
