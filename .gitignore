@@ -7,7 +7,7 @@ __pycache__/
 dist/
 build/
 target/
-
+.agent
 # Dependencies
 node_modules/
 venv/
@@ -19,8 +19,32 @@ venv/
 # Logs and temp files
 *.log
 *.tmp
+memory
+claude-flow.cmd
+performance-capture.js
+performance-monitor.js
 *.swp
-
+.auto-claude
+in-memoria-vectors.db
+in-memoria.db
+.claude
+.claude-flow
+.cursor
+.dropstone
+.hive-mind
+.in-memoria
+.swarm
+.taskmaster
+.vscode
+.next
+.agent
+.agentdb
+.agentic-flow
+.agentic-flow-db
+.agentic-flow-db-v1
+.agentic-flow-db-v2
+.agentic-flow-db-v3
+.vercel
 # Editors
 .vscode/
 .idea/

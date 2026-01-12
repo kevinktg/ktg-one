@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uv",
+      "args": ["run", "serena", "start-mcp-server", "--port", "8000"],
+      "cwd": "D:\\projects\\.mcp-global\\serena",
+      "env": {}
+    },
+    "n8n-mcp": {
+      "command": "node",
+      "args": ["D:\\projects\\.mcp-global\\n8n-mcp-kevin\\dist\\mcp\\index.js"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "_n8n_api_url": "http://localhost:5678/api/v1",
+        "_n8n_api_key": "your_n8n_api_key_here"
+      }
+    },
+    "in-memoria": {
+      "command": "npx",
+      "args": ["in-memoria", "server"],
+      "env": {}
+    },
+    "claude-task-master": {
+      "command": "npx",
+      "args": ["-y", "task-master-ai"],
+      "env": {
+        "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
+        "OPENAI_API_KEY": "YOUR_OPENAI_KEY_HERE",
+        "GOOGLE_API_KEY": "YOUR_GOOGLE_KEY_HERE"
+      }
+    }
+  }
+}
