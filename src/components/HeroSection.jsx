@@ -45,7 +45,7 @@ export const HeroSection = forwardRef((props, ref) => {
       suppressHydrationWarning
     >
       {/* Block geometric background in hero only */}
-      <div className="absolute inset-0 bg-black z-0" />
+      <div className="absolute inset-0 bg-black z-0" style={{ top: '-1px', left: 0 }} />
 
       <Suspense fallback={<div className="absolute inset-0 z-10 bg-neutral-900" />}>
         <HeroImages
@@ -59,10 +59,24 @@ export const HeroSection = forwardRef((props, ref) => {
         ref={marqueeRef}
         // pointer-events-none lets mouse pass through to the blob canvas
         // Moved down (pt-20 md:pt-24) to avoid overlapping header navigation
-        className="absolute top-0 left-0 right-0 z-50 pointer-events-none overflow-hidden pt-20 md:pt-24 pb-5 md:pb-6 border-b border-white/10 bg-black/20 backdrop-blur-md"
+        className="absolute right-0 z-[45] pointer-events-none overflow-hidden pt-20 md:pt-24 pb-5 md:pb-6 border-b border-white/10 bg-black/20 backdrop-blur-md flex"
+        style={{
+          top: '-40px',
+          height: '25px',
+          fontSize: '14px',
+          verticalAlign: 'top',
+          lineHeight: '15px'
+        }}
       >
         <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
-          <div className="flex items-center gap-8 md:gap-12 animate-scroll will-change-transform">
+          <div 
+            className="flex items-start justify-start gap-6 md:gap-6 animate-scroll will-change-transform" 
+            style={{ 
+              gap: '24px',
+              justifyContent: 'flex-start',
+              verticalAlign: 'top'
+            }}
+          >
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
                 <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Cognitive Architect</span>

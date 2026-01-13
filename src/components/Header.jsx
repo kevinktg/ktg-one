@@ -15,7 +15,7 @@ export function Header() {
           </Link>
         </Button>
 
-        <Button variant="outline" asChild className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:text-white text-white/80 transition-all duration-300 font-mono tracking-widest text-xs h-9 px-4 rounded-full">
+        <Button variant="outline" asChild className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:text-white text-white/80 transition-all duration-300 font-mono tracking-widest text-xs h-9 px-4 rounded-full" style={{ fontFamily: 'Syne, sans-serif' }}>
           <Link href="/blog">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse" />
             INSIGHTS
