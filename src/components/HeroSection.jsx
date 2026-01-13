@@ -3,6 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef, forwardRef, lazy, Suspense, useMemo } from "react";
+import { SkipButton } from "@/components/SkipButton";
 
 // Lazy load Three.js component
 const HeroImages = lazy(() => import("@/components/HeroImages").then(mod => ({ default: mod.HeroImages })));
@@ -53,6 +54,9 @@ export const HeroSection = forwardRef((props, ref) => {
           bottomImage="/assets/bottom-hero.webp"
         />
       </Suspense>
+
+      {/* Skip Button */}
+      <SkipButton />
 
       {/* Marquee Banner (Top) */}
       <div 
