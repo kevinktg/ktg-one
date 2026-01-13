@@ -207,14 +207,14 @@ export function HeroImages({ topImage, bottomImage }) {
   }
 
   return (
-    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-neutral-900 transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
         dpr={[1, 2]} 
         gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
         camera={{ position: [0, 0, 1], fov: 75 }}
-        style={{ background: '#171717' }}
+        style={{ background: 'transparent' }}
       >
         <Suspense fallback={null}>
           <RevealPlane

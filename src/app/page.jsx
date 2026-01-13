@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { HeroTransition } from "@/components/HeroTransition";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
+import { ExpertiseTransition } from "@/components/ExpertiseTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
@@ -60,6 +61,9 @@ export default async function Home() {
 
         {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
         <ExpertiseSection />
+
+        {/* TRANSITION: Wipe from expertise (white) to validation (black) */}
+        <ExpertiseTransition />
 
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
         <ValidationSection />

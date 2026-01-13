@@ -127,7 +127,7 @@ export function PhilosophySection({ philosophyData }) {
 
             {/* Header */}
             <div>
-              <div className="font-mono text-xs md:text-sm text-white/40 mb-8 tracking-[0.2em] border-l border-white/20 pl-4 uppercase">
+              <div className="text-xs md:text-sm text-white/40 mb-8 tracking-[0.2em] border-l border-white/20 pl-4">
                 Philosophy
               </div>
               <h2 className="text-5xl md:text-8xl font-syne font-bold lowercase leading-[0.85] text-white">
@@ -145,7 +145,7 @@ export function PhilosophySection({ philosophyData }) {
               <p className="leading-relaxed">
                 {data.description[1]}
               </p>
-              <p className="font-mono text-sm text-white/80 border-l border-white/30 pl-6 py-2 tracking-wide leading-relaxed">
+              <p className="text-sm text-white/80 border-l border-white/30 pl-6 py-2 tracking-wide leading-relaxed">
                 {data.description[2]}
               </p>
             </div>
@@ -165,7 +165,7 @@ export function PhilosophySection({ philosophyData }) {
                 <div className={`absolute top-0 bottom-0 w-px bg-white/10 group-hover:bg-white/40 transition-colors duration-500 ${index % 2 !== 0 ? 'right-0' : 'left-0'}`} />
 
                 <div className={`${index % 2 !== 0 ? 'pr-12 text-right' : 'pl-12 text-left'}`}>
-                  <div className="font-mono text-xs text-white/30 mb-6 tracking-[0.25em]">
+                  <div className="text-xs text-white/30 mb-6 tracking-[0.25em]">
                     {quote.label}
                   </div>
                   <blockquote className="text-3xl md:text-6xl font-syne font-bold text-white/90 leading-tight group-hover:text-white transition-colors duration-500">
@@ -187,8 +187,8 @@ export function PhilosophySection({ philosophyData }) {
             <div className="absolute -inset-12 border border-white/5 rounded-full scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out" />
             <div className="absolute -inset-8 border border-white/10 group-hover:border-white/20 transition-colors duration-500" />
 
-            <div className="relative font-mono text-lg md:text-2xl px-12 py-8 tracking-[0.2em] text-white/80 group-hover:text-white transition-colors">
-              CONTEXT • CONTINUATION • SOLVE
+            <div className="relative text-lg md:text-2xl px-12 py-8 tracking-[0.2em] text-white/80 group-hover:text-white transition-colors">
+              context • continuation • solve
             </div>
           </div>
 
@@ -196,7 +196,7 @@ export function PhilosophySection({ philosophyData }) {
           <div className="pt-8">
             <Link
               href="/blog"
-              className="font-mono text-xs text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+              className="text-xs text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest"
             >
               read insights
             </Link>

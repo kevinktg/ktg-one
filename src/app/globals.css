@@ -127,8 +127,21 @@
   Must stay outside @layer for priority.
 */
 @keyframes animate-square {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
-  100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+  0% { 
+    transform: translateY(0) translateX(0) rotate(0deg); 
+    opacity: 0.8; 
+    border-radius: 0; 
+  }
+  50% {
+    transform: translateY(-500px) translateX(50px) rotate(360deg);
+    opacity: 1;
+    border-radius: 25%;
+  }
+  100% { 
+    transform: translateY(-1000px) translateX(-30px) rotate(720deg); 
+    opacity: 0; 
+    border-radius: 50%; 
+  }
 }
 
 @keyframes scroll {
@@ -154,7 +167,7 @@
   width: 20px;
   height: 20px;
   background: rgba(255, 255, 255, 0.15);
-  animation: animate-square 19s linear infinite;
+  animation: animate-square 25s ease-in-out infinite;
   bottom: -320px;
   /* OPTIMIZATION: Removed permanent will-change - browser will promote layers automatically when animating */
   /* This prevents creating GPU layers for elements with long delays before they start */
@@ -169,6 +182,11 @@
   will-change: transform, opacity;
 }
 
+/* Marquee scroll animation */
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
 /* OPTIMIZATION: Respect user motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .background li {
@@ -179,11 +197,6 @@
   .animate-scroll {
     animation: none;
   }
-}
-
-/* Marquee scroll animation */
-.animate-scroll {
-  animation: scroll 30s linear infinite;
 }
 
 /* OPTIMIZATION: Reduced to 12 squares (from 21) for better performance */
