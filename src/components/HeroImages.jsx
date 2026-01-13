@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useEffect, useState } from 'react'
+import { Suspense, useRef, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree, extend } from '@react-three/fiber'
 import { TextureLoader, ShaderMaterial, Vector2 } from 'three'
 import * as THREE from 'three'
@@ -183,6 +183,8 @@ export function HeroImages({ topImage, bottomImage }) {
     };
   }, []);
 
+  const handleLoaded = useCallback(() => setIsReady(true), []);
+
   if (isMobile) {
     return (
       <div 
@@ -210,7 +212,7 @@ export function HeroImages({ topImage, bottomImage }) {
           <RevealPlane
             topImagePath={topImage}
             bottomImagePath={bottomImage}
-            onLoaded={() => setIsReady(true)}
+            onLoaded={handleLoaded}
           />
         </Suspense>
       </Canvas>
