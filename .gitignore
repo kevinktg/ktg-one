@@ -15,6 +15,31 @@ venv/
 .env
 .env.local
 .env.*
+.in-memoria
+.in-memoria-vectors.db
+.in-memoria.db
+.claude-flow.cmd
+.performance-capture.js
+.performance-monitor.js
+.auto-claude
+.claude
+.claude-flow
+.cursor
+.dropstone
+.hive-mind
+.swarm
+.taskmaster
+.vscode
+.next
+.next
+.agent
+.agentdb
+.agentic-flow
+.agentic-flow-db
+.agentic-flow-db-v1
+.agentic-flow-db-v2
+.agentic-flow-db-v3
+.vercel
 
 # Logs and temp files
 *.log

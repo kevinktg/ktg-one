@@ -8,7 +8,6 @@ export function ClientLayout({ children }) {
   return (
     <ReactLenis root>
       <div className="relative min-h-screen">
-        <GeometricBackground />
         <GlobalCursor />
         {children}
       </div>

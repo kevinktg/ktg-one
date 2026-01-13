@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 // Ensure this path is correct based on your folder structure
 import { GeometricBackground } from "@/components/GeometricBackground";
@@ -17,6 +17,7 @@ export function PhilosophySection({ philosophyData }) {
   const sectionRef = useRef(null);
   const textRef = useRef(null);
   const quoteRefs = useRef([]);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   // Default WP Fallback Data
   const data = philosophyData || {
@@ -46,10 +47,12 @@ export function PhilosophySection({ philosophyData }) {
     ]
   };
 
-  // OPTIMIZATION: Cache sessionStorage check
-  const hasPlayed = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem('philosophy-animated') === 'true';
+  // OPTIMIZATION: Check sessionStorage only on client side to prevent hydration mismatch
+  useEffect(() => {
+    const played = sessionStorage.getItem('philosophy-animated') === 'true';
+    if (played) {
+      setHasPlayed(true);
+    }
   }, []);
 
   useGSAP(() => {
@@ -132,11 +135,7 @@ export function PhilosophySection({ philosophyData }) {
   }, { scope: sectionRef });
 
   return (
-<<<<<<< HEAD
     <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden">
-=======
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-30">
->>>>>>> 41008e9dbc1a433375483baf4cdb348e12dc72c8
 
       {/* Geometric Background Layer */}
       <div className="absolute inset-0 z-0">

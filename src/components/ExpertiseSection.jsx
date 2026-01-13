@@ -2,7 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, forwardRef, useState, useEffect } from "react";
 
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
@@ -24,6 +24,7 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
   const contentRef = useRef(null); // Wrapper for pinned content
   const shutterRef = useRef(null);
   const internalRef = ref || containerRef;
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   // Default Fallback Data
   const data = expertiseData || [
@@ -41,10 +42,12 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
     },
   ];
 
-  // OPTIMIZATION: Cache sessionStorage check
-  const hasPlayed = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem('expertise-revealed') === 'true';
+  // OPTIMIZATION: Check sessionStorage only on client side to prevent hydration mismatch
+  useEffect(() => {
+    const played = sessionStorage.getItem('expertise-revealed') === 'true';
+    if (played) {
+      setHasPlayed(true);
+    }
   }, []);
 
   useGSAP(() => {

@@ -58,7 +58,8 @@ export const HeroSection = forwardRef((props, ref) => {
       <div 
         ref={marqueeRef}
         // pointer-events-none lets mouse pass through to the blob canvas
-        className="absolute top-0 left-0 right-0 z-50 pointer-events-none overflow-hidden py-5 md:py-6 border-b border-white/10 bg-black/20 backdrop-blur-md"
+        // Moved down (pt-20 md:pt-24) to avoid overlapping header navigation
+        className="absolute top-0 left-0 right-0 z-50 pointer-events-none overflow-hidden pt-20 md:pt-24 pb-5 md:pb-6 border-b border-white/10 bg-black/20 backdrop-blur-md"
       >
         <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
           <div className="flex items-center gap-8 md:gap-12 animate-scroll will-change-transform">
