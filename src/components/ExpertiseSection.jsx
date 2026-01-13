@@ -7,7 +7,7 @@ import { useRef, useMemo, forwardRef, useState, useEffect } from "react";
 // Helper Component for the stats at the bottom
 const StatBox = ({ label, value, isFloat, suffix }) => (
   <div className="text-center expertise-group">
-    <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">{label}</div>
+    <div className="stat-label text-xs opacity-50 mb-2 tracking-widest">{label}</div>
     <div
       className="text-4xl md:text-5xl font-syne font-bold stat-counter text-white"
       data-val={value}
@@ -56,6 +56,9 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 1, transformOrigin: "top" });
       }
+      // Set initial state for stats (hidden until animation)
+      gsap.set(".stat-label", { opacity: 0, y: 20 });
+      gsap.set(".stat-counter", { opacity: 0, y: 20 });
     } else {
       if (shutterRef.current?.children) {
         gsap.set(shutterRef.current.children, { scaleY: 0 });
@@ -63,10 +66,15 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
       // If played, set final state immediately
       gsap.set(".expertise-title", { opacity: 1, y: 0 });
       gsap.set(".expertise-group", { opacity: 1, y: 0 });
+      gsap.set(".stat-label", { opacity: 1, y: 0 });
+      gsap.set(".stat-counter", { opacity: 1, y: 0 });
 
-      // Set stats to final values
+      // Set stats to final values (only for numeric stats with data-val)
       const stats = gsap.utils.toArray(".stat-counter");
       stats.forEach((stat) => {
+        // Skip if no data-val attribute (text-based stats like "collaborative" or "∞")
+        if (!stat.getAttribute("data-val")) return;
+        
         const targetVal = parseFloat(stat.getAttribute("data-val"));
         const isFloat = stat.getAttribute("data-is-float") === "true";
         const suffix = stat.getAttribute("data-suffix") || "";
@@ -119,18 +127,29 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
       "-=1"
     );
 
-    // STEP D: Stats Counter Animation (independent trigger or part of timeline?)
-    // Let's make stats animate automatically once we reach the end of the pin
-    // We'll use a separate trigger for the counters themselves to ensure they play smoothly
-    // regardless of scrub speed, but triggered by the timeline progression
+    // STEP D: Stats Labels and Values Reveal (70% - 100%)
+    // Animate stats labels and values separately to ensure they're visible
+    const statLabels = gsap.utils.toArray(".stat-label");
+    const statValues = gsap.utils.toArray(".stat-counter");
+    tl.fromTo(statLabels,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, stagger: 0.2, ease: "power2.out", duration: 1.5 },
+      "-=0.5"
+    );
+    tl.fromTo(statValues,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, stagger: 0.2, ease: "power2.out", duration: 1.5 },
+      "-=1.5"
+    );
 
-    // Instead of timeline scrub for numbers (which looks weird if you scroll back),
-    // we use a call() at the end of the timeline
+    // STEP E: Stats Counter Animation (after values are visible)
+    // Animate the numeric counters from 0 to target value
+    // This happens after the values fade in
     tl.call(() => {
         const stats = gsap.utils.toArray(".stat-counter");
         stats.forEach((stat) => {
-          // Only animate if not already done
-          if (stat.getAttribute("data-animated") === "true") return;
+          // Only animate if not already done and has data-val attribute
+          if (stat.getAttribute("data-animated") === "true" || !stat.getAttribute("data-val")) return;
 
           const targetVal = parseFloat(stat.getAttribute("data-val"));
           const isFloat = stat.getAttribute("data-is-float") === "true";
@@ -147,7 +166,7 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
           });
           stat.setAttribute("data-animated", "true");
         });
-    }, null, "-=1"); // Trigger slightly before end
+    }, null, "-=0.5"); // Trigger after values are visible
 
   }, { scope: containerRef });
 
@@ -186,7 +205,7 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
             <div key={area.category} className="expertise-group relative">
               <div className="mb-8 relative pl-4">
                 <div className="absolute left-0 top-0 w-1 h-full bg-black/30" />
-                <h3 className="font-mono tracking-wider font-bold text-sm uppercase">{area.category}</h3>
+                <h3 className="font-syne tracking-wider font-bold text-sm">{area.category}</h3>
                 <div className="mt-2 w-24 h-0.5 bg-black" />
               </div>
               <ul className="space-y-3 md:space-y-4">
@@ -207,11 +226,14 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
           <StatBox label="CAREERS" value="7" />
 
           <div className="text-center expertise-group">
-            <div className="font-mono text-xs opacity-50 mb-2 tracking-widest">DOMAINS</div>
-            <div className="text-4xl md:text-5xl font-syne font-bold">∞</div>
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest">domains</div>
+            <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">∞</div>
           </div>
 
-          <StatBox label="APPROACH" value="1" />
+          <div className="text-center expertise-group">
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest">APPROACH</div>
+            <div className="stat-counter text-2xl md:text-3xl font-syne font-bold text-white lowercase">collaborative</div>
+          </div>
         </div>
       </div>
     </section>

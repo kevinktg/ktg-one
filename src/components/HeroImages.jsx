@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useEffect, useState } from 'react'
+import { Suspense, useRef, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree, extend } from '@react-three/fiber'
 import { TextureLoader, ShaderMaterial, Vector2 } from 'three'
 import * as THREE from 'three'
@@ -167,12 +167,20 @@ export function HeroImages({ topImage, bottomImage }) {
   const [isReady, setIsReady] = useState(false); // New state for fade-in
 
   useEffect(() => {
+    // Session check: If previously visited, show immediately
+    const hasPlayed = typeof window !== 'undefined' && sessionStorage.getItem('hero-animated') === 'true';
+    if (hasPlayed) {
+        setIsReady(true);
+    }
+
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
     // If mobile, we are using a background image, so set ready quickly.
-    // For Desktop, isReady is triggered by the onLoaded callback in RevealPlane
+    // For Desktop, isReady is triggered by the onLoaded callback in RevealPlane.
+    // However, if we've already played, we want it visible immediately (handled above),
+    // but we still let the texture load in the background.
     if (window.innerWidth < 768) {
         const timer = setTimeout(() => setIsReady(true), 100);
         return () => clearTimeout(timer);
@@ -182,6 +190,8 @@ export function HeroImages({ topImage, bottomImage }) {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
+
+  const handleLoaded = useCallback(() => setIsReady(true), []);
 
   if (isMobile) {
     return (
@@ -210,7 +220,7 @@ export function HeroImages({ topImage, bottomImage }) {
           <RevealPlane
             topImagePath={topImage}
             bottomImagePath={bottomImage}
-            onLoaded={() => setIsReady(true)}
+            onLoaded={handleLoaded}
           />
         </Suspense>
       </Canvas>

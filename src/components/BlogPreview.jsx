@@ -56,17 +56,17 @@ export function BlogPreview({ posts = [] }) {
   // Default fallback message
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
+      <section ref={sectionRef} data-blog-section className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
         <div ref={containerRef} className="max-w-7xl mx-auto">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
-          <p className="text-muted-foreground font-mono">No posts available at the moment.</p>
+          <p className="text-muted-foreground">No posts available at the moment.</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
+    <section ref={sectionRef} data-blog-section className="relative min-h-screen py-32 px-6 bg-black text-white" suppressHydrationWarning>
       <div ref={containerRef} className="max-w-7xl mx-auto">
         <h2 className="font-syne text-4xl md:text-5xl font-bold mb-12 lowercase">blog</h2>
         
@@ -104,7 +104,7 @@ export function BlogPreview({ posts = [] }) {
                   <div className="p-6 flex-1 flex flex-col">
                     {post.date && (
                       <time 
-                        className="text-muted-foreground text-xs font-mono mb-3"
+                        className="text-muted-foreground text-xs mb-3"
                         dateTime={new Date(post.date).toISOString()}
                       >
                         {formatDate(post.date)}
@@ -121,7 +121,7 @@ export function BlogPreview({ posts = [] }) {
                       </p>
                     )}
                     
-                    <span className="text-muted-foreground font-mono text-xs group-hover:text-foreground/70 transition-colors mt-auto">
+                    <span className="text-muted-foreground text-xs group-hover:text-foreground/70 transition-colors mt-auto">
                       read more →
                     </span>
                   </div>
@@ -135,7 +135,7 @@ export function BlogPreview({ posts = [] }) {
           <div className="mt-12 text-center">
             <Link
               href="/blog"
-              className="inline-block font-mono text-sm text-muted-foreground hover:text-foreground transition-colors border-b border-transparent hover:border-foreground/30"
+              className="inline-block text-sm text-muted-foreground hover:text-foreground transition-colors border-b border-transparent hover:border-foreground/30"
             >
               view all posts →
             </Link>
@@ -155,15 +155,15 @@ export function BlogPreview({ posts = [] }) {
             >
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
-                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Cognitive Architect</span>
+                  <span className="text-sm md:text-base text-white/70 tracking-wider">Cognitive Architect</span>
                   <span className="text-white/20">•</span>
-                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Top 0.01%</span>
+                  <span className="text-sm md:text-base text-white/70 tracking-wider">Top 0.01%</span>
                   <span className="text-white/20">•</span>
-                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Context Sovereignty</span>
+                  <span className="text-sm md:text-base text-white/70 tracking-wider">Context Sovereignty</span>
                   <span className="text-white/20">•</span>
-                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Framework Verification</span>
+                  <span className="text-sm md:text-base text-white/70 tracking-wider">Framework Verification</span>
                   <span className="text-white/20">•</span>
-                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Arxiv-Ready Research</span>
+                  <span className="text-sm md:text-base text-white/70 tracking-wider">Arxiv-Ready Research</span>
                   <span className="text-white/20">•</span>
                 </div>
               ))}
