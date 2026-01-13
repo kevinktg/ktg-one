@@ -14,12 +14,12 @@ export default function NotFound() {
           <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase">
             post not found
           </h1>
-          <p className="text-white/60 mb-8 font-mono">
+          <p className="text-white/60 mb-8">
             the post you're looking for doesn't exist or has been moved
           </p>
           <Link
             href="/blog"
-            className="inline-block px-6 py-3 border border-white/20 hover:border-white/40 transition-colors font-mono text-sm uppercase tracking-widest"
+            className="inline-block px-6 py-3 border border-white/20 hover:border-white/40 transition-colors text-sm tracking-widest"
           >
             back to blog
           </Link>

@@ -89,11 +89,11 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=150%", // Pin for 1.5 screen heights
+        end: "+=250%", // Pin for 2.5 screen heights
         pin: true,
         scrub: 0.5, // Smooth scrubbing
         onLeave: () => {
-           sessionStorage.setItem('expertise-revealed', 'true');
+          sessionStorage.setItem('expertise-revealed', 'true');
         }
       }
     });
@@ -186,10 +186,10 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
 
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none z-10 select-none overflow-hidden">
-         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/10 rotate-45 opacity-60" />
+         <div className="absolute top-20 right-20 w-64 h-64 border-2 border-black/10 rotate-45 opacity-80" />
          <div className="absolute top-1/3 right-1/4 w-48 h-48 border-2 border-black/5" />
-         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/10 rounded-full opacity-50" />
-         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+         <div className="absolute bottom-20 left-20 w-96 h-96 border-2 border-black/10 rounded-full opacity-70" />
+         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
       <div ref={contentRef} className="relative z-20 max-w-7xl w-full mx-auto px-6 flex flex-col justify-center h-full">
@@ -222,18 +222,31 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-black/10 py-12">
-          <StatBox label="PERCENTILE" value="0.01" isFloat suffix="%" />
-          <StatBox label="CAREERS" value="7" />
 
+          {/* 01: PERCENTILE */}
           <div className="text-center expertise-group">
-            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest">domains</div>
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Percentile</div>
+            <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">0.01%</div>
+          </div>
+
+          {/* 02: CAREERS */}
+          <div className="text-center expertise-group">
+          <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Careers</div>
+            <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">7</div>
+          </div>
+
+          {/* 03: DOMAINS */}
+          <div className="text-center expertise-group">
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Domains</div>
             <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">∞</div>
           </div>
 
+          {/* 04: APPROACH */}
           <div className="text-center expertise-group">
-            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest">APPROACH</div>
-            <div className="stat-counter text-2xl md:text-3xl font-syne font-bold text-white lowercase">collaborative</div>
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Approach</div>
+            <div className="stat-counter text-2xl md:text-3xl font-syne font-bold text-black lowercase">collaborative</div>
           </div>
+
         </div>
       </div>
     </section>

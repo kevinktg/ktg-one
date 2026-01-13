@@ -98,18 +98,18 @@ export function ExpertiseTransition() {
         aria-hidden="true"
       >
         {/* Subtle gradient for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-white via-white to-transparent" />
       </div>
 
       {/* Top gradient for smooth blend from expertise */}
       <div
-        className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white to-transparent pointer-events-none z-10"
+        className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-white to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
 
       {/* Bottom gradient for smooth blend into validation */}
       <div
-        className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none z-10"
+        className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black to-transparent pointer-events-none z-10"
         aria-hidden="true"
       />
     </div>

@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }) {
           {/* Back Link */}
           <Link
             href="/blog"
-            className="group inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-12 font-mono text-sm uppercase tracking-widest"
+            className="group inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-12 text-sm tracking-widest"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span> 
             back to blog
@@ -125,7 +125,7 @@ export default async function BlogPostPage({ params }) {
             </h1>
             
             {/* Meta */}
-            <div className="flex items-center gap-4 text-white/40 text-sm font-mono mb-12 border-b border-white/10 pb-8">
+            <div className="flex items-center gap-4 text-white/40 text-sm mb-12 border-b border-white/10 pb-8">
               <time dateTime={publishedTime} itemProp="datePublished">
                 {formatDate(post.date)}
               </time>
@@ -173,13 +173,13 @@ export default async function BlogPostPage({ params }) {
             <div className="flex justify-between items-center">
               <Link
                 href="/blog"
-                className="text-white/40 hover:text-white transition-colors font-mono text-sm"
+                className="text-white/40 hover:text-white transition-colors text-sm"
               >
                 view all posts
               </Link>
               <Link
                  href="/"
-                 className="text-white/40 hover:text-white transition-colors font-mono text-sm"
+                 className="text-white/40 hover:text-white transition-colors text-sm"
               >
                  home
               </Link>

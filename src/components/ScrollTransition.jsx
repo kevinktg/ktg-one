@@ -85,7 +85,7 @@ export function GalleryFormation() {
 
                     {/* Minimal Hover Label */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                        <span className="font-mono text-[10px] tracking-widest uppercase bg-black/80 text-white px-2 py-1">
+                        <span className="text-[10px] tracking-widest bg-black/80 text-white px-2 py-1">
                             {item.title}
                         </span>
                     </div>

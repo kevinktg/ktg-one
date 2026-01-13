@@ -333,7 +333,7 @@ function CareerCard({ career, index, cardRefs, align }) {
             ${isCenter ? 'flex-col items-center justify-center text-center' : align === 'right' ? 'flex-row-reverse' : 'flex-row'}
         `}>
             <div className={`flex-1 ${isCenter ? 'w-full' : ''}`}>
-                <div className="text-xs text-white/50 uppercase tracking-widest mb-2 font-mono">{career.role}</div>
+                <div className="text-xs text-white/50 tracking-widest mb-2">{career.role}</div>
                 
                 {/* ⬇️ TYPOGRAPHY UPDATE: Font Syne + Lowercase ⬇️ */}
                 <h3 className={`font-syne font-bold lowercase ${isCenter ? 'text-5xl md:text-6xl mb-4' : 'text-4xl'}`}>
@@ -349,7 +349,7 @@ function CareerCard({ career, index, cardRefs, align }) {
             </div>
         </div>
         
-        <p className={`text-white/70 font-mono text-base leading-relaxed ${isCenter ? 'max-w-xl mx-auto' : ''}`}>
+        <p className={`text-white/70 text-base leading-relaxed ${isCenter ? 'max-w-xl mx-auto' : ''}`}>
             {career.description}
         </p>
       </div>

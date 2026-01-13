@@ -142,19 +142,14 @@ export function BlogPreview({ posts = [] }) {
           </div>
         )}
 
-        {/* Marquee Banner Footer */}
+       {/* Marquee Banner Footer */}
         <div className="mt-24 relative w-full overflow-hidden border-t border-white/10 pt-8 pb-8">
-          <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
-            <div 
-              className="flex items-center gap-6 md:gap-6 animate-scroll will-change-transform" 
-              style={{ 
-                gap: '24px',
-                justifyContent: 'flex-start',
-                verticalAlign: 'top'
-              }}
-            >
+          {/* The Track */}
+          <div className="flex whitespace-nowrap overflow-hidden">
+            {/* The Content - Doubled for seamless loop */}
+            <div className="flex items-center gap-12 animate-scroll hover:[animation-play-state:paused] cursor-default">
               {[...Array(2)].map((_, i) => (
-                <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
+                  <div key={i} className="flex items-center gap-12 shrink-0 pr-12">
                   <span className="text-sm md:text-base text-white/70 tracking-wider">Cognitive Architect</span>
                   <span className="text-white/20">•</span>
                   <span className="text-sm md:text-base text-white/70 tracking-wider">Top 0.01%</span>

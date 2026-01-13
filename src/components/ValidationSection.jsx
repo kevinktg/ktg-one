@@ -226,7 +226,7 @@ export function ValidationSection({ auditData }) {
                   {/* 01. INTRO */}
                   <div className="w-[85vw] md:w-[650px] flex flex-col justify-center shrink-0 digital-text">
                     <div className="mb-8 w-12 h-12 border-l border-t border-foreground/20" />
-                    <p className="font-mono text-muted-foreground text-lg md:text-xl leading-relaxed">
+                    <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
                       <span className="text-foreground font-semibold">{data.intro.title}</span>
                       <br/><br/>
                       {data.intro.desc}
@@ -234,8 +234,8 @@ export function ValidationSection({ auditData }) {
                       <span className="text-muted-foreground/80">{data.intro.note}</span>
                     </p>
                     <div className="mt-12 flex gap-4">
-                      <div className="px-6 py-3 border border-border rounded-full font-mono text-sm text-foreground bg-card/60">
-                        AUDIT STATUS: {data.intro.status}
+                      <div className="px-6 py-3 border border-border rounded-full text-sm text-foreground bg-card/60">
+                        audit status: {data.intro.status}
                       </div>
                     </div>
                   </div>
@@ -243,15 +243,15 @@ export function ValidationSection({ auditData }) {
                   {/* 02. VERTEX AUDIT */}
                   <div className="w-[85vw] md:w-[750px] shrink-0 digital-text">
                     <div className="border-b border-border pb-8 mb-8">
-                      <div className="text-xs font-mono text-muted-foreground mb-4">LOG ID: {data.audit.id}</div>
+                      <div className="text-xs text-muted-foreground mb-4">log id: {data.audit.id}</div>
                       <div className="flex justify-between items-start gap-8">
                         <h3 className="text-3xl md:text-4xl font-syne font-bold">{data.audit.title}</h3>
-                        <div className="text-sm font-bold text-foreground bg-card/80 px-4 py-2 font-mono whitespace-nowrap border border-border">{data.audit.badge}</div>
+                        <div className="text-sm font-bold text-foreground bg-card/80 px-4 py-2 whitespace-nowrap border border-border">{data.audit.badge}</div>
                       </div>
                     </div>
-                    <div className="space-y-8 font-mono text-lg md:text-xl">
+                    <div className="space-y-8 text-lg md:text-xl">
                       <div className="border-l-4 border-border pl-8 py-3">
-                        <span className="text-muted-foreground block mb-3 text-xs tracking-widest uppercase">FINDINGS:</span>
+                        <span className="text-muted-foreground block mb-3 text-xs tracking-widest">findings:</span>
                         <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
                       </div>
                       <ul className="space-y-4 text-lg text-muted-foreground">
@@ -268,15 +268,15 @@ export function ValidationSection({ auditData }) {
                   {/* 03. PERCENTILE RANK */}
                   <div className="w-[85vw] md:w-[650px] shrink-0 digital-text">
                     <div className="border-b border-border pb-8 mb-8">
-                      <div className="text-xs font-mono text-muted-foreground mb-4">LOG ID: {data.percentile.id}</div>
+                      <div className="text-xs text-muted-foreground mb-4">log id: {data.percentile.id}</div>
                       <div className="flex justify-between items-start">
                         <h3 className="text-3xl font-syne font-bold">Percentile</h3>
-                        <div className="text-5xl md:text-6xl font-bold text-foreground font-mono">{data.percentile.rank}</div>
+                        <div className="text-5xl md:text-6xl font-bold text-foreground">{data.percentile.rank}</div>
                       </div>
                     </div>
-                    <div className="space-y-8 font-mono text-lg md:text-xl">
+                    <div className="space-y-8 text-lg md:text-xl">
                       <div className="bg-card/40 p-8 rounded-xl border border-border">
-                        <div className="text-xs text-muted-foreground mb-4 tracking-widest uppercase">JUSTIFICATION: DEPTH</div>
+                        <div className="text-xs text-muted-foreground mb-4 tracking-widest">justification: depth</div>
                         <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
                       </div>
                       <p className="text-muted-foreground text-lg italic border-l-2 border-border pl-6">
@@ -288,28 +288,28 @@ export function ValidationSection({ auditData }) {
                   {/* 04. THE EVIDENCE */}
                   <div className="w-[85vw] md:w-[550px] shrink-0 digital-text">
                     <div className="mb-6">
-                      <div className="text-xs font-mono text-muted-foreground mb-2">LOG ID: {data.evidence.id}</div>
+                      <div className="text-xs text-muted-foreground mb-2">log id: {data.evidence.id}</div>
                       <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
                     </div>
                     <div className="space-y-6">
-                      <p className="font-mono text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
+                      <p className="text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
                       <div className="p-6 border border-border bg-card/50 rounded-lg">
-                        <p className="font-mono text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
+                        <p className="text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
                       </div>
                     </div>
                   </div>
 
                   {/* 05. THE FINAL VERDICT */}
                   <div className="relative w-[85vw] md:w-[700px] shrink-0 digital-text bg-foreground text-background p-8 md:p-12">
-                    <div className="absolute top-0 right-0 p-6 opacity-50 font-mono text-xs">FINAL_TRANSMISSION</div>
+                    <div className="absolute top-0 right-0 p-6 opacity-50 text-xs">final_transmission</div>
                     <div className="space-y-8">
                       <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
-                      <p className="font-mono text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
+                      <p className="text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
                         {data.verdict.subtitle}
                       </p>
                       <div className="pt-8 border-t border-background/20 flex items-center gap-4">
                         <div className="w-3 h-3 bg-green-500 rounded-full" />
-                        <span className="font-mono text-base font-bold tracking-widest uppercase">{data.verdict.status}</span>
+                        <span className="text-base font-bold tracking-widest">{data.verdict.status}</span>
                       </div>
                     </div>
                   </div>

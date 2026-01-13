@@ -190,12 +190,11 @@
 /* OPTIMIZATION: Respect user motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .background li {
-    animation: none;
-    will-change: auto;
+    animation: animate-square 25s ease-in-out infinite; /* Super slow instead of off */
   }
-  
+
   .animate-scroll {
-    animation: none;
+    animation: scroll 60s linear infinite; /* Barely moving instead of off */
   }
 }
 

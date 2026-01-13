@@ -77,7 +77,7 @@ export default async function BlogPage() {
             <h1 className="font-syne text-5xl md:text-6xl font-bold mb-4 lowercase text-white">
               blog
             </h1>
-            <p className="text-white/60 font-mono text-lg">
+            <p className="text-white/60 text-lg">
               thoughts, insights, and updates
             </p>
           </div>
@@ -86,7 +86,7 @@ export default async function BlogPage() {
           {posts.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl">
               <p className="text-white/40 mb-2">No posts found.</p>
-              <p className="text-white/30 text-sm font-mono">
+              <p className="text-white/30 text-sm">
                 System awaiting input from WordPress...
               </p>
             </div>
@@ -129,7 +129,7 @@ export default async function BlogPage() {
                           {title}
                         </h2>
                         
-                        <div className="text-white/40 text-sm font-mono mb-4 flex items-center gap-2">
+                        <div className="text-white/40 text-sm mb-4 flex items-center gap-2">
                           <time dateTime={post.date}>
                             {formatDate(post.date)}
                           </time>
@@ -141,7 +141,7 @@ export default async function BlogPage() {
                           {excerpt}
                         </p>
 
-                        <span className="inline-block text-sm font-mono text-white/50 border-b border-transparent group-hover:border-white/50 transition-all">
+                        <span className="inline-block text-sm text-white/50 border-b border-transparent group-hover:border-white/50 transition-all">
                           read full entry →
                         </span>
                       </Link>

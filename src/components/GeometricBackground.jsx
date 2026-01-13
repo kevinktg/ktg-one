@@ -24,7 +24,7 @@ export const GeometricBackground = memo(function GeometricBackground({ fixed = f
       {/* 1. THE MOVING SQUARES */}
       {/* These sit at the bottom of the stack, powered by animate-square in globals.css */}
       {/* OPTIMIZATION: Reduced to 12 elements, will-change applied conditionally via CSS */}
-      <ul className="background" style={{ opacity: 0.5 }}>
+      <ul className="background" style={{ opacity: 0.8 }}>
         {Array.from({ length: SQUARE_COUNT }).map((_, i) => (
           <li key={i} />
         ))}
