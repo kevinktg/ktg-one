@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 // Ensure this path is correct based on your folder structure
 import { GeometricBackground } from "@/components/GeometricBackground";
@@ -17,7 +17,6 @@ export function PhilosophySection({ philosophyData }) {
   const sectionRef = useRef(null);
   const textRef = useRef(null);
   const quoteRefs = useRef([]);
-  const [hasPlayed, setHasPlayed] = useState(false);
 
   // Default WP Fallback Data
   const data = philosophyData || {
@@ -47,24 +46,7 @@ export function PhilosophySection({ philosophyData }) {
     ]
   };
 
-  // OPTIMIZATION: Check sessionStorage only on client side to prevent hydration mismatch
-  useEffect(() => {
-    const played = sessionStorage.getItem('philosophy-animated') === 'true';
-    if (played) {
-      setHasPlayed(true);
-    }
-  }, []);
-
   useGSAP(() => {
-    if (hasPlayed) {
-      // Skip animation - set final states immediately
-      if (textRef.current) gsap.set(textRef.current, { opacity: 1, y: 0 });
-      quoteRefs.current.forEach((quote) => {
-        if (quote) gsap.set(quote, { opacity: 1, x: 0 });
-      });
-      return;
-    }
-
     // 1. HEADER - Cinematic Reveal
     if (textRef.current) {
       gsap.fromTo(textRef.current,
@@ -100,11 +82,6 @@ export function PhilosophySection({ philosophyData }) {
               duration: 1.5,
               ease: "expo.out",
               overwrite: true,
-              onComplete: () => {
-                if (originalIndex === quoteRefs.current.length - 1) {
-                  sessionStorage.setItem('philosophy-animated', 'true');
-                }
-              }
             }
           );
         });

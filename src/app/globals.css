@@ -131,6 +131,11 @@
   100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
 }
 
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* MOVING BACKGROUND CLASSES
 */
 .background {
@@ -170,6 +175,15 @@
     animation: none;
     will-change: auto;
   }
+  
+  .animate-scroll {
+    animation: none;
+  }
+}
+
+/* Marquee scroll animation */
+.animate-scroll {
+  animation: scroll 30s linear infinite;
 }
 
 /* OPTIMIZATION: Reduced to 12 squares (from 21) for better performance */

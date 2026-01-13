@@ -141,6 +141,35 @@ export function BlogPreview({ posts = [] }) {
             </Link>
           </div>
         )}
+
+        {/* Marquee Banner Footer */}
+        <div className="mt-24 relative w-full overflow-hidden border-t border-white/10 pt-8 pb-8">
+          <div className="flex items-center gap-8 md:gap-12 whitespace-nowrap w-max">
+            <div 
+              className="flex items-center gap-6 md:gap-6 animate-scroll will-change-transform" 
+              style={{ 
+                gap: '24px',
+                justifyContent: 'flex-start',
+                verticalAlign: 'top'
+              }}
+            >
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="flex items-center gap-8 md:gap-12 shrink-0">
+                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Cognitive Architect</span>
+                  <span className="text-white/20">•</span>
+                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Top 0.01%</span>
+                  <span className="text-white/20">•</span>
+                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Context Sovereignty</span>
+                  <span className="text-white/20">•</span>
+                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Framework Verification</span>
+                  <span className="text-white/20">•</span>
+                  <span className="font-mono text-sm md:text-base text-white/70 uppercase tracking-wider">Arxiv-Ready Research</span>
+                  <span className="text-white/20">•</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
