@@ -109,10 +109,13 @@ export function PhilosophySection({ philosophyData }) {
         });
     });
 
+    // Refresh triggers to ensure correct positions after layout shifts
+    setTimeout(() => ScrollTrigger.refresh(), 500);
+
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-30">
 
       {/* Geometric Background Layer */}
       <div className="absolute inset-0 z-0">
