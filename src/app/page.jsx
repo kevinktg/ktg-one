@@ -6,7 +6,7 @@ import { ExpertiseTransition } from "@/components/ExpertiseTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
-import { ToolsSection } from "@/components/ToolsSection";
+import { HubEntry } from "@/components/HubEntry";
 import { BlogPreview } from "@/components/BlogPreview";
 import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
@@ -60,8 +60,8 @@ export default async function Home() {
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
         <ValidationSection />
 
-        {/* TOOLS / LABORATORY: Black Background (Grid) */}
-        <ToolsSection />
+        {/* HUB ENTRY: Call to Action for System Hub */}
+        <HubEntry />
 
         {/* PHILOSOPHY: Black Background (Parallax Quotes) */}
         <PhilosophySection />
