@@ -86,26 +86,6 @@ export async function getPosts(page = 1, perPage = 10) {
       return [];
     }
     
-    console.log(`✅ Successfully fetched ${data.length} posts from WordPress`);
-    
-    // Debug: Log first post structure if available
-    if (data.length > 0) {
-      console.log('📝 Sample post structure:', {
-        id: data[0].id,
-        title: data[0].title?.rendered || data[0].title,
-        slug: data[0].slug,
-        hasExcerpt: !!(data[0].excerpt?.rendered || data[0].excerpt),
-        hasEmbedded: !!data[0]._embedded,
-        hasFeaturedImage: !!getFeaturedImage(data[0]),
-        date: data[0].date,
-      });
-    } else {
-      console.warn('⚠️ WordPress API returned empty array. Check:');
-      console.warn('   - Are there published posts in WordPress?');
-      console.warn('   - Is the REST API enabled?');
-      console.warn('   - Are posts publicly accessible?');
-    }
-    
     return data;
   } catch (error) {
     if (error.name === 'AbortError') {
