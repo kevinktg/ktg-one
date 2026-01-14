@@ -49,7 +49,9 @@ export default async function Home() {
         <HeroTransition />
 
         {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
-        <ExpertiseSection />
+        <div id="main-content">
+          <ExpertiseSection />
+        </div>
 
         {/* TRANSITION: Wipe from expertise (white) to validation (black) */}
         <ExpertiseTransition />
