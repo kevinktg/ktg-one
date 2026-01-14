@@ -113,7 +113,7 @@ export function PhilosophySection({ philosophyData }) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-30">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-50">
 
       {/* Geometric Background Layer */}
       <div className="absolute inset-0 z-0">

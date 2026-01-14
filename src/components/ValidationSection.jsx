@@ -196,7 +196,7 @@ export function ValidationSection({ auditData }) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden bg-background z-20">
+    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden bg-background z-40">
 
       {/* SHUTTERS (White -> Black Swoop) */}
       {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
