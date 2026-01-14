@@ -130,11 +130,11 @@ export default async function BlogPage() {
                         </h2>
                         
                         <div className="text-white/40 text-sm mb-4 flex items-center gap-2">
-                          <time dateTime={post.date}>
+                          <time dateTime={post.date} className="drop-shadow-md">
                             {formatDate(post.date)}
                           </time>
-                          <span>•</span>
-                          <span>ai anthropology</span>
+                          <span className="drop-shadow-md">•</span>
+                          <span className="drop-shadow-md">ai anthropology</span>
                         </div>
 
                         <p className="text-white/70 leading-relaxed mb-4">
