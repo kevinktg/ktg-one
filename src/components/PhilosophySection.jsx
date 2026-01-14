@@ -5,8 +5,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 import Link from "next/link";
-// Ensure this path is correct based on your folder structure
-import { GeometricBackground } from "@/components/GeometricBackground";
 
 // Register ScrollTrigger if not already registered
 if (typeof window !== "undefined") {
@@ -112,12 +110,7 @@ export function PhilosophySection({ philosophyData }) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden">
-
-      {/* Geometric Background Layer */}
-      <div className="absolute inset-0 z-0">
-        <GeometricBackground />
-      </div>
+    <section ref={sectionRef} className="relative min-h-screen bg-transparent py-32 px-6 overflow-hidden">
 
       <div className="max-w-6xl mx-auto relative z-10">
 
