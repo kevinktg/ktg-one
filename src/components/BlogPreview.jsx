@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getFeaturedImage, formatDate } from "@/lib/wordpress";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,18 @@ export function BlogPreview({ posts = [] }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
   const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
+    }
+  };
 
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
@@ -82,12 +95,33 @@ export function BlogPreview({ posts = [] }) {
                 <h2 className="font-syne text-4xl md:text-6xl font-bold lowercase leading-none">blog</h2>
                 <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
              </div>
-             <Link
-              href="/blog"
-              className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
-            >
-              view all →
-            </Link>
+
+             <div className="flex items-center gap-6">
+                {/* Desktop Scroll Controls */}
+                <div className="hidden md:flex gap-3">
+                  <button
+                    onClick={scrollLeft}
+                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    aria-label="Scroll left"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    aria-label="Scroll right"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <Link
+                  href="/blog"
+                  className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+                >
+                  view all →
+                </Link>
+             </div>
           </div>
         </div>
 
