@@ -49,46 +49,44 @@ export function PhilosophySection({ philosophyData }) {
   useGSAP(() => {
     // 1. HEADER - Cinematic Reveal
     if (textRef.current) {
-      gsap.fromTo(textRef.current,
-        { y: 100, opacity: 0 },
-        {
-          y: 0,
+      // Set initial state explicitly via JS
+      gsap.set(textRef.current, { y: 100, opacity: 0 });
+
+      gsap.to(textRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 1.5,
+        ease: "expo.out",
+        scrollTrigger: {
+          trigger: textRef.current,
+          start: "top 80%",
+          once: true
+        }
+      });
+    }
+
+    // 2. QUOTES SLIDE-IN - Robust Loop Implementation
+    const quotes = quoteRefs.current.filter(q => q);
+    if (quotes.length > 0) {
+      quotes.forEach((quote, index) => {
+        const xVal = index % 2 === 0 ? -100 : 100;
+
+        // Set initial state explicitly
+        gsap.set(quote, { opacity: 0, x: xVal });
+
+        gsap.to(quote, {
           opacity: 1,
+          x: 0,
           duration: 1.5,
           ease: "expo.out",
           scrollTrigger: {
-            trigger: textRef.current,
-            start: "top 80%",
+            trigger: quote,
+            start: "top 85%",
             once: true
           }
-        }
-      );
-    }
-
-    // 2. QUOTES SLIDE-IN - Batching ScrollTriggers for Performance
-    ScrollTrigger.batch(quoteRefs.current.filter(q => q), {
-      onEnter: (batch) => {
-        batch.forEach((quote, i) => {
-          // Determine direction based on original index logic (we need the index relative to all quotes)
-          // Since we filter, we might lose exact index if some are null, but assuming they are valid:
-          const originalIndex = quoteRefs.current.indexOf(quote);
-          const xVal = originalIndex % 2 === 0 ? -100 : 100;
-
-          gsap.fromTo(quote,
-            { opacity: 0, x: xVal },
-            {
-              opacity: 1,
-              x: 0,
-              duration: 1.5,
-              ease: "expo.out",
-              overwrite: true,
-            }
-          );
         });
-      },
-      start: "top 85%",
-      once: true
-    });
+      });
+    }
 
     // 3. Parallax Effect (Separate Batch or Loop)
     // We can keep the scrub effect separate as it behaves differently (scrub vs trigger)
@@ -109,10 +107,13 @@ export function PhilosophySection({ philosophyData }) {
         });
     });
 
+    // Refresh triggers to ensure correct positions after layout shifts
+    setTimeout(() => ScrollTrigger.refresh(), 500);
+
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-screen bg-black py-32 px-6 overflow-hidden z-50">
 
       {/* Geometric Background Layer */}
       <div className="absolute inset-0 z-0">
@@ -122,7 +123,7 @@ export function PhilosophySection({ philosophyData }) {
       <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Main Statement */}
-        <div ref={textRef} className="mb-40 opacity-0 translate-y-[100px]">
+        <div ref={textRef} className="mb-40">
           <div className="grid md:grid-cols-2 gap-16 items-start">
 
             {/* Header */}
@@ -158,7 +159,7 @@ export function PhilosophySection({ philosophyData }) {
             <div
               key={index}
               ref={(el) => { quoteRefs.current[index] = el; }}
-              className={`relative group flex opacity-0 ${index % 2 !== 0 ? 'justify-end' : 'justify-start'}`}
+              className={`relative group flex ${index % 2 !== 0 ? 'justify-end' : 'justify-start'}`}
             >
               <div className="max-w-4xl relative">
                 {/* Visual Anchor Line */}

@@ -6,6 +6,7 @@ import { ExpertiseTransition } from "@/components/ExpertiseTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
+import { HubEntry } from "@/components/HubEntry";
 import { BlogPreview } from "@/components/BlogPreview";
 import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
@@ -49,13 +50,18 @@ export default async function Home() {
         <HeroTransition />
 
         {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
-        <ExpertiseSection />
+        <div id="main-content">
+          <ExpertiseSection />
+        </div>
 
         {/* TRANSITION: Wipe from expertise (white) to validation (black) */}
         <ExpertiseTransition />
 
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
         <ValidationSection />
+
+        {/* HUB ENTRY: Call to Action for System Hub */}
+        <HubEntry />
 
         {/* PHILOSOPHY: Black Background (Parallax Quotes) */}
         <PhilosophySection />
