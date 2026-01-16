@@ -95,7 +95,8 @@ export function BlogPreview({ posts = [] }) {
         {/* hide-scrollbar utility is often needed, or just standard styling */}
         <div
           ref={scrollContainerRef}
-          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory"
+          data-lenis-prevent="true"
+          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {posts.map((post, index) => {
@@ -111,7 +112,7 @@ export function BlogPreview({ posts = [] }) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="blog-post group relative flex-none w-[85vw] md:w-[400px] snap-center"
+                className="blog-post group relative flex-none w-[75vw] md:w-[400px] snap-center"
               >
                 <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-colors duration-300 bg-black/80 backdrop-blur-sm rounded-xl overflow-hidden">
                   {featuredImage && (
