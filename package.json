@@ -34,7 +34,7 @@
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
-    "zustand": "^5.0.10"
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@swc/cli": "^0.7.9",
