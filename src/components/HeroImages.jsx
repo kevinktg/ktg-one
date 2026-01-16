@@ -126,6 +126,9 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
   const { viewport } = useThree()
   const [textures, setTextures] = useState({ top: null, bottom: null })
   
+  // OPTIMIZATION: Reusable vector to avoid GC in useFrame
+  const mouseTarget = useRef(new Vector2(0, 0))
+
   useEffect(() => {
     const loader = new TextureLoader()
     Promise.all([
@@ -139,19 +142,26 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       if (onLoaded) onLoaded();
     })
   }, [topImagePath, bottomImagePath, onLoaded])
+
+  // OPTIMIZATION: Update uniforms only when textures change to avoid redundant assignment in useFrame
+  useEffect(() => {
+      if (materialRef.current) {
+          if (textures.top) materialRef.current.uniforms.topTex.value = textures.top;
+          if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom;
+      }
+  }, [textures]);
   
   useFrame((state) => {
     if (!materialRef.current) return
     const targetX = (state.pointer.x + 1) / 2
     const targetY = (state.pointer.y + 1) / 2
 
-    // Update uniforms
-    materialRef.current.uniforms.mouse.value.lerp(new Vector2(targetX, targetY), 0.1)
+    // OPTIMIZATION: Reuse vector instance to avoid garbage collection
+    mouseTarget.current.set(targetX, targetY);
+    materialRef.current.uniforms.mouse.value.lerp(mouseTarget.current, 0.1)
+
     materialRef.current.uniforms.aspect.value = viewport.aspect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
-    
-    if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-    if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
   })
 
   return (
