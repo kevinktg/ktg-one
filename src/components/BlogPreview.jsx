@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { getFeaturedImage, formatDate } from "@/lib/wordpress";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,18 @@ export function BlogPreview({ posts = [] }) {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
   const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
+    }
+  };
 
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
@@ -70,24 +83,45 @@ export function BlogPreview({ posts = [] }) {
     <section
       ref={sectionRef}
       data-blog-section
-      className="relative h-screen max-h-screen flex flex-col justify-start md:justify-center pt-24 md:pt-0 bg-black text-white overflow-hidden"
+      className="relative h-screen max-h-screen flex flex-col justify-center bg-black text-white overflow-hidden"
       suppressHydrationWarning
     >
-      <div className="flex-1 flex flex-col justify-start md:justify-center w-full max-w-[100vw]">
+      <div className="flex-1 flex flex-col justify-center w-full max-w-[100vw]">
         
         {/* Header - Fixed Padding */}
-        <div className="px-6 md:px-12 mb-6 md:mb-12 shrink-0">
+        <div className="px-6 md:px-12 mb-8 md:mb-12 shrink-0">
           <div className="max-w-7xl mx-auto w-full flex justify-between items-end">
              <div>
-                <h2 className="font-syne text-3xl md:text-6xl font-bold lowercase leading-none">blog</h2>
+                <h2 className="font-syne text-4xl md:text-6xl font-bold lowercase leading-none">blog</h2>
                 <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
              </div>
-             <Link
-              href="/blog"
-              className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
-            >
-              view all →
-            </Link>
+
+             <div className="flex items-center gap-6">
+                {/* Desktop Scroll Controls */}
+                <div className="hidden md:flex gap-3">
+                  <button
+                    onClick={scrollLeft}
+                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    aria-label="Scroll left"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    aria-label="Scroll right"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <Link
+                  href="/blog"
+                  className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+                >
+                  view all →
+                </Link>
+             </div>
           </div>
         </div>
 
@@ -95,8 +129,8 @@ export function BlogPreview({ posts = [] }) {
         {/* hide-scrollbar utility is often needed, or just standard styling */}
         <div
           ref={scrollContainerRef}
-          data-lenis-prevent
-          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-4 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
+          data-lenis-prevent="true"
+          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {posts.map((post, index) => {
@@ -122,7 +156,7 @@ export function BlogPreview({ posts = [] }) {
                         alt={title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        sizes="(max-width: 768px) 85vw, 400px"
+                        sizes="(max-width: 768px) 75vw, 400px"
                         loading={index < 3 ? "eager" : "lazy"}
                       />
                       {/* Overlay gradient for text readability if needed */}

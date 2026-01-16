@@ -140,18 +140,13 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     })
   }, [topImagePath, bottomImagePath, onLoaded])
   
-  const targetRef = useRef(new Vector2(0.5, 0.5))
-
   useFrame((state) => {
     if (!materialRef.current) return
     const targetX = (state.pointer.x + 1) / 2
     const targetY = (state.pointer.y + 1) / 2
 
-    // Update target ref instead of creating new Vector2 every frame
-    targetRef.current.set(targetX, targetY)
-
     // Update uniforms
-    materialRef.current.uniforms.mouse.value.lerp(targetRef.current, 0.1)
+    materialRef.current.uniforms.mouse.value.lerp(new Vector2(targetX, targetY), 0.1)
     materialRef.current.uniforms.aspect.value = viewport.aspect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
     
