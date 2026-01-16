@@ -83,16 +83,16 @@ export function BlogPreview({ posts = [] }) {
     <section
       ref={sectionRef}
       data-blog-section
-      className="relative h-screen max-h-screen flex flex-col justify-start md:justify-center pt-24 md:pt-0 bg-black text-white overflow-hidden"
+      className="relative h-screen max-h-screen flex flex-col justify-center bg-black text-white overflow-hidden"
       suppressHydrationWarning
     >
-      <div className="flex-1 flex flex-col justify-start md:justify-center w-full max-w-[100vw]">
+      <div className="flex-1 flex flex-col justify-center w-full max-w-[100vw]">
         
         {/* Header - Fixed Padding */}
-        <div className="px-6 md:px-12 mb-6 md:mb-12 shrink-0">
+        <div className="px-6 md:px-12 mb-8 md:mb-12 shrink-0">
           <div className="max-w-7xl mx-auto w-full flex justify-between items-end">
              <div>
-                <h2 className="font-syne text-3xl md:text-6xl font-bold lowercase leading-none">blog</h2>
+                <h2 className="font-syne text-4xl md:text-6xl font-bold lowercase leading-none">blog</h2>
                 <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
              </div>
 
@@ -129,8 +129,8 @@ export function BlogPreview({ posts = [] }) {
         {/* hide-scrollbar utility is often needed, or just standard styling */}
         <div
           ref={scrollContainerRef}
-          data-lenis-prevent
-          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-4 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
+          data-lenis-prevent="true"
+          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {posts.map((post, index) => {
