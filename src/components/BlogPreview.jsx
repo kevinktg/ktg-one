@@ -156,7 +156,7 @@ export function BlogPreview({ posts = [] }) {
                         alt={title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        sizes="(max-width: 768px) 85vw, 400px"
+                        sizes="(max-width: 768px) 75vw, 400px"
                         loading={index < 3 ? "eager" : "lazy"}
                       />
                       {/* Overlay gradient for text readability if needed */}
