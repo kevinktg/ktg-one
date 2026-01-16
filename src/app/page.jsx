@@ -6,6 +6,7 @@ import { ExpertiseTransition } from "@/components/ExpertiseTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
+import { HubEntry } from "@/components/HubEntry";
 import { BlogPreview } from "@/components/BlogPreview";
 import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
@@ -21,18 +22,7 @@ export default async function Home() {
   try {
     // Attempt to fetch posts. If WP is down, it won't crash the whole site.
     blogPosts = await getPosts(1, 6);
-    console.log(`[Home] Fetched ${blogPosts?.length || 0} posts from WordPress`);
-    
-    // Debug: Log if posts array is empty
-    if (!blogPosts || blogPosts.length === 0) {
-      console.warn("[Home] No posts returned from WordPress API. Check:");
-      console.warn("1. WordPress URL:", process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://lawngreen-mallard-558077.hostingersite.com');
-      console.warn("2. WordPress REST API is enabled");
-      console.warn("3. Posts exist and are published");
-    }
   } catch (error) {
-    console.error("[Home] Failed to fetch posts:", error);
-    console.error("[Home] Error details:", error.message);
     // Continue - BlogPreview will show loading state
   }
 
@@ -60,13 +50,18 @@ export default async function Home() {
         <HeroTransition />
 
         {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
-        <ExpertiseSection />
+        <div id="main-content">
+          <ExpertiseSection />
+        </div>
 
         {/* TRANSITION: Wipe from expertise (white) to validation (black) */}
         <ExpertiseTransition />
 
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
         <ValidationSection />
+
+        {/* HUB ENTRY: Call to Action for System Hub */}
+        <HubEntry />
 
         {/* PHILOSOPHY: Black Background (Parallax Quotes) */}
         <PhilosophySection />

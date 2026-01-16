@@ -90,12 +90,16 @@ export function ValidationSection({ auditData }) {
         }
       });
 
-      // PHASE 2: TEXT REVEAL ANIMATIONS - Start after shutters
+      // PHASE 2: TEXT REVEAL ANIMATIONS - Robust implementation
       const textElements = gsap.utils.toArray(".digital-text");
+
+      // Set initial state explicitly
+      gsap.set(textElements, { opacity: 0, x: 30 });
+
       textElements.forEach((text, index) => {
-        gsap.from(text, {
-          opacity: 0,
-          x: 30,
+        gsap.to(text, {
+          opacity: 1,
+          x: 0,
           duration: 0.8,
           ease: "power2.out",
           delay: 0.8 + (index * 0.1), // Stagger after shutter animation
@@ -121,11 +125,15 @@ export function ValidationSection({ auditData }) {
       const contentWidth = scrollWidth - clientWidth;
       
       if (contentWidth > 0) {
+        // FORCE MINIMUM SCROLL DISTANCE
+        // Ensures the scroll doesn't happen "lightning fast" even if width calc is small
+        const scrollDistance = Math.max(contentWidth, 1500);
+
         // Pin the entire section - section stays fixed while content scrolls
         pinTrigger = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${contentWidth + window.innerHeight}`,
+          end: () => `+=${scrollDistance + window.innerHeight}`,
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
@@ -135,12 +143,12 @@ export function ValidationSection({ auditData }) {
         // Animate horizontal scroll of content inside card
         // This is tied to the section's scroll progress
         scrollTween = gsap.to(horizontalScrollRef.current, {
-          x: -contentWidth,
+          x: -contentWidth, // We still only scroll the actual width
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
-            end: () => `+=${contentWidth + window.innerHeight}`,
+            end: () => `+=${scrollDistance + window.innerHeight}`,
             scrub: 1,
             invalidateOnRefresh: true,
           }
@@ -188,7 +196,7 @@ export function ValidationSection({ auditData }) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden bg-background">
+    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden bg-background z-40">
 
       {/* SHUTTERS (White -> Black Swoop) */}
       {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
