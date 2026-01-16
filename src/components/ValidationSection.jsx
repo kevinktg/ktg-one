@@ -9,8 +9,15 @@ import { cn } from "@/lib/utils";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * ValidationSection - Graphite.com style stacking cards
- * Cards pin and stack as user scrolls, creating depth effect
+ * Render a Graphite-style stacking validation section whose cards pin and stack as the user scrolls.
+ *
+ * Renders a multi-card audit display with a one-time entrance shutter animation (session-scoped)
+ * and per-card ScrollTrigger behaviors that pin, stack, and apply subtle scale/opacity transitions.
+ *
+ * @param {Object} [auditData] - Optional override for the card content. If omitted, a built-in default
+ *   object supplying `intro`, `audit`, `percentile`, `evidence`, and `verdict` sections is used.
+ *   Each section should contain the fields referenced by the built-in default (titles, descriptions,
+ *   ids, quotes, checklist entries, and status text).
  */
 export function ValidationSection({ auditData }) {
   const sectionRef = useRef(null);
