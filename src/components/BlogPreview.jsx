@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getFeaturedImage, formatDate } from "@/lib/wordpress";
@@ -19,6 +19,38 @@ export function BlogPreview({ posts = [] }) {
   const hasPlayed = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return sessionStorage.getItem('blog-animated') === 'true';
+  }, []);
+
+  // Map vertical wheel scroll to horizontal scroll
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      // Only capture vertical scroll (deltaY)
+      if (e.deltaY === 0) return;
+
+      // Check boundaries
+      const isAtLeft = container.scrollLeft === 0;
+      const isAtRight = Math.abs(container.scrollWidth - container.scrollLeft - container.clientWidth) < 2;
+
+      // Allow default behavior (page scroll) when at boundaries
+      // If scrolling UP (deltaY < 0) and at LEFT, allow page scroll up
+      if (e.deltaY < 0 && isAtLeft) return;
+      // If scrolling DOWN (deltaY > 0) and at RIGHT, allow page scroll down
+      if (e.deltaY > 0 && isAtRight) return;
+
+      // Otherwise, hijack scroll for horizontal movement
+      e.preventDefault();
+      container.scrollLeft += e.deltaY;
+    };
+
+    // Add passive: false to allow preventDefault
+    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   useGSAP(() => {
