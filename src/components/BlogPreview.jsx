@@ -26,13 +26,16 @@ export function BlogPreview({ posts = [] }) {
     const container = scrollContainerRef.current;
     if (!container) return;
 
+    // Tolerance for floating-point precision errors in scroll calculations
+    const SCROLL_BOUNDARY_TOLERANCE = 2;
+
     const handleWheel = (e) => {
       // Only capture vertical scroll (deltaY)
       if (e.deltaY === 0) return;
 
       // Check boundaries
       const isAtLeft = container.scrollLeft === 0;
-      const isAtRight = Math.abs(container.scrollWidth - container.scrollLeft - container.clientWidth) < 2;
+      const isAtRight = Math.abs(container.scrollWidth - container.scrollLeft - container.clientWidth) < SCROLL_BOUNDARY_TOLERANCE;
 
       // Allow default behavior (page scroll) when at boundaries
       // If scrolling UP (deltaY < 0) and at LEFT, allow page scroll up
