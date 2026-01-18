@@ -39,7 +39,9 @@ export function BlogPreview({ posts = [] }) {
 
       // Determine if we are at boundaries
       const atStart = el.scrollLeft === 0;
-      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < 2;
+      // Tolerance for floating-point precision errors in scroll calculations
+      const SCROLL_BOUNDARY_TOLERANCE = 2;
+      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < SCROLL_BOUNDARY_TOLERANCE;
 
       if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) {
         // At boundary and trying to go further out -> Allow vertical scroll
