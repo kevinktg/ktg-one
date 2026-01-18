@@ -127,11 +127,11 @@ export function PhilosophySection({ philosophyData }) {
           <div className="grid md:grid-cols-2 gap-16 items-start">
 
             {/* Header */}
-            <div>
+            <div className="mb-8 md:mb-0">
               <div className="text-xs md:text-sm text-white/40 mb-8 tracking-[0.2em] border-l border-white/20 pl-4">
                 Philosophy
               </div>
-              <h2 className="text-5xl md:text-8xl font-syne font-bold lowercase leading-[0.85] text-white">
+              <h2 className="text-4xl md:text-8xl font-syne font-bold lowercase leading-[0.9] md:leading-[0.85] text-white">
                 <span className="block">{data.heading.line1}</span>
                 <span className="block text-white/40">{data.heading.line2}</span>
                 <span className="block">{data.heading.line3}</span>
