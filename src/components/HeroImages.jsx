@@ -146,7 +146,8 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     const targetY = (state.pointer.y + 1) / 2
 
     // Update uniforms
-    materialRef.current.uniforms.mouse.value.lerp(new Vector2(targetX, targetY), 0.1)
+    materialRef.current.uniforms.mouse.value.x += (targetX - materialRef.current.uniforms.mouse.value.x) * 0.1
+    materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
     materialRef.current.uniforms.aspect.value = viewport.aspect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
     
