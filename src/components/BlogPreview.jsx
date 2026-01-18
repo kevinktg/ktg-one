@@ -12,8 +12,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function BlogPreview({ posts = [] }) {
   const sectionRef = useRef(null);
-  const containerRef = useRef(null);
-  const scrollContainerRef = useRef(null);
 
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
@@ -22,29 +20,29 @@ export function BlogPreview({ posts = [] }) {
   }, []);
 
   useGSAP(() => {
-    // Set initial state - posts should be visible
-    gsap.set(".blog-post", { opacity: 1, x: 0 });
+    // Set initial state
+    gsap.set(".blog-post", { opacity: 1, y: 0 });
     
     if (hasPlayed) {
       return;
     }
 
-    // Stagger animation for blog posts (Fade in from right)
+    // Stagger animation for blog posts (Fade up)
     const blogPosts = gsap.utils.toArray(".blog-post");
     
     if (blogPosts.length > 0) {
       // Start hidden, animate in on scroll
-      gsap.set(blogPosts, { opacity: 0, x: 50 });
+      gsap.set(blogPosts, { opacity: 0, y: 50 });
       
       gsap.to(blogPosts, {
         opacity: 1,
-        x: 0,
+        y: 0,
         duration: 0.8,
         stagger: 0.1,
         ease: "power2.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 70%", // Start earlier as it's now horizontal
+          start: "top 70%",
           toggleActions: "play none none reverse",
           onComplete: () => {
             sessionStorage.setItem('blog-animated', 'true');
@@ -57,8 +55,8 @@ export function BlogPreview({ posts = [] }) {
   // Default fallback message
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} data-blog-section className="relative h-screen flex flex-col justify-center px-6 bg-black text-white overflow-hidden" suppressHydrationWarning>
-        <div ref={containerRef} className="max-w-7xl mx-auto w-full">
+      <section ref={sectionRef} data-blog-section className="relative min-h-screen flex flex-col justify-center px-6 bg-black text-white overflow-hidden" suppressHydrationWarning>
+        <div className="max-w-7xl mx-auto w-full">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
           <p className="text-muted-foreground">No posts available at the moment.</p>
         </div>
@@ -70,35 +68,29 @@ export function BlogPreview({ posts = [] }) {
     <section
       ref={sectionRef}
       data-blog-section
-      className="relative h-screen max-h-screen flex flex-col justify-center bg-black text-white overflow-hidden"
+      className="relative min-h-screen py-24 flex flex-col justify-center bg-black text-white overflow-hidden"
       suppressHydrationWarning
     >
-      <div className="flex-1 flex flex-col justify-center w-full max-w-[100vw]">
+      <div className="max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col h-full">
         
-        {/* Header - Fixed Padding */}
-        <div className="px-6 md:px-12 mb-8 md:mb-12 shrink-0">
-          <div className="max-w-7xl mx-auto w-full flex justify-between items-end">
-             <div>
-                <h2 className="font-syne text-4xl md:text-6xl font-bold lowercase leading-none">blog</h2>
-                <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
-             </div>
-             <Link
+        {/* Header */}
+        <div className="flex justify-between items-end mb-12">
+           <div>
+              <h2 className="font-syne text-4xl md:text-6xl font-bold lowercase leading-none">blog</h2>
+              <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
+           </div>
+
+           <Link
               href="/blog"
-              className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+              className="text-xs md:text-sm text-white hover:text-white/70 transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
             >
               view all →
-            </Link>
-          </div>
+           </Link>
         </div>
 
-        {/* Horizontal Scroll Container */}
-        {/* hide-scrollbar utility is often needed, or just standard styling */}
-        <div
-          ref={scrollContainerRef}
-          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {posts.map((post, index) => {
+        {/* Grid Container - 6 cards visible at once */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pb-12">
+          {posts.slice(0, 6).map((post, index) => {
             if (!post || !post.title) return null;
             
             const featuredImage = getFeaturedImage(post);
@@ -111,7 +103,7 @@ export function BlogPreview({ posts = [] }) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="blog-post group relative flex-none w-[85vw] md:w-[400px] snap-center"
+                className="blog-post group flex flex-col w-full"
               >
                 <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-colors duration-300 bg-black/80 backdrop-blur-sm rounded-xl overflow-hidden">
                   {featuredImage && (
@@ -121,7 +113,7 @@ export function BlogPreview({ posts = [] }) {
                         alt={title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        sizes="(max-width: 768px) 85vw, 400px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         loading={index < 3 ? "eager" : "lazy"}
                       />
                       {/* Overlay gradient for text readability if needed */}
@@ -142,7 +134,7 @@ export function BlogPreview({ posts = [] }) {
                         <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 transition-colors" />
                     </div>
                     
-                    <h3 className="font-syne text-xl md:text-2xl font-bold mb-3 lowercase group-hover:text-white/80 transition-colors leading-tight">
+                    <h3 className="font-syne text-xl font-bold mb-3 lowercase group-hover:text-white/80 transition-colors leading-tight">
                       {title}
                     </h3>
                     
@@ -163,31 +155,8 @@ export function BlogPreview({ posts = [] }) {
               </Link>
             );
           })}
-
-           {/* "View All" Card for Mobile/End of List */}
-           <Link
-              href="/blog"
-              className="blog-post flex-none w-[200px] md:w-[250px] border border-dashed border-white/10 hover:border-white/30 rounded-xl flex flex-col items-center justify-center gap-4 group transition-colors snap-center"
-           >
-              <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                →
-              </div>
-              <span className="text-sm text-white/50 tracking-widest uppercase">View Archive</span>
-           </Link>
-
-           {/* Spacer for right padding */}
-           <div className="w-6 shrink-0" />
         </div>
 
-        {/* Mobile View All Link (if not using card) */}
-        <div className="mt-8 text-center md:hidden shrink-0 pb-8">
-            <Link
-              href="/blog"
-              className="inline-block text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white/30"
-            >
-              view all posts →
-            </Link>
-        </div>
       </div>
 
        {/* Marquee Banner Footer - Absolute bottom to ensure it sticks */}

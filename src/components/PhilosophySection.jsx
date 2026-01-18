@@ -15,7 +15,6 @@ if (typeof window !== "undefined") {
 
 export function PhilosophySection({ philosophyData }) {
   const sectionRef = useRef(null);
-  const textRef = useRef(null);
   const quoteRefs = useRef([]);
 
   // Default WP Fallback Data
@@ -47,21 +46,23 @@ export function PhilosophySection({ philosophyData }) {
   };
 
   useGSAP(() => {
-    // 1. HEADER - Cinematic Reveal
-    if (textRef.current) {
-      // Set initial state explicitly via JS
-      gsap.set(textRef.current, { y: 100, opacity: 0 });
+    // 1. HEADER & TEXT - Staggered Reveal
+    const animElements = gsap.utils.toArray(".philosophy-anim");
+    if (animElements.length > 0) {
+      gsap.set(animElements, { y: 50, opacity: 0 });
 
-      gsap.to(textRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1.5,
-        ease: "expo.out",
-        scrollTrigger: {
-          trigger: textRef.current,
-          start: "top 80%",
-          once: true
-        }
+      ScrollTrigger.batch(animElements, {
+        onEnter: (batch) => {
+          gsap.to(batch, {
+            opacity: 1,
+            y: 0,
+            stagger: 0.15,
+            duration: 1.2,
+            ease: "power3.out"
+          });
+        },
+        start: "top 85%",
+        once: true
       });
     }
 
@@ -123,30 +124,30 @@ export function PhilosophySection({ philosophyData }) {
       <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Main Statement */}
-        <div ref={textRef} className="mb-40">
-          <div className="grid md:grid-cols-2 gap-16 items-start">
+        <div className="mb-40">
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
 
             {/* Header */}
-            <div>
-              <div className="text-xs md:text-sm text-white/40 mb-8 tracking-[0.2em] border-l border-white/20 pl-4">
+            <div className="mb-8 lg:mb-0">
+              <div className="philosophy-anim text-xs md:text-sm text-white/40 mb-8 tracking-[0.2em] border-l border-white/20 pl-4">
                 Philosophy
               </div>
-              <h2 className="text-5xl md:text-8xl font-syne font-bold lowercase leading-[0.85] text-white">
-                <span className="block">{data.heading.line1}</span>
-                <span className="block text-white/40">{data.heading.line2}</span>
-                <span className="block">{data.heading.line3}</span>
+              <h2 className="text-4xl md:text-6xl lg:text-8xl font-syne font-bold lowercase leading-[0.9] md:leading-[0.85] text-white">
+                <span className="philosophy-anim block">{data.heading.line1}</span>
+                <span className="philosophy-anim block text-white/40">{data.heading.line2}</span>
+                <span className="philosophy-anim block">{data.heading.line3}</span>
               </h2>
             </div>
 
             {/* Description Text */}
             <div className="space-y-10 text-white/60 text-lg md:text-xl font-light pt-4">
-              <p className="leading-relaxed">
+              <p className="philosophy-anim leading-relaxed">
                 {data.description[0]}
               </p>
-              <p className="leading-relaxed">
+              <p className="philosophy-anim leading-relaxed">
                 {data.description[1]}
               </p>
-              <p className="text-sm text-white/80 border-l border-white/30 pl-6 py-2 tracking-wide leading-relaxed">
+              <p className="philosophy-anim text-sm text-white/80 border-l border-white/30 pl-6 py-2 tracking-wide leading-relaxed">
                 {data.description[2]}
               </p>
             </div>
@@ -197,7 +198,7 @@ export function PhilosophySection({ philosophyData }) {
           <div className="pt-8">
             <Link
               href="/blog"
-              className="text-xs text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest"
+              className="text-xs text-white hover:text-white/70 transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest"
             >
               read insights
             </Link>

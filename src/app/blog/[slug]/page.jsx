@@ -112,7 +112,7 @@ export default async function BlogPostPage({ params }) {
           {/* Back Link */}
           <Link
             href="/blog"
-            className="group inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-12 text-sm tracking-widest"
+            className="group inline-flex items-center gap-2 text-white hover:text-white/70 transition-colors mb-12 text-sm tracking-widest"
           >
             <span className="group-hover:-translate-x-1 transition-transform">←</span> 
             back to blog
@@ -173,13 +173,13 @@ export default async function BlogPostPage({ params }) {
             <div className="flex justify-between items-center">
               <Link
                 href="/blog"
-                className="text-white/40 hover:text-white transition-colors text-sm"
+                className="text-white hover:text-white/70 transition-colors text-sm"
               >
                 view all posts
               </Link>
               <Link
                  href="/"
-                 className="text-white/40 hover:text-white transition-colors text-sm"
+                 className="text-white hover:text-white/70 transition-colors text-sm"
               >
                  home
               </Link>
