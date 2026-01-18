@@ -3,10 +3,10 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getFeaturedImage, formatDate } from "@/lib/wordpress";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -16,17 +16,44 @@ export function BlogPreview({ posts = [] }) {
   const containerRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
-  const scrollLeft = () => {
+  const scroll = (direction) => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
+      const scrollAmount = window.innerWidth < 768 ? 300 : 400; // Approximate card width
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
     }
   };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
-    }
-  };
+  // Map vertical wheel scroll to horizontal scroll
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const onWheel = (e) => {
+      if (e.deltaY === 0) return;
+
+      const isVertical = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      if (!isVertical) return;
+
+      // Determine if we are at boundaries
+      const atStart = el.scrollLeft === 0;
+      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < 2;
+
+      if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) {
+        // At boundary and trying to go further out -> Allow vertical scroll
+        return;
+      }
+
+      // Otherwise, hijack vertical scroll for horizontal movement
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
@@ -96,22 +123,22 @@ export function BlogPreview({ posts = [] }) {
                 <p className="text-white/40 mt-2 text-sm md:text-base">recent_transmissions</p>
              </div>
 
-             <div className="flex items-center gap-6">
-                {/* Desktop Scroll Controls */}
-                <div className="hidden md:flex gap-3">
+             <div className="hidden md:flex items-center gap-8">
+                {/* Navigation Buttons */}
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={scrollLeft}
-                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    onClick={() => scroll('left')}
+                    className="p-3 rounded-full border border-white/10 text-white/50 hover:text-white hover:bg-white/5 hover:border-white/30 transition-all active:scale-95"
                     aria-label="Scroll left"
                   >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={scrollRight}
-                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-white hover:bg-white/10 transition-all active:scale-95"
+                    onClick={() => scroll('right')}
+                    className="p-3 rounded-full border border-white/10 text-white/50 hover:text-white hover:bg-white/5 hover:border-white/30 transition-all active:scale-95"
                     aria-label="Scroll right"
                   >
-                    <ArrowRight className="w-4 h-4" />
+                    <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
 
