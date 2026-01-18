@@ -11,15 +11,8 @@ def verify_blog_and_hub():
             page.goto("http://localhost:3000", timeout=60000)
             page.wait_for_load_state("networkidle")
 
-            # 1. Verify HubEntry is GONE
-            print("Checking for HubEntry...")
-            # We look for text that was in HubEntry, e.g., "System Hub" or specific class if known.
-            # Based on memory, it might have had "System Hub" text.
-            # Or we can check if the element with text "Hub" is gone.
-            # Better: Check that the section after ValidationSection is PhilosophySection.
-
-            # Let's take a screenshot of the whole page to inspect manually
-            print("Taking screenshot...")
+            # Capture a screenshot of the home page for manual visual inspection.
+            print("Capturing home page screenshot for manual verification...")
             page.screenshot(path="verification/home_page.png", full_page=True)
 
             # 2. Verify Blog Section Exists
