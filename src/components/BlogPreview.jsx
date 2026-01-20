@@ -26,36 +26,6 @@ export function BlogPreview({ posts = [] }) {
     }
   };
 
-  // Map vertical wheel scroll to horizontal scroll
-  useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const onWheel = (e) => {
-      if (e.deltaY === 0) return;
-
-      const isVertical = Math.abs(e.deltaY) > Math.abs(e.deltaX);
-      if (!isVertical) return;
-
-      // Determine if we are at boundaries
-      const atStart = el.scrollLeft === 0;
-      // Tolerance for floating-point precision errors in scroll calculations
-      const SCROLL_BOUNDARY_TOLERANCE = 2;
-      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < SCROLL_BOUNDARY_TOLERANCE;
-
-      if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) {
-        // At boundary and trying to go further out -> Allow vertical scroll
-        return;
-      }
-
-      // Otherwise, hijack vertical scroll for horizontal movement
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
 
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
@@ -65,37 +35,37 @@ export function BlogPreview({ posts = [] }) {
 
   // Map vertical wheel scroll to horizontal scroll
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
 
     // Tolerance for floating-point precision errors in scroll calculations
     const SCROLL_BOUNDARY_TOLERANCE = 2;
 
-    const handleWheel = (e) => {
+    const onWheel = (e) => {
       // Only capture vertical scroll (deltaY)
       if (e.deltaY === 0) return;
 
+      // Check if it's primarily a vertical scroll intent
+      const isVertical = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      if (!isVertical) return;
+
       // Check boundaries
-      const isAtLeft = container.scrollLeft === 0;
-      const isAtRight = Math.abs(container.scrollWidth - container.scrollLeft - container.clientWidth) < SCROLL_BOUNDARY_TOLERANCE;
+      const atStart = el.scrollLeft === 0;
+      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < SCROLL_BOUNDARY_TOLERANCE;
 
       // Allow default behavior (page scroll) when at boundaries
-      // If scrolling UP (deltaY < 0) and at LEFT, allow page scroll up
-      if (e.deltaY < 0 && isAtLeft) return;
-      // If scrolling DOWN (deltaY > 0) and at RIGHT, allow page scroll down
-      if (e.deltaY > 0 && isAtRight) return;
+      // If scrolling UP (deltaY < 0) and at START (left), allow page scroll up
+      if (e.deltaY < 0 && atStart) return;
+      // If scrolling DOWN (deltaY > 0) and at END (right), allow page scroll down
+      if (e.deltaY > 0 && atEnd) return;
 
-      // Otherwise, hijack scroll for horizontal movement
+      // Otherwise, hijack vertical scroll for horizontal movement
       e.preventDefault();
-      container.scrollLeft += e.deltaY;
+      el.scrollLeft += e.deltaY;
     };
 
-    // Add passive: false to allow preventDefault
-    container.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
   useGSAP(() => {
