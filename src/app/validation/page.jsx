@@ -1,6 +1,4 @@
-import { Header } from "@/components/Header";
 import { ValidationSection } from "@/components/ValidationSection";
-import { Footer } from "@/components/Footer";
 
 // OPTIMIZATION: SEO Metadata for the dedicated Validation page
 export const metadata = {
@@ -18,14 +16,12 @@ export default function ValidationPage() {
   return (
     // OPTIMIZATION: 'flex flex-col min-h-screen' ensures footer hits bottom
     <div className="flex flex-col min-h-screen relative w-full bg-transparent" suppressHydrationWarning>
-      <Header />
 
       {/* OPTIMIZATION: Added 'pt-20' so content starts below the fixed header */}
       <main className="flex-1 w-full pt-20" suppressHydrationWarning>
         <ValidationSection />
       </main>
 
-      <Footer />
     </div>
   );
 }

@@ -63,41 +63,6 @@ export function BlogPreview({ posts = [] }) {
     return sessionStorage.getItem('blog-animated') === 'true';
   }, []);
 
-  // Map vertical wheel scroll to horizontal scroll
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // Tolerance for floating-point precision errors in scroll calculations
-    const SCROLL_BOUNDARY_TOLERANCE = 2;
-
-    const handleWheel = (e) => {
-      // Only capture vertical scroll (deltaY)
-      if (e.deltaY === 0) return;
-
-      // Check boundaries
-      const isAtLeft = container.scrollLeft === 0;
-      const isAtRight = Math.abs(container.scrollWidth - container.scrollLeft - container.clientWidth) < SCROLL_BOUNDARY_TOLERANCE;
-
-      // Allow default behavior (page scroll) when at boundaries
-      // If scrolling UP (deltaY < 0) and at LEFT, allow page scroll up
-      if (e.deltaY < 0 && isAtLeft) return;
-      // If scrolling DOWN (deltaY > 0) and at RIGHT, allow page scroll down
-      if (e.deltaY > 0 && isAtRight) return;
-
-      // Otherwise, hijack scroll for horizontal movement
-      e.preventDefault();
-      container.scrollLeft += e.deltaY;
-    };
-
-    // Add passive: false to allow preventDefault
-    container.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
-
   useGSAP(() => {
     // Set initial state - posts should be visible
     gsap.set(".blog-post", { opacity: 1, x: 0 });
@@ -194,7 +159,7 @@ export function BlogPreview({ posts = [] }) {
         <div
           ref={scrollContainerRef}
           data-lenis-prevent="true"
-          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-pan-x"
+          className="w-full overflow-x-auto pb-8 px-6 md:px-12 flex gap-6 md:gap-8 items-stretch shrink-0 scrollbar-hide snap-x snap-mandatory touch-auto"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {posts.map((post, index) => {

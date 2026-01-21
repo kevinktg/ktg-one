@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getPosts, formatDate, getFeaturedImage } from "@/lib/wordpress";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 
 // OPTIMIZATION: 
 // Switch from 'force-dynamic' to ISR (60 seconds).
@@ -62,13 +60,13 @@ export default async function BlogPage() {
 
   return (
     <div className="flex flex-col min-h-screen relative w-full bg-transparent">
-      <Header />
       
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
       />
 
+      {/* ADDED PADDING: pt-32 to clear fixed header from Layout */}
       <main className="flex-1 pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto">
           
@@ -154,7 +152,6 @@ export default async function BlogPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }
