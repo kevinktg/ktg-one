@@ -13,6 +13,9 @@ const TECH_GRID_STYLE = {
 // Selected elements with best visual distribution and timing
 const SQUARE_COUNT = 12
 
+// OPTIMIZATION: Generate array once outside component to prevent allocation on every render
+const SQUARES = Array.from({ length: SQUARE_COUNT })
+
 // OPTIMIZATION: Memoize component to prevent unnecessary re-renders
 export const GeometricBackground = memo(function GeometricBackground({ fixed = false }) {
   return (
@@ -25,7 +28,7 @@ export const GeometricBackground = memo(function GeometricBackground({ fixed = f
       {/* These sit at the bottom of the stack, powered by animate-square in globals.css */}
       {/* OPTIMIZATION: Reduced to 12 elements, will-change applied conditionally via CSS */}
       <ul className="background" style={{ opacity: 0.8 }}>
-        {Array.from({ length: SQUARE_COUNT }).map((_, i) => (
+        {SQUARES.map((_, i) => (
           <li key={i} />
         ))}
       </ul>
