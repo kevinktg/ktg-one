@@ -2,8 +2,6 @@ import { notFound } from "next/navigation";
 import { getPostBySlug, getPosts, formatDate, getFeaturedImage } from "@/lib/wordpress";
 import Image from "next/image";
 import Link from "next/link";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 
 // OPTIMIZATION:
 // 1. Revalidate every 60 seconds (Incremental Static Regeneration)
@@ -100,7 +98,6 @@ export default async function BlogPostPage({ params }) {
   return (
     // LAYOUT FIX: 'flex-col min-h-screen' keeps footer at bottom
     <div className="flex flex-col min-h-screen text-white bg-transparent" suppressHydrationWarning>
-      <Header />
       
       <script
         type="application/ld+json"
@@ -188,7 +185,6 @@ export default async function BlogPostPage({ params }) {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

@@ -1,10 +1,8 @@
-import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { HeroTransition } from "@/components/HeroTransition";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
 import { ExpertiseTransition } from "@/components/ExpertiseTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
-import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
 import { getPosts } from "@/lib/wordpress";
@@ -32,11 +30,6 @@ export default async function Home() {
   return (
     <div className="bg-background min-h-screen flex flex-col relative" suppressHydrationWarning>
       
-      {/* Header is usually fixed/sticky.
-        Ensure it has z-50 to sit above the Hero canvas
-      */}
-      <Header />
-
       <main className="grow" suppressHydrationWarning>
 
         {/* HERO: Black Background with blob reveal cursor */}
@@ -65,8 +58,6 @@ export default async function Home() {
 
       </main>
 
-      {/* FOOTER */}
-      <Footer />
     </div>
   );
 }
