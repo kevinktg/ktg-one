@@ -132,13 +132,29 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       new Promise(resolve => loader.load(topImagePath, resolve)),
       new Promise(resolve => loader.load(bottomImagePath, resolve))
     ]).then(([top, bottom]) => {
-      const ani = Math.min(window.devicePixelRatio > 1 ? 4 : 8, 8);
+      // Reduce anisotropy for performance (2x/4x is sufficient for distorted textures)
+      const ani = Math.min(window.devicePixelRatio > 1 ? 2 : 4, 4);
       top.anisotropy = ani;
       bottom.anisotropy = ani;
+
+      // Update uniforms directly to avoid frame loop assignment
+      if (materialRef.current) {
+        materialRef.current.uniforms.topTex.value = top;
+        materialRef.current.uniforms.bottomTex.value = bottom;
+        materialRef.current.uniforms.aspect.value = viewport.aspect;
+      }
+
       setTextures({ top, bottom })
       if (onLoaded) onLoaded();
     })
-  }, [topImagePath, bottomImagePath, onLoaded])
+  }, [topImagePath, bottomImagePath, onLoaded, viewport.aspect])
+
+  // Update aspect ratio when viewport changes
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.aspect.value = viewport.aspect;
+    }
+  }, [viewport.aspect]);
   
   useFrame((state) => {
     if (!materialRef.current) return
@@ -148,11 +164,8 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     // Update uniforms
     materialRef.current.uniforms.mouse.value.x += (targetX - materialRef.current.uniforms.mouse.value.x) * 0.1
     materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
-    materialRef.current.uniforms.aspect.value = viewport.aspect
+    // Aspect and textures are handled in useEffects to reduce per-frame overhead
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
-    
-    if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-    if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
   })
 
   return (
@@ -212,7 +225,7 @@ export function HeroImages({ topImage, bottomImage }) {
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
-        dpr={[1, 2]} 
+        dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
         camera={{ position: [0, 0, 1], fov: 75 }}
         style={{ background: 'transparent' }}
