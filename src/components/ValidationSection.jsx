@@ -3,19 +3,15 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef, useMemo, useCallback, useState, useEffect } from "react";
+import { useRef, useMemo } from "react";
 
-// Register ScrollTrigger safely
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 export function ValidationSection({ auditData }) {
-  const sectionRef = useRef(null);
-  const horizontalScrollRef = useRef(null);
-  const shutterRef = useRef(null);
-  const cardRef = useRef(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const containerRef = useRef(null);
+  const cardsRef = useRef([]);
 
   // Default Data
   const data = auditData || {
@@ -54,280 +50,206 @@ export function ValidationSection({ auditData }) {
     }
   };
 
-  // OPTIMIZATION: Check sessionStorage only on client side to prevent hydration mismatch
-  useEffect(() => {
-    const played = sessionStorage.getItem('validation-animated') === 'true';
-    if (played) {
-      setHasPlayed(true);
-    }
-  }, []);
-
-
-  useGSAP(() => {
-    // Wait for all refs to be ready
-    if (!horizontalScrollRef.current || !shutterRef.current || !cardRef.current) {
-      // Refs not ready yet - useGSAP will re-run when component updates
-      // Return early to prevent errors
-      return;
-    }
-
-    if (hasPlayed) {
-      // Skip animation - set final states immediately
-      if (shutterRef.current?.children) {
-        gsap.set(shutterRef.current.children, { scaleY: 0 });
-      }
-      gsap.set(".digital-text", { opacity: 1, x: 0 });
-    } else {
-      // PHASE 1: THE SWOOP (White -> Black) - Run immediately on mount
-      gsap.to(shutterRef.current?.children, {
-        scaleY: 0,
-        duration: 1,
-        stagger: 0.05,
-        ease: "power3.inOut",
-        transformOrigin: "bottom",
-        onComplete: () => {
-          sessionStorage.setItem('validation-animated', 'true');
-        }
-      });
-
-      // PHASE 2: TEXT REVEAL ANIMATIONS - Robust implementation
-      const textElements = gsap.utils.toArray(".digital-text");
-
-      // Set initial state explicitly
-      gsap.set(textElements, { opacity: 0, x: 30 });
-
-      textElements.forEach((text, index) => {
-        gsap.to(text, {
-          opacity: 1,
-          x: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          delay: 0.8 + (index * 0.1), // Stagger after shutter animation
-        });
-      });
-    }
-
-    // PHASE 3: CARD-ONLY SCROLLTRIGGER (Graphite.com pattern)
-    // Pin the card itself, scroll content horizontally inside
-    let pinTrigger = null;
-    let scrollTween = null;
-    let resizeTimeout = null;
-    
-    const setupScrollTrigger = () => {
-      if (!sectionRef.current || !cardRef.current || !horizontalScrollRef.current) {
-        console.warn('[ValidationSection] Refs not ready for ScrollTrigger setup');
-        return;
-      }
-      
-      // Calculate horizontal scroll distance
-      const scrollWidth = horizontalScrollRef.current.scrollWidth;
-      const clientWidth = cardRef.current.clientWidth;
-      const contentWidth = scrollWidth - clientWidth;
-      
-      if (contentWidth > 0) {
-        // FORCE MINIMUM SCROLL DISTANCE
-        // Ensures the scroll doesn't happen "lightning fast" even if width calc is small
-        const scrollDistance = Math.max(contentWidth, 1500);
-
-        // Pin the entire section - section stays fixed while content scrolls
-        pinTrigger = ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: "top top",
-          end: () => `+=${scrollDistance + window.innerHeight}`,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-        });
-        
-        // Animate horizontal scroll of content inside card
-        // This is tied to the section's scroll progress
-        scrollTween = gsap.to(horizontalScrollRef.current, {
-          x: -contentWidth, // We still only scroll the actual width
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: () => `+=${scrollDistance + window.innerHeight}`,
-            scrub: 1,
-            invalidateOnRefresh: true,
-          }
-        });
-      } else {
-        console.warn('[ValidationSection] No horizontal scroll content detected');
-      }
-    };
-    
-    // Setup with delay to ensure Lenis/ScrollTrigger are fully initialized
-    // Also ensures refs are definitely attached to DOM
-    const initTimeout = setTimeout(() => {
-      // Double-check refs are ready before setup
-      if (cardRef.current && horizontalScrollRef.current) {
-        setupScrollTrigger();
-        // Refresh ScrollTrigger after setup to ensure it recognizes the elements
-        ScrollTrigger.refresh();
-      } else {
-        console.warn('[ValidationSection] Refs still not ready after delay');
-      }
-    }, 300);
-    
-    // OPTIMIZATION: Debounced resize handler to prevent excessive recalculations
-    const handleResize = () => {
-      if (resizeTimeout) clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        if (pinTrigger) pinTrigger.kill();
-        if (scrollTween) scrollTween.kill();
-        ScrollTrigger.refresh();
-        setupScrollTrigger();
-      }, 150);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup function
-    return () => {
-      clearTimeout(initTimeout);
-      if (resizeTimeout) clearTimeout(resizeTimeout);
-      window.removeEventListener('resize', handleResize);
-      if (pinTrigger) pinTrigger.kill();
-      if (scrollTween) scrollTween.kill();
-    };
-
-  }, { scope: sectionRef });
-
-  return (
-    <section ref={sectionRef} className="relative w-full py-8 overflow-hidden bg-background z-40">
-
-      {/* SHUTTERS (White -> Black Swoop) */}
-      {/* OPTIMIZATION: will-change only applied when animation is active, not permanently */}
-      <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>
-         {[...Array(5)].map((_, i) => (
-           <div 
-             key={i} 
-             className={`w-1/5 h-full bg-white border-r border-black/5 ${!hasPlayed ? 'will-change-transform' : ''}`}
-             style={{ contain: 'strict' }}
-           />
-         ))}
-      </div>
-
-      {/* Scroll Feature Container - matches Graphite pattern */}
-      <div className="w-full scroll-feature-container">
-        
-        {/* Full-height wrapper for proper spacing */}
-        <div 
-          className="h-dvh w-full flex flex-col items-center justify-center p-4 md:p-8"
-        >
-          
-          {/* Card Container - This gets pinned by ScrollTrigger (Graphite style) */}
-          <div
-            ref={cardRef}
-            className="h-full max-h-[85vh] w-full mx-auto max-w-[98vw] relative flex p-4 md:p-8 border border-border rounded-3xl overflow-hidden bg-card/40 backdrop-blur-sm"
-          >
-            
-            {/* Horizontal Scrolling Content - Scrolls inside pinned card */}
-            {/* OPTIMIZATION: will-change applied conditionally - only when scrolling */}
-            <div 
-              ref={horizontalScrollRef} 
-              className="flex gap-8 md:gap-16 min-w-max h-full items-center"
-            >
-                  
-                  {/* 01. INTRO */}
-                  <div className="w-[85vw] md:w-[650px] flex flex-col justify-center shrink-0 digital-text">
-                    <div className="mb-8 w-12 h-12 border-l border-t border-foreground/20" />
-                    <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
-                      <span className="text-foreground font-semibold">{data.intro.title}</span>
-                      <br/><br/>
-                      {data.intro.desc}
-                      <br/><br/>
-                      <span className="text-muted-foreground/80">{data.intro.note}</span>
-                    </p>
-                    <div className="mt-12 flex gap-4">
-                      <div className="px-6 py-3 border border-border rounded-full text-sm text-foreground bg-card/60">
-                        audit status: {data.intro.status}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 02. VERTEX AUDIT */}
-                  <div className="w-[85vw] md:w-[750px] shrink-0 digital-text">
-                    <div className="border-b border-border pb-8 mb-8">
-                      <div className="text-xs text-muted-foreground mb-4">log id: {data.audit.id}</div>
-                      <div className="flex justify-between items-start gap-8">
-                        <h3 className="text-3xl md:text-4xl font-syne font-bold">{data.audit.title}</h3>
-                        <div className="text-sm font-bold text-foreground bg-card/80 px-4 py-2 whitespace-nowrap border border-border">{data.audit.badge}</div>
-                      </div>
-                    </div>
-                    <div className="space-y-8 text-lg md:text-xl">
-                      <div className="border-l-4 border-border pl-8 py-3">
-                        <span className="text-muted-foreground block mb-3 text-xs tracking-widest">findings:</span>
-                        <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
-                      </div>
-                      <ul className="space-y-4 text-lg text-muted-foreground">
-                        {data.audit.checklist.map((item, i) => (
-                          <li key={i} className="flex gap-4 items-start">
-                            <span className="text-foreground mt-1.5">✓</span>
-                            <span><strong className="text-foreground">{item.label}:</strong> {item.desc}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* 03. PERCENTILE RANK */}
-                  <div className="w-[85vw] md:w-[650px] shrink-0 digital-text">
-                    <div className="border-b border-border pb-8 mb-8">
-                      <div className="text-xs text-muted-foreground mb-4">log id: {data.percentile.id}</div>
-                      <div className="flex justify-between items-start">
-                        <h3 className="text-3xl font-syne font-bold">Percentile</h3>
-                        <div className="text-5xl md:text-6xl font-bold text-foreground">{data.percentile.rank}</div>
-                      </div>
-                    </div>
-                    <div className="space-y-8 text-lg md:text-xl">
-                      <div className="bg-card/40 p-8 rounded-xl border border-border">
-                        <div className="text-xs text-muted-foreground mb-4 tracking-widest">justification: depth</div>
-                        <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
-                      </div>
-                      <p className="text-muted-foreground text-lg italic border-l-2 border-border pl-6">
-                        "{data.percentile.quote}"
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 04. THE EVIDENCE */}
-                  <div className="w-[85vw] md:w-[550px] shrink-0 digital-text">
-                    <div className="mb-6">
-                      <div className="text-xs text-muted-foreground mb-2">log id: {data.evidence.id}</div>
-                      <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
-                    </div>
-                    <div className="space-y-6">
-                      <p className="text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
-                      <div className="p-6 border border-border bg-card/50 rounded-lg">
-                        <p className="text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 05. THE FINAL VERDICT */}
-                  <div className="relative w-[85vw] md:w-[700px] shrink-0 digital-text bg-foreground text-background p-8 md:p-12">
-                    <div className="absolute top-0 right-0 p-6 opacity-50 text-xs">final_transmission</div>
-                    <div className="space-y-8">
-                      <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
-                      <p className="text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
-                        {data.verdict.subtitle}
-                      </p>
-                      <div className="pt-8 border-t border-background/20 flex items-center gap-4">
-                        <div className="w-3 h-3 bg-green-500 rounded-full" />
-                        <span className="text-base font-bold tracking-widest">{data.verdict.status}</span>
-                      </div>
-                    </div>
-                  </div>
-                
-                {/* END SPACER */}
-                <div className="w-[10vw] shrink-0" />
-                
+  const cards = useMemo(() => [
+    {
+      id: 'intro',
+      content: (
+        <div className="flex flex-col justify-center h-full">
+          <div className="mb-8 w-12 h-12 border-l border-t border-foreground/20" />
+          <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
+            <span className="text-foreground font-semibold">{data.intro.title}</span>
+            <br /><br />
+            {data.intro.desc}
+            <br /><br />
+            <span className="text-muted-foreground/80">{data.intro.note}</span>
+          </p>
+          <div className="mt-12 flex gap-4">
+            <div className="px-6 py-3 border border-border rounded-full text-sm text-foreground bg-card/60">
+              audit status: {data.intro.status}
             </div>
           </div>
         </div>
+      )
+    },
+    {
+      id: 'audit',
+      content: (
+        <div className="flex flex-col justify-center h-full">
+          <div className="border-b border-border pb-6 mb-6">
+            <div className="text-xs text-muted-foreground mb-4">log id: {data.audit.id}</div>
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <h3 className="text-2xl md:text-3xl font-syne font-bold">{data.audit.title}</h3>
+              <div className="text-sm font-bold text-foreground bg-card/80 px-4 py-2 whitespace-nowrap border border-border">{data.audit.badge}</div>
+            </div>
+          </div>
+          <div className="space-y-6 text-base md:text-lg overflow-y-auto pr-2 custom-scrollbar">
+            <div className="border-l-4 border-border pl-6 py-2">
+              <span className="text-muted-foreground block mb-2 text-xs tracking-widest uppercase">findings:</span>
+              <p className="leading-relaxed text-foreground">{data.audit.findings}</p>
+            </div>
+            <ul className="space-y-3 text-base text-muted-foreground">
+              {data.audit.checklist.map((item, i) => (
+                <li key={i} className="flex gap-3 items-start">
+                  <span className="text-foreground mt-1">✓</span>
+                  <span><strong className="text-foreground">{item.label}:</strong> {item.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'percentile',
+      content: (
+        <div className="flex flex-col justify-center h-full">
+          <div className="border-b border-border pb-6 mb-6">
+            <div className="text-xs text-muted-foreground mb-4">log id: {data.percentile.id}</div>
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-syne font-bold">Percentile</h3>
+              <div className="text-4xl md:text-6xl font-bold text-foreground">{data.percentile.rank}</div>
+            </div>
+          </div>
+          <div className="space-y-6 text-base md:text-lg">
+            <div className="bg-background/20 p-6 rounded-xl border border-border">
+              <div className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">justification: depth</div>
+              <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
+            </div>
+            <p className="text-muted-foreground italic border-l-2 border-border pl-6">
+              "{data.percentile.quote}"
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'evidence',
+      content: (
+        <div className="flex flex-col justify-center h-full">
+          <div className="mb-6">
+            <div className="text-xs text-muted-foreground mb-2">log id: {data.evidence.id}</div>
+            <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
+          </div>
+          <div className="space-y-6">
+            <p className="text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
+            <div className="p-6 border border-border bg-background/20 rounded-lg">
+              <p className="text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'verdict',
+      // Special styling for the final card
+      className: "bg-foreground text-background",
+      content: (
+        <div className="flex flex-col justify-center h-full relative">
+           <div className="absolute top-0 right-0 p-2 md:p-4 opacity-50 text-xs uppercase">final_transmission</div>
+           <div className="space-y-8">
+             <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
+             <p className="text-xl md:text-2xl border-l-4 border-background/20 pl-6 py-2">
+               {data.verdict.subtitle}
+             </p>
+             <div className="pt-8 border-t border-background/20 flex items-center gap-4">
+               <div className="w-3 h-3 bg-green-500 rounded-full" />
+               <span className="text-base font-bold tracking-widest uppercase">{data.verdict.status}</span>
+             </div>
+           </div>
+        </div>
+      )
+    }
+  ], [data]);
+
+  useGSAP(() => {
+    const cardElements = cardsRef.current;
+    if (!cardElements.length) return;
+
+    // The total distance we want to pin for
+    const scrollDistance = window.innerHeight * (cards.length);
+
+    ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: `+=${scrollDistance}`,
+      pin: true,
+      scrub: 1, // Smooth scrub
+    });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: `+=${scrollDistance}`,
+        scrub: 1,
+      }
+    });
+
+    // Animate cards
+    cardElements.forEach((card, i) => {
+      // Skip the first card's entry animation as it's already there
+      if (i === 0) return;
+
+      // 1. New card slides in from bottom
+      // It starts at 200% (offscreen) and comes to 0 (center)
+      tl.to(card, {
+        yPercent: 0,
+        ease: "none",
+        duration: 1
+      });
+
+      // 2. Previous card scales down and fades slightly
+      if (i > 0) {
+        tl.to(cardElements[i - 1], {
+          scale: 0.95,
+          yPercent: -5, // Move slightly up to show stacking
+          filter: "brightness(0.6)",
+          duration: 1
+        }, "<");
+      }
+      
+      // 3. Push older cards further back
+      if (i > 1) {
+         tl.to(cardElements[i - 2], {
+             scale: 0.9,
+             yPercent: -10,
+             filter: "brightness(0.4)",
+             duration: 1
+         }, "<");
+      }
+    });
+
+  }, { scope: containerRef });
+
+  return (
+    <section
+      ref={containerRef}
+      className="relative w-full h-screen bg-background overflow-hidden flex flex-col items-center justify-center z-40"
+    >
+      <div className="relative w-full h-full flex items-center justify-center p-4">
+        {cards.map((card, i) => (
+          <div
+            key={card.id}
+            ref={el => cardsRef.current[i] = el}
+            className={`
+              absolute
+              w-full max-w-[90vw] md:max-w-[600px]
+              h-[65vh] md:h-[70vh]
+              border border-border rounded-3xl p-6 md:p-10 shadow-2xl
+              flex flex-col
+              will-change-transform
+              ${card.className ? card.className : "bg-card"}
+            `}
+            style={{
+              // First card starts at 0, others at 200% (completely offscreen bottom)
+              // We use 200% to ensure no overlap on initial load
+              transform: i === 0 ? "translate(0, 0) scale(1)" : "translate(0, 200%) scale(1)",
+              zIndex: i + 10
+            }}
+          >
+            {card.content}
+          </div>
+        ))}
       </div>
     </section>
   );
