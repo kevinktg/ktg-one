@@ -139,6 +139,13 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       if (onLoaded) onLoaded();
     })
   }, [topImagePath, bottomImagePath, onLoaded])
+
+  useEffect(() => {
+    if (materialRef.current && textures.top && textures.bottom) {
+      materialRef.current.uniforms.topTex.value = textures.top
+      materialRef.current.uniforms.bottomTex.value = textures.bottom
+    }
+  }, [textures])
   
   useFrame((state) => {
     if (!materialRef.current) return
@@ -150,9 +157,6 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
     materialRef.current.uniforms.aspect.value = viewport.aspect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
-    
-    if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-    if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
   })
 
   return (

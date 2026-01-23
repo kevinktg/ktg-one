@@ -16,7 +16,7 @@ export const metadata = {
   keywords: ["AI anthropology", "prompt engineering", "LLM optimization", "AI insights", "machine learning"],
   openGraph: {
     title: "Blog | .ktg",
-    description: "Insights from a top 0.01% prompt engineer.",
+    description: "Insights from a distinguished prompt engineer.",
     type: "website",
     siteName: ".ktg",
   },

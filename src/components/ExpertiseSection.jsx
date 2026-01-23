@@ -225,8 +225,8 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
 
           {/* 01: PERCENTILE */}
           <div className="text-center expertise-group">
-            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Percentile</div>
-            <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">0.01%</div>
+            <div className="stat-label text-xs opacity-50 mb-2 tracking-widest uppercase font-syne">Ranking</div>
+            <div className="stat-counter text-4xl md:text-5xl font-syne font-bold">Top Tier</div>
           </div>
 
           {/* 02: CAREERS */}
