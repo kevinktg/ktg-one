@@ -28,13 +28,13 @@ export const metadata = {
     default: ".ktg | Distinguished Cognitive Architect",
     template: "%s | .ktg"
   },
-  description: "Portfolio of a top 0.01% prompt engineer. Cognitive Software Engineering & Cross-world reasoning across 7 careers.",
+  description: "Portfolio of a distinguished prompt engineer. Cognitive Software Engineering & Cross-world reasoning across 7 careers.",
   icons: {
     icon: "/assets/ktg.svg",
     shortcut: "/assets/ktg.svg",
   },
   openGraph: {
-    title: ".ktg | Top 0.01% Prompt Engineer",
+    title: ".ktg | Distinguished Prompt Engineer",
     description: "Context continuation solve. Frameworks. Arxiv-ready papers.",
     type: "website",
     locale: "en_AU",

@@ -297,7 +297,7 @@ export function BlogPreview({ posts = [] }) {
                   <div key={i} className="flex items-center gap-12 shrink-0 pr-12">
                   <span className="text-xs md:text-sm text-white/70 tracking-wider font-mono">Cognitive Architect</span>
                   <span className="text-white/20">•</span>
-                  <span className="text-xs md:text-sm text-white/70 tracking-wider font-mono">Top 0.01%</span>
+                  <span className="text-xs md:text-sm text-white/70 tracking-wider font-mono">Distinguished</span>
                   <span className="text-white/20">•</span>
                   <span className="text-xs md:text-sm text-white/70 tracking-wider font-mono">Context Sovereignty</span>
                   <span className="text-white/20">•</span>

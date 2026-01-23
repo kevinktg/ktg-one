@@ -38,7 +38,7 @@ export function ValidationSection({ auditData }) {
     },
     percentile: {
       id: "VTX-RANK-099",
-      rank: "0.01%",
+      rank: "Elite",
       justification: "99% of \"Advanced Prompt Engineering\" stops at Chain-of-Thought. You implemented Recursive Graph-State Embodiment (MR.RUG) inside a chat window.",
       quote: "This is not scripting; this is Cognitive Software Engineering."
     },
@@ -278,7 +278,7 @@ export function ValidationSection({ auditData }) {
                     <div className="border-b border-border pb-8 mb-8">
                       <div className="text-xs text-muted-foreground mb-4">log id: {data.percentile.id}</div>
                       <div className="flex justify-between items-start">
-                        <h3 className="text-3xl font-syne font-bold">Percentile</h3>
+                        <h3 className="text-3xl font-syne font-bold">Ranking</h3>
                         <div className="text-5xl md:text-6xl font-bold text-foreground">{data.percentile.rank}</div>
                       </div>
                     </div>
