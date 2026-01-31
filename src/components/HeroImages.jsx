@@ -139,6 +139,21 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       if (onLoaded) onLoaded();
     })
   }, [topImagePath, bottomImagePath, onLoaded])
+
+  // OPTIMIZATION: Update aspect uniform only when viewport changes, not every frame
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.aspect.value = viewport.aspect
+    }
+  }, [viewport.aspect])
+
+  // OPTIMIZATION: Assign textures only when they change, not every frame
+  useEffect(() => {
+    if (materialRef.current) {
+      if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
+      if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
+    }
+  }, [textures])
   
   useFrame((state) => {
     if (!materialRef.current) return
@@ -148,11 +163,10 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     // Update uniforms
     materialRef.current.uniforms.mouse.value.x += (targetX - materialRef.current.uniforms.mouse.value.x) * 0.1
     materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
-    materialRef.current.uniforms.aspect.value = viewport.aspect
+    // Aspect update moved to useEffect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
     
-    if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-    if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
+    // Texture updates moved to useEffect
   })
 
   return (
