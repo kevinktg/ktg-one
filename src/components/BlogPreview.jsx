@@ -134,7 +134,7 @@ export function BlogPreview({ posts = [] }) {
   // Default fallback message
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} data-blog-section className="relative h-screen flex flex-col justify-center px-6 bg-black text-white overflow-hidden" suppressHydrationWarning>
+      <section ref={sectionRef} data-blog-section className="relative h-screen flex flex-col justify-center px-6 bg-black text-white overflow-hidden z-60" suppressHydrationWarning>
         <div ref={containerRef} className="max-w-7xl mx-auto w-full">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
           <p className="text-muted-foreground">No posts available at the moment.</p>
@@ -147,7 +147,7 @@ export function BlogPreview({ posts = [] }) {
     <section
       ref={sectionRef}
       data-blog-section
-      className="relative h-screen max-h-screen flex flex-col justify-center bg-black text-white overflow-hidden"
+      className="relative h-screen max-h-screen flex flex-col justify-center bg-black text-white overflow-hidden z-60"
       suppressHydrationWarning
     >
       <div className="flex-1 flex flex-col justify-center w-full max-w-[100vw]">
