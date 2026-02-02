@@ -139,6 +139,14 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       if (onLoaded) onLoaded();
     })
   }, [topImagePath, bottomImagePath, onLoaded])
+
+  // OPTIMIZATION: Update static uniforms only when they change, not on every frame
+  useEffect(() => {
+    if (materialRef.current) {
+      if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
+      if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
+    }
+  }, [textures])
   
   useFrame((state) => {
     if (!materialRef.current) return
@@ -150,9 +158,6 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
     materialRef.current.uniforms.aspect.value = viewport.aspect
     materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
-    
-    if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-    if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
   })
 
   return (
