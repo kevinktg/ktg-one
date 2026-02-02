@@ -93,35 +93,41 @@ export function ToolsSection() {
             </div>
           </div>
 
-          {/* Card 3: Vercel AI SDK (Interactive Placeholder) */}
-          <div className="tool-card group relative p-8 border border-white/10 bg-white/5 rounded-2xl overflow-hidden hover:border-white/30 transition-colors duration-300">
-            <div className="absolute inset-0 bg-linear-to-tr from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          {/* Card 3: AI Tools Hub (Links to AI Gateway) */}
+          <Link href="#ai-tools-hub" className="tool-card group relative p-8 border border-white/10 bg-white/5 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-colors duration-300 block">
+            <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <ArrowUpRight className="w-5 h-5 text-purple-400" />
+            </div>
 
             <div className="h-12 w-12 mb-6 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
               <span className="font-mono text-purple-400 font-bold">AI</span>
             </div>
-            <h3 className="font-syne text-2xl font-bold mb-3">AI Playground</h3>
+            <h3 className="font-syne text-2xl font-bold mb-3">AI Tools Hub</h3>
             <p className="text-white/50 text-sm leading-relaxed mb-6">
-              Interactive streaming chat interface powered by Vercel AI SDK.
+              Multi-provider gateway with Claude, GPT-4, and Gemini. Streaming chat powered by Vercel AI SDK.
             </p>
 
-            {/* Placeholder Input UI */}
+            {/* Status UI */}
             <div className="bg-black/40 border border-white/10 rounded-lg p-3 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs text-white/40 font-mono">System Ready</span>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs text-emerald-400 font-mono">Gateway Active</span>
               </div>
-              <div className="mt-2 text-xs text-white/30 font-mono">
-                &gt; Awaiting input keys...
+              <div className="mt-2 text-xs text-white/40 font-mono">
+                &gt; anthropic/claude-sonnet-4 ready
               </div>
             </div>
 
-            <div className="mt-auto">
+            <div className="mt-auto flex gap-2">
+              <span className="text-xs font-mono text-purple-400 uppercase tracking-widest border border-purple-500/30 bg-purple-500/10 px-2 py-1 rounded">
+                Live
+              </span>
               <span className="text-xs font-mono text-white/30 uppercase tracking-widest border border-white/10 px-2 py-1 rounded">
                 Interactive
               </span>
             </div>
-          </div>
+          </Link>
 
         </div>
       </div>

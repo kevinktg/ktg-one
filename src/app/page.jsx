@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
 import { GeometricBackground } from "@/components/GeometricBackground";
+import { AIToolsHub } from "@/components/ai";
 import { getPosts } from "@/lib/wordpress";
 
 // Force dynamic rendering if you want new blog posts to appear instantly on refresh
@@ -61,6 +62,10 @@ export default async function Home() {
 
         {/* PHILOSOPHY: Black Background (Parallax Quotes) */}
         <PhilosophySection />
+
+        {/* AI TOOLS HUB: Black Background (Multi-provider gateway) */}
+        {/* First session: scroll-triggered intro modal, then disappears */}
+        <AIToolsHub />
 
         {/* BLOG: Black Background (Grid Stagger) */}
         {/* We pass the server-fetched posts here */}
