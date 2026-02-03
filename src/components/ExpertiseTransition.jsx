@@ -70,7 +70,7 @@ export function ExpertiseTransition() {
   return (
     <div
       ref={containerRef}
-      className="relative h-[60vh] w-full overflow-hidden z-20"
+      className="relative h-[60vh] w-full overflow-hidden z-35"
       style={{ contain: 'layout paint' }}
     >
       {/* Grid reveal pattern - shows geometric background peaking through */}

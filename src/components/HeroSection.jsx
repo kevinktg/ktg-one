@@ -46,7 +46,7 @@ export const HeroSection = forwardRef((props, ref) => {
     <section
       ref={internalRef}
       data-cursor-zone="hero"
-      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden"
+      className="relative w-full min-h-screen flex items-center justify-center px-6 overflow-hidden z-10"
       style={{ background: 'transparent' }}
       suppressHydrationWarning
     >
