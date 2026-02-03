@@ -171,7 +171,7 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30 content-visibility-auto">
+    <section ref={containerRef} className="relative min-h-screen bg-white text-black overflow-hidden py-20 z-30">
 
       {/* SHUTTERS (Transition Layer) */}
       <div ref={shutterRef} className="absolute inset-0 z-50 flex pointer-events-none h-full w-full" style={{ contain: 'layout paint' }}>

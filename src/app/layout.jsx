@@ -4,6 +4,8 @@ import "./globals.css";
 import { ClientLayout } from "@/components/ClientLayout";
 import { GeometricBackground } from "@/components/GeometricBackground";
 import { CursorDot } from "@/components/CursorDot";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 // OPTIMIZATION: Use 'swap' to ensure branding fonts load even on slower connections.
 // fallback ensures graceful degradation if Google Fonts fails
@@ -69,7 +71,12 @@ export default function RootLayout({ children }) {
           {/* Global GeometricBackground - always visible on all pages, behind all content */}
           <GeometricBackground fixed />
 
+          <Header />
+
           {children}
+
+          <Footer />
+
           <SpeedInsights />
 
           {/* Global CursorDot - MUST be last to stay on top of all stacking contexts */}
