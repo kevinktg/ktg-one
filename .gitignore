@@ -121,3 +121,11 @@ htmlcov/
 *.tar.zst
 ```
 .next/
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor\rules\openmemory.mdc
+CLAUDE.md
+AGENTS.md
+.cursor\rules\openmemory.mdc
+CLAUDE.md
+AGENTS.md
