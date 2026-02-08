@@ -15,6 +15,7 @@ venv/
 .env
 .env.local
 .env.*
+!.env.example
 .in-memoria
 .in-memoria-vectors.db
 .in-memoria.db
