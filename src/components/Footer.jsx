@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail } from "lucide-react";
+import { siteConfig } from "@/lib/config";
 
 export function Footer() {
   return (
@@ -18,13 +19,13 @@ export function Footer() {
             </CardHeader>
             <CardContent className="flex flex-col gap-4 items-center pb-6">
                 <Button variant="outline" className="w-full gap-2" asChild>
-                    <a href="mailto:kevin@ktg.one">
+                    <a href={`mailto:${siteConfig.contact.email}`}>
                         <Mail className="h-4 w-4" />
-                        kevin@ktg.one
+                        {siteConfig.contact.email}
                     </a>
                 </Button>
                  <div className="text-xs text-muted-foreground">
-                    Backup: <a href="mailto:kevinktg@outlook.com" className="hover:text-foreground transition-colors underline underline-offset-4">kevinktg@outlook.com</a>
+                    Backup: <a href={`mailto:${siteConfig.contact.backupEmail}`} className="hover:text-foreground transition-colors underline underline-offset-4">{siteConfig.contact.backupEmail}</a>
                 </div>
             </CardContent>
         </Card>
