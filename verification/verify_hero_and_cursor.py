@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+import os
 
 def run():
     with sync_playwright() as p:
@@ -6,8 +7,9 @@ def run():
         page = browser.new_page(viewport={'width': 1280, 'height': 720})
 
         try:
+            base_url = os.getenv("SITE_URL", "http://localhost:3000")
             print("Navigating to home page...")
-            page.goto("http://localhost:3001")
+            page.goto(base_url)
             # Wait for the page to finish loading and network to be idle
             page.wait_for_load_state("networkidle")
 
