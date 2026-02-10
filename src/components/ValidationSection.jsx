@@ -128,22 +128,24 @@ export function ValidationSection({ auditData }) {
         // FORCE MINIMUM SCROLL DISTANCE
         // Ensures the scroll doesn't happen "lightning fast" even if width calc is small
         const scrollDistance = Math.max(contentWidth, 1500);
+        // Extra dwell at end so the final verdict stays visible before unpin
+        const totalPinDistance = scrollDistance + window.innerHeight * 1.5;
 
         // Pin the entire section - section stays fixed while content scrolls
         pinTrigger = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${scrollDistance + window.innerHeight}`,
+          end: () => `+=${totalPinDistance}`,
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         });
-        
+
         // Animate horizontal scroll of content inside card
-        // This is tied to the section's scroll progress
+        // Scroll finishes before the pin ends, so the final card dwells in view
         scrollTween = gsap.to(horizontalScrollRef.current, {
-          x: -contentWidth, // We still only scroll the actual width
+          x: -contentWidth,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -321,10 +323,10 @@ export function ValidationSection({ auditData }) {
                       </div>
                     </div>
                   </div>
-                
-                {/* END SPACER */}
-                <div className="w-[10vw] shrink-0" />
-                
+
+                {/* END SPACER — wide enough so final verdict stays fully visible before unpin */}
+                <div className="w-[50vw] shrink-0" />
+
             </div>
           </div>
         </div>
