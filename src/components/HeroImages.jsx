@@ -132,7 +132,8 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       new Promise(resolve => loader.load(topImagePath, resolve)),
       new Promise(resolve => loader.load(bottomImagePath, resolve))
     ]).then(([top, bottom]) => {
-      const ani = Math.min(window.devicePixelRatio > 1 ? 4 : 8, 8);
+      // OPTIMIZATION: Reduce anisotropy to prevent GPU bottlenecks
+      const ani = Math.min(window.devicePixelRatio > 1 ? 2 : 4, 4);
       top.anisotropy = ani;
       bottom.anisotropy = ani;
       setTextures({ top, bottom })
@@ -141,14 +142,6 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
   }, [topImagePath, bottomImagePath, onLoaded])
 
   // OPTIMIZATION: Update static uniforms only when they change, not on every frame
-  useEffect(() => {
-    if (materialRef.current) {
-      if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-      if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
-    }
-  }, [textures])
-  
-  // OPTIMIZATION: Update textures only when they change, avoiding per-frame assignment
   useEffect(() => {
     if (materialRef.current) {
       if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
@@ -232,7 +225,7 @@ export function HeroImages({ topImage, bottomImage }) {
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
-        dpr={[1, 2]} 
+        dpr={[1, 1.5]}
         gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
         camera={{ position: [0, 0, 1], fov: 75 }}
         style={{ background: 'transparent' }}
