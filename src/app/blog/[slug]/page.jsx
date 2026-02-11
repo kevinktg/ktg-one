@@ -149,7 +149,7 @@ export default async function BlogPostPage({ params }) {
               </div>
             )}
 
-            {/* Content */}
+            {/* Content - uses Tailwind prose with explicit list and code block styling */}
             <div
               className="prose prose-invert prose-lg max-w-none
                 prose-headings:font-syne prose-headings:lowercase
@@ -163,7 +163,12 @@ export default async function BlogPostPage({ params }) {
                 prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-white/10
                 prose-img:rounded-xl prose-img:shadow-2xl
                 prose-blockquote:border-l-white/20 prose-blockquote:text-white/60 prose-blockquote:italic
-                prose-li:marker:text-white/30"
+                prose-li:marker:text-white/30
+                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6
+                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6
+                [&_li]:mb-2
+                [&_pre]:!bg-white/5 [&_pre]:!p-4 [&_pre]:!rounded-lg [&_pre]:!overflow-x-auto [&_pre]:!border [&_pre]:!border-white/10
+                [&_pre_code]:!bg-transparent [&_pre_code]:!p-0 [&_pre_code]:!text-inherit"
               dangerouslySetInnerHTML={{ __html: post.content.rendered }}
             />
           </article>
