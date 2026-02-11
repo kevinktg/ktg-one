@@ -36,7 +36,6 @@ export function ChatInterface({ className }) {
     isLoading,
     error,
     reload,
-    stop,
   } = useChat({
     api: '/api/gateway',
     body: { model: selectedModel },
