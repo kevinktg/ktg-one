@@ -19,8 +19,13 @@ export function SkipButton() {
   const handleSkip = () => {
     // Find BlogPreview section and scroll to it
     const findBlogSection = () => {
-      // Try data attribute first (most reliable)
-      let blogSection = document.querySelector('[data-blog-section]');
+      // Try ID first (most specific)
+      let blogSection = document.getElementById('blog-section');
+
+      // Fallback: try data attribute
+      if (!blogSection) {
+        blogSection = document.querySelector('[data-blog-section]');
+      }
       
       // Fallback: find section containing "blog" heading
       if (!blogSection) {
