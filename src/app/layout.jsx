@@ -25,8 +25,8 @@ const inter = Inter({
 export const metadata = {
   metadataBase: new URL('https://ktg.one'), 
   title: {
-    default: ".ktg | Distinguished Cognitive Architect",
-    template: "%s | .ktg"
+    default: "AI Anthropologist | The world evaluates tools. I collaborate with intelligence",
+    template: "%s | AI Anthropologist"
   },
   description: "Portfolio of a top 0.01% prompt engineer. Cognitive Software Engineering & Cross-world reasoning across 7 careers.",
   icons: {
