@@ -16,16 +16,19 @@ export const HeroSection = forwardRef((props, ref) => {
       const hasSeenIntro = sessionStorage.getItem('intro-completed') === 'true';
 
       if (hasSeenIntro) {
-          // Attempt to find the main content anchor
-          const mainContent = document.getElementById('main-content');
+          // Attempt to find the target section (prioritize blog, fallback to main content)
+          const targetSection = document.getElementById('blog-section') || document.getElementById('main-content');
 
-          if (mainContent) {
+          if (targetSection) {
               // Use Lenis for immediate scroll if available, otherwise native
-              if (window.lenis) {
-                  window.lenis.scrollTo(mainContent, { immediate: true });
-              } else {
-                  mainContent.scrollIntoView({ behavior: "auto" });
-              }
+              // Add a delay to ensure layout/pinning (GSAP ScrollTrigger) is fully calculated
+              setTimeout(() => {
+                  if (window.lenis) {
+                      window.lenis.scrollTo(targetSection, { immediate: true });
+                  } else {
+                      targetSection.scrollIntoView({ behavior: "auto" });
+                  }
+              }, 500);
           }
       } else {
           // Mark intro as completed once the user scrolls past the hero
