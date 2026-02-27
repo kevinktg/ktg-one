@@ -9,17 +9,19 @@ export const runCodeTool = tool({
     runtime: z.enum(["node24", "python3.13"]).default("node24"),
   }),
   execute: async ({ code, runtime }) => {
+    const sandbox = await Sandbox.create({ runtime, timeout: 30000 });
     try {
-      const sandbox = await Sandbox.create({ runtime, timeout: 30000 });
       const filename = runtime === "node24" ? "index.js" : "index.py";
-      await sandbox.files.write(filename, code);
-      const result = await sandbox.commands.run(
-        runtime === "node24" ? `node ${filename}` : `python ${filename}`
-      );
-      await sandbox.stop();
-      return { stdout: result.stdout, stderr: result.stderr, exitCode: result.exitCode };
+      await sandbox.writeFiles([{ path: filename, content: Buffer.from(code) }]);
+      const command = runtime === "node24" ? "node" : "python";
+      const result = await sandbox.runCommand(command, [filename]);
+      const stdout = (await result.stdout()).slice(0, 8000);
+      const stderr = (await result.stderr()).slice(0, 8000);
+      return { stdout, stderr, exitCode: result.exitCode };
     } catch (e) {
       return { error: e.message };
+    } finally {
+      await sandbox.stop();
     }
   },
 });
