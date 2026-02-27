@@ -13,6 +13,7 @@
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.57",
     "@ai-sdk/openai": "^3.0.9",
+    "@ai-sdk/react": "^3.0.105",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-navigation-menu": "^1.2.14",
