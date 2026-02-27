@@ -4,22 +4,20 @@ import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "ktg-one-conversations";
 
-export function useConversations() {
-  const [conversations, setConversations] = useState([]);
-  const [activeId, setActiveId] = useState(null);
-
-  useEffect(() => {
+function loadStored() {
+  if (typeof window === "undefined") return { conversations: [], activeId: null };
+  try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setConversations(parsed);
-        if (parsed.length > 0) setActiveId(parsed[0].id);
-      } catch {
-        // ignore corrupt data
-      }
-    }
-  }, []);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return { conversations: parsed, activeId: parsed[0]?.id ?? null };
+  } catch {
+    return { conversations: [], activeId: null };
+  }
+}
+
+export function useConversations() {
+  const [conversations, setConversations] = useState(() => loadStored().conversations);
+  const [activeId, setActiveId] = useState(() => loadStored().activeId);
 
   function save(convs) {
     setConversations(convs);

@@ -191,6 +191,7 @@ export function HeroImages({ topImage, bottomImage }) {
     // Session check: If previously visited, show immediately
     const hasPlayed = typeof window !== 'undefined' && sessionStorage.getItem('hero-animated') === 'true';
     if (hasPlayed) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsReady(true);
     }
 

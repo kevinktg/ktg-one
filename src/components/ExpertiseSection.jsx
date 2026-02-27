@@ -46,6 +46,7 @@ export const ExpertiseSection = forwardRef(({ expertiseData }, ref) => {
   useEffect(() => {
     const played = sessionStorage.getItem('expertise-revealed') === 'true';
     if (played) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasPlayed(true);
     }
   }, []);

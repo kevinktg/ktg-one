@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "deploy": "vercel --prod",
     "vercel-build": "next build"
   },
@@ -48,7 +48,9 @@
     "@swc/core": "^1.15.8",
     "@tailwindcss/typography": "^0.5.19",
     "eslint": "^9",
+    "eslint-config-next": "^16.1.1",
     "puppeteer": "^24.32.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }
