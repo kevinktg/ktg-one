@@ -15,7 +15,7 @@ export const queryNotionTool = tool({
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
-        "Notion-Version": "2022-06-28",
+        "Notion-Version": "2022-06-28", // required by Notion API for versioned responses
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ query, page_size: 5 }),
@@ -24,16 +24,20 @@ export const queryNotionTool = tool({
     const data = await res.json();
     if (!res.ok) return { error: data.message };
 
+    const results = data.results?.map((r) => ({
+      id: r.id,
+      title:
+        r.properties?.title?.title?.[0]?.plain_text ??
+        r.properties?.Name?.title?.[0]?.plain_text ??
+        r.object,
+      url: r.url,
+      type: r.object,
+    })) ?? [];
+
     return {
-      results: data.results?.map((r) => ({
-        id: r.id,
-        title:
-          r.properties?.title?.title?.[0]?.plain_text ??
-          r.properties?.Name?.title?.[0]?.plain_text ??
-          r.object,
-        url: r.url,
-        type: r.object,
-      })) ?? [],
+      results: filter
+        ? results.filter((r) => r.title?.toLowerCase().includes(filter.toLowerCase()))
+        : results,
     };
   },
 });
