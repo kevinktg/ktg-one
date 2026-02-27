@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const queryNotionTool = tool({
   description: "Search Notion pages and databases. Use for KISMET CRM data, tasks, notes, any Notion content.",
-  parameters: z.object({
+  inputSchema: z.object({
     query: z.string().describe("What to search for in Notion"),
     filter: z.string().optional().describe("Optional: filter by database name e.g. 'KISMET' or 'Tasks'"),
   }),
