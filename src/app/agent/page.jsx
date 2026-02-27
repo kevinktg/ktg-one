@@ -1,7 +1,9 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useChat } from "@ai-sdk/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MessageThread } from "@/components/chat/MessageThread";
 import { InputBar } from "@/components/chat/InputBar";
@@ -20,20 +22,28 @@ export default function AgentPage() {
     deleteConversation,
   } = useConversations();
 
+  const messagesRef = useRef([]);
+  const activeIdRef = useRef(activeId);
+  useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
+
   const { messages, input, setInput, handleSubmit, isLoading, stop, setMessages } = useChat({
     api: "/api/agent",
     body: { model },
     onFinish: (msg) => {
-      if (activeId) {
-        const firstUserMsg = messages.find((m) => m.role === "user");
+      const currentActiveId = activeIdRef.current;
+      if (currentActiveId) {
+        const currentMessages = messagesRef.current;
+        const firstUserMsg = currentMessages.find((m) => m.role === "user");
         const title = firstUserMsg?.content?.slice(0, 40) ?? "New conversation";
-        updateConversation(activeId, {
-          messages: [...messages, msg],
+        updateConversation(currentActiveId, {
+          messages: [...currentMessages, msg],
           title,
         });
       }
     },
   });
+
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   // Load messages when switching conversations
   useEffect(() => {
@@ -45,7 +55,7 @@ export default function AgentPage() {
   }, [activeId]); // eslint-disable-line
 
   function handleNew() {
-    const conv = newConversation(model);
+    newConversation(model);
     setMessages([]);
     setInput("");
   }
