@@ -26,7 +26,7 @@ export default function AgentPage() {
   const activeIdRef = useRef(activeId);
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
 
-  const { messages, input, setInput, handleSubmit, isLoading, stop, setMessages } = useChat({
+  const { messages, input, setInput, handleInputChange, handleSubmit, isLoading, stop, setMessages } = useChat({
     api: "/api/agent",
     body: { model },
     onFinish: () => {
@@ -88,7 +88,7 @@ export default function AgentPage() {
         {/* Input */}
         <InputBar
           value={input}
-          onChange={setInput}
+          onChange={handleInputChange}
           onSubmit={handleSubmit}
           onStop={stop}
           isLoading={isLoading}

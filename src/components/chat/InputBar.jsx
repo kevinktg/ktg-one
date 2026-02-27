@@ -21,7 +21,7 @@ export function InputBar({ value = "", onChange, onSubmit, onStop, isLoading }) 
         <Textarea
           ref={ref}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
           onKeyDown={handleKey}
           placeholder="Ask anything… (Enter to send, Shift+Enter for newline)"
           className="pr-12 resize-none bg-muted border-0 focus-visible:ring-1 focus-visible:ring-violet-500 min-h-[52px] max-h-[200px]"
