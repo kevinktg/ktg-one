@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const listCallsTool = tool({
   description: "List recent GoodAI voice agent calls. Use to check call history or status.",
-  parameters: z.object({
+  inputSchema: z.object({
     limit: z.number().int().min(1).max(100).default(10).describe("Number of recent calls to fetch"),
   }),
   execute: async ({ limit }) => {
