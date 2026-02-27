@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+import { streamText, convertToModelMessages } from "ai";
 import { gateway } from "@ai-sdk/gateway";
 import { tools } from "@/lib/tools";
 
@@ -41,10 +41,10 @@ export async function POST(req) {
   const result = streamText({
     model: gateway(model),
     system: SYSTEM,
-    messages,
+    messages: await convertToModelMessages(messages),
     maxSteps: 10,
     tools,
   });
 
-  return result.toDataStreamResponse();
+  return result.toUIMessageStreamResponse();
 }

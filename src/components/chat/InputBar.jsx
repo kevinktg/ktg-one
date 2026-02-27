@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, Square } from "lucide-react";
 
-export function InputBar({ value, onChange, onSubmit, onStop, isLoading }) {
+export function InputBar({ value = "", onChange, onSubmit, onStop, isLoading }) {
   const ref = useRef(null);
 
   function handleKey(e) {
