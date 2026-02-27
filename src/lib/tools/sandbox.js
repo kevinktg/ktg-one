@@ -4,7 +4,7 @@ import { Sandbox } from "@vercel/sandbox";
 
 export const runCodeTool = tool({
   description: "Execute JavaScript or Python code in a secure sandbox. Use for calculations, data processing, testing snippets.",
-  parameters: z.object({
+  inputSchema: z.object({
     code: z.string().describe("Code to execute"),
     runtime: z.enum(["node24", "python3.13"]).default("node24"),
   }),
@@ -15,8 +15,8 @@ export const runCodeTool = tool({
       await sandbox.writeFiles([{ path: filename, content: Buffer.from(code) }]);
       const command = runtime === "node24" ? "node" : "python";
       const result = await sandbox.runCommand(command, [filename]);
-      const stdout = (await result.stdout()).slice(0, 8000);
-      const stderr = (await result.stderr()).slice(0, 8000);
+      const stdout = (await result.stdout()).toString("utf-8").slice(0, 8000);
+      const stderr = (await result.stderr()).toString("utf-8").slice(0, 8000);
       return { stdout, stderr, exitCode: result.exitCode };
     } catch (e) {
       return { error: e.message };
