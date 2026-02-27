@@ -7,6 +7,18 @@ import { Plus, MessageSquare, Trash2 } from "lucide-react";
 
 const TOOLS = ["notion", "n8n", "sandbox", "web search", "goodai"];
 
+function getConversationTitle(conversation) {
+  if (conversation?.title?.trim()) return conversation.title;
+  const firstUser = conversation?.messages?.find((m) => m.role === "user");
+  if (!firstUser || !Array.isArray(firstUser.parts)) return "New conversation";
+  const text = firstUser.parts
+    .filter((p) => p?.type === "text" && typeof p.text === "string")
+    .map((p) => p.text)
+    .join("")
+    .trim();
+  return text.slice(0, 40) || "New conversation";
+}
+
 export function AppSidebar({ conversations, activeId, onSelect, onNew, onDelete }) {
   return (
     <div className="w-[240px] shrink-0 border-r border-border flex flex-col h-full bg-zinc-950">
@@ -33,7 +45,7 @@ export function AppSidebar({ conversations, activeId, onSelect, onNew, onDelete 
               onClick={() => onSelect(c.id)}
             >
               <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-              <span className="flex-1 truncate text-xs">{c.title}</span>
+              <span className="flex-1 truncate text-xs">{getConversationTitle(c)}</span>
               <Button
                 size="icon"
                 variant="ghost"

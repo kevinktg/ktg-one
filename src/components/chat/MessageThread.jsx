@@ -44,7 +44,11 @@ export function MessageThread({ messages, isLoading }) {
                     return (
                       <div
                         key={i}
-                        className="rounded-xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap bg-muted text-foreground"
+                        className={`rounded-xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                          msg.role === "user"
+                            ? "bg-violet-600 text-white"
+                            : "bg-muted text-foreground"
+                        }`}
                       >
                         {part.text}
                       </div>

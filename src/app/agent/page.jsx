@@ -29,16 +29,18 @@ export default function AgentPage() {
   const { messages, input, setInput, handleSubmit, isLoading, stop, setMessages } = useChat({
     api: "/api/agent",
     body: { model },
-    onFinish: (msg) => {
+    onFinish: () => {
       const currentActiveId = activeIdRef.current;
       if (currentActiveId) {
         const currentMessages = messagesRef.current;
         const firstUserMsg = currentMessages.find((m) => m.role === "user");
-        const title = firstUserMsg?.content?.slice(0, 40) ?? "New conversation";
-        updateConversation(currentActiveId, {
-          messages: [...currentMessages, msg],
-          title,
-        });
+        const title = firstUserMsg?.parts
+          ?.filter((p) => p?.type === "text")
+          .map((p) => p.text)
+          .join("")
+          .trim()
+          .slice(0, 40) || "New conversation";
+        updateConversation(currentActiveId, { messages: currentMessages, title });
       }
     },
   });
