@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const triggerWorkflowTool = tool({
   description: "Trigger an n8n automation workflow by webhook name. Use for sending emails, updating CRM, syncing data, sending Slack messages.",
-  parameters: z.object({
+  inputSchema: z.object({
     webhook: z.string().describe("Webhook path e.g. 'kismet-crm-complete' or 'send-follow-up'"),
     payload: z.record(z.any()).optional().describe("JSON payload to send to the webhook"),
   }),
