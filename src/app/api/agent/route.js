@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages } from "ai";
+import { streamText, convertToModelMessages, stepCountIs } from "ai";
 import { gateway } from "@ai-sdk/gateway";
 import { tools } from "@/lib/tools";
 
@@ -42,7 +42,7 @@ export async function POST(req) {
     model: gateway(model),
     system: SYSTEM,
     messages: await convertToModelMessages(messages),
-    maxSteps: 10,
+    stopWhen: [stepCountIs(10)],
     tools,
   });
 
