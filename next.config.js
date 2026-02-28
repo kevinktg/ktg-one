@@ -28,6 +28,20 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/blog',
+        destination: 'https://goodai.au',
+        permanent: false,
+      },
+      {
+        source: '/blog/:path*',
+        destination: 'https://goodai.au',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
