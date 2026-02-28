@@ -6,22 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "deploy": "vercel --prod",
     "vercel-build": "next build"
   },
   "dependencies": {
-    "@ai-sdk/gateway": "^3.0.53",
+    "@ai-sdk/gateway": "^3.0.57",
     "@ai-sdk/openai": "^3.0.9",
-    "@ai-sdk/react": "^3.0.99",
+    "@ai-sdk/react": "^3.0.105",
     "@gsap/react": "^2.1.2",
+    "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@swc/helpers": "^0.5.18",
     "@tailwindcss/postcss": "^4.1.18",
+    "@vercel/sandbox": "^1.7.1",
     "@vercel/speed-insights": "^1.2.0",
     "ai": "^6.0.5",
     "array": "^0.4.3",
@@ -36,6 +40,7 @@
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
+    "zod": "^4.3.6",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
@@ -43,7 +48,9 @@
     "@swc/core": "^1.15.8",
     "@tailwindcss/typography": "^0.5.19",
     "eslint": "^9",
+    "eslint-config-next": "^16.1.1",
     "puppeteer": "^24.32.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }
