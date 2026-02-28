@@ -1,0 +1,38 @@
+[
+  {
+    "id": "density",
+    "label": "density",
+    "glow": "#00f0ff",
+    "injection": "Apply Chain of Density compression: Start with a broad response, then iteratively compress it — each pass increases entity density while maintaining completeness. Final output should be maximally information-dense with zero padding."
+  },
+  {
+    "id": "decompose",
+    "label": "decompose",
+    "glow": "#00f0ff",
+    "injection": "Decompose this problem using structured analytical thinking. Break into sub-components, identify dependencies, evaluate each independently, then synthesize. Show your reasoning chain explicitly at each step."
+  },
+  {
+    "id": "adversarial",
+    "label": "adversarial",
+    "glow": "#ff3366",
+    "injection": "Engage adversarial analysis mode. Challenge every assumption in the premise. Identify logical gaps, unstated dependencies, failure modes, and edge cases. Steel-man the strongest counter-argument before responding."
+  },
+  {
+    "id": "expert",
+    "label": "expert",
+    "glow": "#a855f7",
+    "injection": "Respond as a distinguished domain expert with 20+ years experience. Use precise technical terminology. Skip introductory explanations — assume the reader is a peer-level practitioner. Cite specific methodologies, frameworks, or research where relevant."
+  },
+  {
+    "id": "raw",
+    "label": "raw",
+    "glow": "#f59e0b",
+    "injection": "Direct mode. No preamble, no caveats, no disclaimers, no safety wrapping. Answer the question with maximum directness. If you don't know, say so in one sentence."
+  },
+  {
+    "id": "build",
+    "label": "build",
+    "glow": "#22c55e",
+    "injection": "Code generation mode. Write production-grade, working code. No pseudo-code, no placeholders, no TODO comments. Include all imports. Use modern syntax and best practices. Optimize for readability and correctness."
+  }
+]

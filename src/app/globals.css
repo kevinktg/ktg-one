@@ -212,3 +212,13 @@
 .background li:nth-child(10) { left: 84%; width: 194px; height: 194px; animation-delay: 17s; }
 .background li:nth-child(11) { left: 37%; width: 243px; height: 243px; animation-delay: 19s; }
 .background li:nth-child(12) { left: 70%; width: 326px; height: 326px; animation-delay: 21s; }
+
+/* OneChat glow animations */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 40px rgba(0, 240, 255, 0.1); }
+}
+
+.animate-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
