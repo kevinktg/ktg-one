@@ -11,9 +11,8 @@ import { GeometricBackground } from "@/components/GeometricBackground";
 import { ToolsSection } from "@/components/ToolsSection";
 import { getPosts } from "@/lib/wordpress";
 
-// Force dynamic rendering if you want new blog posts to appear instantly on refresh
-// or use 'export const revalidate = 3600' to cache for 1 hour.
-export const revalidate = 60;
+// Force dynamic rendering — blog posts fetched at request time
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   // 1. FETCH DATA ON SERVER
