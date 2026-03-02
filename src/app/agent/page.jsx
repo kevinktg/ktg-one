@@ -29,6 +29,9 @@ export default function AgentPage() {
   const { messages, input, setInput, handleInputChange, handleSubmit, isLoading, stop, setMessages } = useChat({
     api: "/api/agent",
     body: { model },
+    headers: process.env.NEXT_PUBLIC_AGENT_API_KEY
+      ? { Authorization: `Bearer ${process.env.NEXT_PUBLIC_AGENT_API_KEY}` }
+      : undefined,
     onFinish: () => {
       const currentActiveId = activeIdRef.current;
       if (currentActiveId) {

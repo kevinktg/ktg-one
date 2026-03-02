@@ -85,11 +85,17 @@ export function useConversations() {
 
   const active = conversations.find((c) => c.id === activeId) ?? null;
 
+  function selectActiveId(id) {
+    setActiveId(id);
+    if (id) localStorage.setItem(ACTIVE_KEY, id);
+    else localStorage.removeItem(ACTIVE_KEY);
+  }
+
   return {
     conversations,
     active,
     activeId,
-    setActiveId,
+    setActiveId: selectActiveId,
     newConversation,
     updateConversation,
     deleteConversation,
