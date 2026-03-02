@@ -167,7 +167,7 @@ export function HeroImages({ topImage, bottomImage }) {
   }
 
   return (
-    <div className={`absolute inset-0 z-10 w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`absolute inset-0 z-10 pointer-events-none w-full h-full bg-transparent transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
