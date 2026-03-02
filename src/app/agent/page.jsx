@@ -10,6 +10,8 @@ import { InputBar } from "@/components/chat/InputBar";
 import { ModelSelector } from "@/components/chat/ModelSelector";
 import { useConversations } from "@/lib/chat-store";
 
+const AGENT_API_SECRET = process.env.NEXT_PUBLIC_AGENT_API_SECRET;
+
 export default function AgentPage() {
   const [model, setModel] = useState("anthropic/claude-sonnet-4-6");
   const {
@@ -29,6 +31,7 @@ export default function AgentPage() {
   const { messages, input, setInput, handleInputChange, handleSubmit, isLoading, stop, setMessages } = useChat({
     api: "/api/agent",
     body: { model },
+    headers: AGENT_API_SECRET ? { Authorization: `Bearer ${AGENT_API_SECRET}` } : {},
     onFinish: () => {
       const currentActiveId = activeIdRef.current;
       if (currentActiveId) {
