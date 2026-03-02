@@ -20,7 +20,7 @@ export function BlogPreview({ posts = [] }) {
   }, []);
 
   // Limit to 6 posts
-  const displayPosts = posts.slice(0, 6);
+  const displayPosts = (posts ?? []).slice(0, 6);
 
   useGSAP(() => {
     gsap.set(".blog-post", { opacity: 1, y: 0 });
