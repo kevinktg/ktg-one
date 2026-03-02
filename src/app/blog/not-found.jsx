@@ -15,7 +15,7 @@ export default function NotFound() {
             post not found
           </h1>
           <p className="text-white/60 mb-8">
-            the post you're looking for doesn't exist or has been moved
+            the post you&apos;re looking for doesn&apos;t exist or has been moved
           </p>
           <Link
             href="/blog"

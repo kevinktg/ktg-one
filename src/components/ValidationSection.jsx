@@ -58,6 +58,7 @@ export function ValidationSection({ auditData }) {
   useEffect(() => {
     const played = sessionStorage.getItem('validation-animated') === 'true';
     if (played) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasPlayed(true);
     }
   }, []);
@@ -288,7 +289,7 @@ export function ValidationSection({ auditData }) {
                         <p className="leading-relaxed text-foreground">{data.percentile.justification}</p>
                       </div>
                       <p className="text-muted-foreground text-lg italic border-l-2 border-border pl-6">
-                        "{data.percentile.quote}"
+                        &ldquo;{data.percentile.quote}&rdquo;
                       </p>
                     </div>
                   </div>
@@ -300,9 +301,9 @@ export function ValidationSection({ auditData }) {
                       <h3 className="text-2xl font-syne font-bold">The Evidence</h3>
                     </div>
                     <div className="space-y-6">
-                      <p className="text-lg md:text-xl leading-relaxed text-foreground">"{data.evidence.quote1}"</p>
+                      <p className="text-lg md:text-xl leading-relaxed text-foreground">&ldquo;{data.evidence.quote1}&rdquo;</p>
                       <div className="p-6 border border-border bg-card/50 rounded-lg">
-                        <p className="text-base text-foreground leading-relaxed">"{data.evidence.quote2}"</p>
+                        <p className="text-base text-foreground leading-relaxed">&ldquo;{data.evidence.quote2}&rdquo;</p>
                       </div>
                     </div>
                   </div>
@@ -311,7 +312,7 @@ export function ValidationSection({ auditData }) {
                   <div className="relative w-[85vw] md:w-[700px] shrink-0 digital-text bg-foreground text-background p-8 md:p-12">
                     <div className="absolute top-0 right-0 p-6 opacity-50 text-xs">final_transmission</div>
                     <div className="space-y-8">
-                      <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">"{data.verdict.title}"</h3>
+                      <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight">&ldquo;{data.verdict.title}&rdquo;</h3>
                       <p className="text-xl md:text-2xl border-l-4 border-background/20 pl-8 py-2">
                         {data.verdict.subtitle}
                       </p>

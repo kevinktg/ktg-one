@@ -18,9 +18,12 @@ export function GlobalCursor() {
 
     // Mouse move handler
     const handleMouseMove = (e) => {
-      positionRef.current = { x: e.clientX, y: e.clientY };
+      // Optimization: Mutate existing object to avoid GC churn
+      positionRef.current.x = e.clientX;
+      positionRef.current.y = e.clientY;
     };
 
+    let rafId;
     // Animation loop for smooth follower movement
     const animate = () => {
       // Update main cursor position immediately
@@ -34,11 +37,11 @@ export function GlobalCursor() {
          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    const rafId = requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
