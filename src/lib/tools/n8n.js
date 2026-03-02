@@ -13,7 +13,7 @@ export const triggerWorkflowTool = tool({
 
     // Validate webhook path to prevent SSRF via prompt injection
     if (!/^[\w-]+$/.test(webhook)) {
-      return { error: `Invalid webhook path: "${webhook}". Use alphanumeric characters and hyphens only.` };
+      return { error: `Invalid webhook path: "${webhook}". Use alphanumeric characters, hyphens, and underscores only.` };
     }
 
     const controller = new AbortController();
