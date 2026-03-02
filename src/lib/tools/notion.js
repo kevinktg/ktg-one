@@ -5,7 +5,7 @@ export const queryNotionTool = tool({
   description: "Search Notion pages and databases. Use for KISMET CRM data, tasks, notes, any Notion content.",
   inputSchema: z.object({
     query: z.string().describe("What to search for in Notion"),
-    filter: z.string().optional().describe("Optional: filter by database name e.g. 'KISMET' or 'Tasks'"),
+    filter: z.string().optional().describe("Optional: filter results by title (case-insensitive) e.g. 'KISMET' or 'Tasks'"),
   }),
   execute: async ({ query, filter }) => {
     const apiKey = process.env.NOTION_API_KEY;

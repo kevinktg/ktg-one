@@ -1,5 +1,6 @@
 import { streamText, convertToModelMessages, stepCountIs } from "ai";
 import { gateway } from "@ai-sdk/gateway";
+import { timingSafeEqual } from "crypto";
 import { tools } from "@/lib/tools";
 
 export const maxDuration = 60;
@@ -22,6 +23,23 @@ const SYSTEM = `You are ktg-one, a personal AI agent for Kevin. You have access 
 Be concise. Show your reasoning briefly before calling tools. After tool results, summarise what you found/did.`;
 
 export async function POST(req) {
+  const agentApiKey = process.env.AGENT_API_KEY;
+  if (agentApiKey) {
+    const authHeader = req.headers.get("authorization") ?? "";
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    const keyBuf = Buffer.from(agentApiKey);
+    const tokBuf = Buffer.from(token);
+    const valid =
+      keyBuf.length === tokBuf.length &&
+      timingSafeEqual(keyBuf, tokBuf);
+    if (!valid) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
   const { messages, model = "anthropic/claude-sonnet-4-6" } = await req.json();
 
   if (!Array.isArray(messages) || messages.length === 0) {
