@@ -39,8 +39,10 @@ function loadStored() {
 }
 
 export function useConversations() {
-  const [conversations, setConversations] = useState(() => loadStored().conversations);
-  const [activeId, setActiveId] = useState(() => loadStored().activeId);
+  const { conversations: initialConversations, activeId: initialActiveId } = loadStored();
+
+  const [conversations, setConversations] = useState(initialConversations);
+  const [activeId, setActiveId] = useState(initialActiveId);
 
   function save(nextOrUpdater) {
     setConversations((prev) => {
