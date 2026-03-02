@@ -160,7 +160,6 @@ export default async function BlogPostPage({ params }) {
                 prose-strong:text-white prose-strong:font-bold
                 prose-code:text-emerald-400 prose-code:font-mono prose-code:text-sm
                 prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-                prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-white/10
                 prose-img:rounded-xl prose-img:shadow-2xl
                 prose-blockquote:border-l-white/20 prose-blockquote:text-white/60 prose-blockquote:italic
                 prose-li:marker:text-white/30
