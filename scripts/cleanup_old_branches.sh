@@ -61,7 +61,33 @@ git for-each-ref --format='%(committerdate:unix) %(refname:lstrip=3)' refs/remot
 
   # 2. Check CI status using GitHub API
   is_failed=false
-  # We query the commit status API. `state` at the root object indicates the combined status.
+  ci_status=""
+  api_url="https://api.github.com/repos/$REPO/commits/$branch_name/status"
+
+  # Use optional GitHub token to authenticate (helps with rate limits and private repos)
+  auth_header=()
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+  fi
+
+  # Fetch CI status and capture HTTP status code
+  api_response=$(curl -sS "${auth_header[@]}" "$api_url" -w " HTTPSTATUS:%{http_code}" ) || api_response=""
+  http_status="${api_response##*HTTPSTATUS:}"
+  response_body="${api_response% HTTPSTATUS:*}"
+
+  if [[ -z "$api_response" || "$http_status" -lt 200 || "$http_status" -ge 300 ]]; then
+    # Network or HTTP error – treat as failed to be conservative
+    echo "Warning: Failed to fetch CI status for branch '$branch_name' (HTTP $http_status). Treating as failed."
+    is_failed=true
+  else
+    # We query the commit status API. `state` at the root object indicates the combined status.
+    ci_status=$(grep -m 1 '"state":' <<< "$response_body" | awk -F'"' '{print $4}')
+
+    # Treat failure-like states as failed CI
+    if [[ "$ci_status" == "failure" || "$ci_status" == "error" || "$ci_status" == "cancelled" ]]; then
+      is_failed=true
+    fi
+  fi
   status=$(curl -sL "https://api.github.com/repos/$REPO/commits/$branch_name/status" | grep -m 1 '"state":' | awk -F'"' '{print $4}')
   if [ "$status" == "failure" ]; then
     is_failed=true
