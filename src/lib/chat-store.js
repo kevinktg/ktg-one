@@ -40,7 +40,13 @@ function loadStored() {
 
 export function useConversations() {
   const [conversations, setConversations] = useState(() => loadStored().conversations);
-  const [activeId, setActiveId] = useState(() => loadStored().activeId);
+  const [activeId, _setActiveId] = useState(() => loadStored().activeId);
+
+  function setActiveId(id) {
+    _setActiveId(id);
+    if (id) localStorage.setItem(ACTIVE_KEY, id);
+    else localStorage.removeItem(ACTIVE_KEY);
+  }
 
   function save(nextOrUpdater) {
     setConversations((prev) => {
@@ -60,7 +66,6 @@ export function useConversations() {
     };
     save((prev) => [conv, ...prev]);
     setActiveId(conv.id);
-    localStorage.setItem(ACTIVE_KEY, conv.id);
     return conv;
   }
 
@@ -74,8 +79,6 @@ export function useConversations() {
       if (activeId === id) {
         const nextActiveId = next[0]?.id ?? null;
         setActiveId(nextActiveId);
-        if (nextActiveId) localStorage.setItem(ACTIVE_KEY, nextActiveId);
-        else localStorage.removeItem(ACTIVE_KEY);
       }
       return next;
     });
