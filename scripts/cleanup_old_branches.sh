@@ -1,7 +1,21 @@
 #!/bin/bash
 
 # Configuration
-REPO="kevinktg/ktg-one"
+# Derive owner/repo from the current git remote URL (origin) to avoid hardcoding.
+REMOTE_URL=$(git remote get-url origin 2>/dev/null || true)
+if [ -z "$REMOTE_URL" ]; then
+  echo "Error: Could not determine git remote 'origin' URL. Are you in a git repository?" >&2
+  exit 1
+fi
+
+# Extract owner/repo from common git remote URL formats (SSH and HTTPS)
+REPO=$(printf '%s\n' "$REMOTE_URL" | sed -E 's#(git@|ssh://git@|https?://)([^/:]+)[:/]([^/]+/[^.]+)(\.git)?#\3#')
+
+if [ -z "$REPO" ]; then
+  echo "Error: Failed to parse repository name from remote URL: $REMOTE_URL" >&2
+  exit 1
+fi
+
 DRY_RUN=true
 
 # Parse arguments
