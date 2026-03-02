@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+
+# Dependency check
+command -v jq >/dev/null 2>&1 || { echo "Error: jq is required but not installed." >&2; exit 1; }
 
 # Configuration
 # Derive owner/repo from the current git remote URL (origin) to avoid hardcoding.
@@ -41,9 +45,31 @@ else
   echo "⚠️  FORCE MODE: Branches WILL be deleted from origin!"
 fi
 echo "================================================="
+
+# If running in force mode, require an explicit confirmation before proceeding.
+if [ "$DRY_RUN" = false ]; then
+  echo ""
+  echo "This will delete remote branches from 'origin' in repository '$REPO'."
+  echo "These deletions are immediate and cannot be easily undone."
+  echo ""
+  echo "To proceed, type 'yes' and press Enter. Any other response will abort."
+  printf "Confirm deletion: "
+  read -t 30 -r confirmation || { echo ""; echo "Timed out waiting for confirmation. Aborting."; exit 1; }
+  if [ "$confirmation" != "yes" ]; then
+    echo "Aborting cleanup; no branches were deleted."
+    exit 1
+  fi
+  echo "Proceeding with forced deletion of eligible branches..."
+  echo "================================================="
+fi
+
 echo "Deleting branches older than 2 weeks or with failed CI..."
 echo "Reference timestamp: $TWO_WEEKS_AGO"
 echo ""
+
+# Ensure remote-tracking branches are up to date
+echo "Fetching latest branches from origin (with prune)..."
+git fetch --prune origin
 
 # Get all remote branches with their committerdate in Unix timestamp format
 git for-each-ref --format='%(committerdate:unix) %(refname:lstrip=3)' refs/remotes/origin | while read -r branch_date branch_name; do
@@ -59,38 +85,36 @@ git for-each-ref --format='%(committerdate:unix) %(refname:lstrip=3)' refs/remot
     is_old=true
   fi
 
-  # 2. Check CI status using GitHub API
+  # 2. Check CI status using GitHub API (only for non-old branches to conserve rate limit quota)
   is_failed=false
   ci_status=""
-  api_url="https://api.github.com/repos/$REPO/commits/$branch_name/status"
+  if [ "$is_old" = false ]; then
+    # URL-encode the branch name (replace '/' with '%2F') for use in the API URL
+    encoded_branch_name="${branch_name//\//%2F}"
+    api_url="https://api.github.com/repos/$REPO/commits/$encoded_branch_name/status"
 
-  # Use optional GitHub token to authenticate (helps with rate limits and private repos)
-  auth_header=()
-  if [[ -n "$GITHUB_TOKEN" ]]; then
-    auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
-  fi
-
-  # Fetch CI status and capture HTTP status code
-  api_response=$(curl -sS "${auth_header[@]}" "$api_url" -w " HTTPSTATUS:%{http_code}" ) || api_response=""
-  http_status="${api_response##*HTTPSTATUS:}"
-  response_body="${api_response% HTTPSTATUS:*}"
-
-  if [[ -z "$api_response" || "$http_status" -lt 200 || "$http_status" -ge 300 ]]; then
-    # Network or HTTP error – treat as failed to be conservative
-    echo "Warning: Failed to fetch CI status for branch '$branch_name' (HTTP $http_status). Treating as failed."
-    is_failed=true
-  else
-    # We query the commit status API. `state` at the root object indicates the combined status.
-    ci_status=$(grep -m 1 '"state":' <<< "$response_body" | awk -F'"' '{print $4}')
-
-    # Treat failure-like states as failed CI
-    if [[ "$ci_status" == "failure" || "$ci_status" == "error" || "$ci_status" == "cancelled" ]]; then
-      is_failed=true
+    # Fetch CI status and capture HTTP status code; pass auth header if token is available
+    if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+      api_response=$(curl -sS -H "Authorization: Bearer $GITHUB_TOKEN" "$api_url" -w " HTTPSTATUS:%{http_code}") || api_response=""
+    else
+      api_response=$(curl -sS "$api_url" -w " HTTPSTATUS:%{http_code}") || api_response=""
     fi
-  fi
-  status=$(curl -sL "https://api.github.com/repos/$REPO/commits/$branch_name/status" | grep -m 1 '"state":' | awk -F'"' '{print $4}')
-  if [ "$status" == "failure" ]; then
-    is_failed=true
+    http_status="${api_response##*HTTPSTATUS:}"
+    response_body="${api_response% HTTPSTATUS:*}"
+
+    if [[ -z "$api_response" || ! "$http_status" =~ ^[0-9]+$ || "$http_status" -lt 200 || "$http_status" -ge 300 ]]; then
+      # Network or HTTP error – treat as failed to be conservative
+      echo "Warning: Failed to fetch CI status for branch '$branch_name' (HTTP $http_status). Treating as failed."
+      is_failed=true
+    else
+      # Use jq to robustly parse the combined state from the JSON response
+      ci_status=$(printf '%s' "$response_body" | jq -r '.state // empty')
+
+      # Treat failure-like states as failed CI
+      if [[ "$ci_status" == "failure" || "$ci_status" == "error" || "$ci_status" == "cancelled" ]]; then
+        is_failed=true
+      fi
+    fi
   fi
 
   # Determine if we should delete
@@ -115,13 +139,11 @@ git for-each-ref --format='%(committerdate:unix) %(refname:lstrip=3)' refs/remot
     echo "Marked for deletion: $branch_name"
     echo "  Reason: $reason"
     echo "  Last commit: $human_date"
-    echo "  CI Status: ${status:-unknown}"
+    echo "  CI Status: ${ci_status:-unknown}"
 
     if [ "$DRY_RUN" = false ]; then
       # Execute the delete command
-      git push origin --delete "$branch_name"
-
-      if [ $? -eq 0 ]; then
+      if git push origin --delete "$branch_name"; then
         echo "  ✅ Successfully deleted $branch_name"
       else
         echo "  ❌ Failed to delete $branch_name"
