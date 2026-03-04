@@ -1,100 +1,87 @@
-```
-# Compiled and build artifacts
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build artifacts
+.next/
+dist/
+build/
+target/
 *.pyc
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
-.agent
-# Dependencies
-node_modules/
-venv/
-.venv/
+tsconfig.tsbuildinfo
+
+# Environment
 .env
 .env.local
-.env.*
-.in-memoria
-.in-memoria-vectors.db
-.in-memoria.db
-.claude-flow.cmd
-.performance-capture.js
-.performance-monitor.js
-.auto-claude
-.claude
-.claude-flow
-.cursor
-.dropstone
-.hive-mind
-.swarm
-.taskmaster
-.vscode
-.next
-.next
-.agent
-.agentdb
-.agentic-flow
-.agentic-flow-db
-.agentic-flow-db-v1
-.agentic-flow-db-v2
-.agentic-flow-db-v3
-.vercel
-GEMINI.md
-CLAUDE.md
-claude_desktop_config.json
-claude_settings.json
-.jules
-.in-memoria
-.github
-debug-screenshots
-coordination
+.env.development.local
+.env.test.local
+.env.production.local
+venv/
+.venv/
 
 # Logs and temp files
 *.log
 *.tmp
-memory
-claude-flow.cmd
-performance-capture.js
-performance-monitor.js
 *.swp
-.auto-claude
-in-memoria-vectors.db
-in-memoria.db
-.claude
-.claude-flow
-.cursor
-.dropstone
-.hive-mind
-.in-memoria
-.swarm
-.taskmaster
-.vscode
-.next
-.agent
-.agentdb
-.agentic-flow
-.agentic-flow-db
-.agentic-flow-db-v1
-.agentic-flow-db-v2
-.agentic-flow-db-v3
-.vercel
-# Editors
-.vscode/
-.idea/
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+.cursor
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Python specific
+# Python
 .mypy_cache/
 .pytest_cache/
+
+# Agent/tool metadata
+.agent
+.agentdb
+.agentic-flow
+.agentic-flow-db*
+.auto-claude
+.claude
+.claude-flow
+.claude-flow.cmd
+.dropstone
+.hive-mind
+.in-memoria
+.in-memoria.db
+.in-memoria-vectors.db
+.swarm
+.taskmaster
+.vercel
+.jules
+.worktrees
+debug-screenshots
+coordination
+memory
+
+# Agent config files
+claude_desktop_config.json
+claude_settings.json
+GEMINI.md
+CLAUDE.md
+
+# Scripts
+performance-capture.js
+performance-monitor.js
+.performance-capture.js
+.performance-monitor.js
+claude-flow.cmd
 
 # Compressed files
 *.zip
@@ -107,17 +94,3 @@ htmlcov/
 *.rar
 *.zst
 *.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
-```
-.next/

@@ -301,7 +301,7 @@ npm run deploy
 ### Custom Domain Setup
 - DNS records configured for ktg.one
 - Redirects vercel.app domain to custom domain
-- See VERCEL_DEPLOY.md for detailed domain management
+- See `docs/VERCEL_DEPLOY.md` for detailed domain management
 
 **Platform:** Vercel with automatic deployments from GitHub
 **Branch:** Deploy from main branch
@@ -310,7 +310,7 @@ npm run deploy
 
 - **GSAP Integration:** See `GSAP_NEXTJS_INTEGRATION.md`
 - **Hydration Debug:** See `HYDRATION-DEBUG-SESSION.md`
-- **Deployment Guide:** See `VERCEL_DEPLOY.md`
+- **Deployment Guide:** See `docs/VERCEL_DEPLOY.md`
 
 ---
 

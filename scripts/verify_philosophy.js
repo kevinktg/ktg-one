@@ -31,7 +31,7 @@ const puppeteer = require('puppeteer');
     if (section) {
         console.log("Scrolled to Philosophy. Waiting for animation...");
         await new Promise(r => setTimeout(r, 3000)); // Wait for GSAP
-        await page.screenshot({ path: 'verification_philosophy.png', fullPage: false });
+        await page.screenshot({ path: 'verification/verification_philosophy.png', fullPage: false });
         console.log("Screenshot saved.");
     } else {
         console.log("Philosophy section not found.");
