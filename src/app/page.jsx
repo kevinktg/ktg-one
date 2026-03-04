@@ -1,13 +1,12 @@
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
-import { HeroTransition } from "@/components/HeroTransition";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
-import { ExpertiseTransition } from "@/components/ExpertiseTransition";
+import { SectionTransition } from "@/components/SectionTransition";
 import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
-import { GeometricBackground } from "@/components/GeometricBackground";
+
 import { getPosts } from "@/lib/wordpress";
 
 // Force dynamic rendering if you want new blog posts to appear instantly on refresh
@@ -32,9 +31,6 @@ export default async function Home() {
 
   return (
     <div className="bg-background min-h-screen flex flex-col relative" suppressHydrationWarning>
-      {/* Global background with gradient glow and grid - reactive to cursor */}
-      <GeometricBackground fixed />
-      
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}
@@ -46,7 +42,13 @@ export default async function Home() {
         <HeroSection />
 
         {/* TRANSITION: Wipe from hero to geometric background */}
-        <HeroTransition />
+        <SectionTransition
+          sessionKey="hero-transition-played"
+          panelColor="black"
+          zIndex="z-20"
+          topGradientFrom="from-black"
+          bottomGradientFrom="from-black"
+        />
 
         {/* EXPERTISE: White Background (Scrolls over geometric bg) */}
         <div id="main-content">
@@ -54,7 +56,13 @@ export default async function Home() {
         </div>
 
         {/* TRANSITION: Wipe from expertise (white) to validation (black) */}
-        <ExpertiseTransition />
+        <SectionTransition
+          sessionKey="expertise-transition-played"
+          panelColor="white"
+          zIndex="z-35"
+          topGradientFrom="from-white"
+          bottomGradientFrom="from-black"
+        />
 
         {/* VALIDATION: Black Background (Horizontal Scroll) */}
         <ValidationSection />

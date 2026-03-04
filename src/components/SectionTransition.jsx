@@ -8,24 +8,32 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * ExpertiseTransition - Creates wipe effect from expertise (white) to validation (black)
- * Similar to HeroTransition but transitions from white to black
+ * SectionTransition - Reusable wipe transition between sections
+ * @param {string} sessionKey - Key for sessionStorage animation tracking
+ * @param {string} panelColor - Color of the wipe panel ("black" or "white")
+ * @param {string} zIndex - Tailwind z-index class (e.g. "z-20", "z-35")
+ * @param {string} topGradientFrom - Top gradient start color
+ * @param {string} bottomGradientFrom - Bottom gradient start color
  */
-export function ExpertiseTransition() {
+export function SectionTransition({
+  sessionKey,
+  panelColor = "black",
+  zIndex = "z-20",
+  topGradientFrom = "from-black",
+  bottomGradientFrom = "from-black",
+}) {
   const containerRef = useRef(null);
   const wipeRef = useRef(null);
   const gridRevealRef = useRef(null);
 
-  // Session-based animation tracking
   const hasPlayed = useMemo(() => {
     if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem('expertise-transition-played') === 'true';
-  }, []);
+    return sessionStorage.getItem(sessionKey) === 'true';
+  }, [sessionKey]);
 
   useGSAP(() => {
     if (!containerRef.current) return;
 
-    // If already played, set final state
     if (hasPlayed) {
       if (wipeRef.current) {
         gsap.set(wipeRef.current, { clipPath: 'inset(100% 0 0 0)' });
@@ -36,7 +44,6 @@ export function ExpertiseTransition() {
       return;
     }
 
-    // Timeline for coordinated transition
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
@@ -44,12 +51,11 @@ export function ExpertiseTransition() {
         end: 'bottom 20%',
         scrub: 0.8,
         onLeave: () => {
-          sessionStorage.setItem('expertise-transition-played', 'true');
+          sessionStorage.setItem(sessionKey, 'true');
         },
       },
     });
 
-    // Wipe effect using clip-path (white to black transition)
     tl.fromTo(
       wipeRef.current,
       { clipPath: 'inset(0 0 0 0)' },
@@ -57,7 +63,6 @@ export function ExpertiseTransition() {
       0
     );
 
-    // Reveal grid pattern (geometric background)
     tl.fromTo(
       gridRevealRef.current,
       { opacity: 0 },
@@ -67,13 +72,17 @@ export function ExpertiseTransition() {
 
   }, { scope: containerRef });
 
+  const panelBg = panelColor === "white" ? "bg-white" : "bg-black";
+  const gradientClass = panelColor === "white"
+    ? "bg-linear-to-b from-white via-white to-transparent"
+    : "bg-gradient-to-b from-black via-black to-transparent";
+
   return (
     <div
       ref={containerRef}
-      className="relative h-[60vh] w-full overflow-hidden z-35"
+      className={`relative h-[60vh] w-full overflow-hidden ${zIndex}`}
       style={{ contain: 'layout paint' }}
     >
-      {/* Grid reveal pattern - shows geometric background peaking through */}
       <div
         ref={gridRevealRef}
         className="absolute inset-0 pointer-events-none opacity-0"
@@ -87,29 +96,25 @@ export function ExpertiseTransition() {
         aria-hidden="true"
       />
 
-      {/* Wipe panel - white overlay that clips away to reveal black bg */}
       <div
         ref={wipeRef}
-        className="absolute inset-0 bg-white"
+        className={`absolute inset-0 ${panelBg}`}
         style={{
           clipPath: 'inset(0 0 0 0)',
           willChange: 'clip-path',
         }}
         aria-hidden="true"
       >
-        {/* Subtle gradient for depth */}
-        <div className="absolute inset-0 bg-linear-to-b from-white via-white to-transparent" />
+        <div className={`absolute inset-0 ${gradientClass}`} />
       </div>
 
-      {/* Top gradient for smooth blend from expertise */}
       <div
-        className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-white to-transparent pointer-events-none z-10"
+        className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${topGradientFrom} to-transparent pointer-events-none z-10`}
         aria-hidden="true"
       />
 
-      {/* Bottom gradient for smooth blend into validation */}
       <div
-        className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black to-transparent pointer-events-none z-10"
+        className={`absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t ${bottomGradientFrom} to-transparent pointer-events-none z-10`}
         aria-hidden="true"
       />
     </div>

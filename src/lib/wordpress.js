@@ -18,23 +18,6 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
-// Test WordPress connection
-export async function testWordPressConnection() {
-  try {
-    const response = await fetchWithTimeout(`${WORDPRESS_URL}/wp-json/wp/v2`, {
-      cache: 'no-store',
-    });
-    return response.ok;
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.error('WordPress connection test timed out');
-    } else {
-      console.error('WordPress connection test failed:', error);
-    }
-    return false;
-  }
-}
-
 // Fetch all blog posts
 export async function getPosts(page = 1, perPage = 10) {
   try {
