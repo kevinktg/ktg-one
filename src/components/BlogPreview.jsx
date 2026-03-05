@@ -26,37 +26,6 @@ export function BlogPreview({ posts = [] }) {
     }
   };
 
-  // Map vertical wheel scroll to horizontal scroll
-  useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const onWheel = (e) => {
-      if (e.deltaY === 0) return;
-
-      const isVertical = Math.abs(e.deltaY) > Math.abs(e.deltaX);
-      if (!isVertical) return;
-
-      // Determine if we are at boundaries
-      const atStart = el.scrollLeft === 0;
-      // Tolerance for floating-point precision errors in scroll calculations
-      const SCROLL_BOUNDARY_TOLERANCE = 2;
-      const atEnd = Math.abs(el.scrollLeft + el.clientWidth - el.scrollWidth) < SCROLL_BOUNDARY_TOLERANCE;
-
-      if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) {
-        // At boundary and trying to go further out -> Allow vertical scroll
-        return;
-      }
-
-      // Otherwise, hijack vertical scroll for horizontal movement
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
-
   // OPTIMIZATION: Cache sessionStorage check to avoid synchronous access on every render
   const hasPlayed = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -74,6 +43,9 @@ export function BlogPreview({ posts = [] }) {
     const handleWheel = (e) => {
       // Only capture vertical scroll (deltaY)
       if (e.deltaY === 0) return;
+
+      const isVertical = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      if (!isVertical) return;
 
       // Check boundaries
       const isAtLeft = container.scrollLeft === 0;

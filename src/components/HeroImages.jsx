@@ -147,14 +147,6 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
       if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
     }
   }, [textures])
-  
-  // OPTIMIZATION: Update textures only when they change, avoiding per-frame assignment
-  useEffect(() => {
-    if (materialRef.current) {
-      if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-      if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
-    }
-  }, [textures])
 
   // OPTIMIZATION: Update aspect ratio only on resize, avoiding per-frame assignment
   useEffect(() => {

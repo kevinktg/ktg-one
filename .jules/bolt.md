@@ -9,3 +9,7 @@
 ## 2024-05-24 - [Package Lock Noise]
 **Learning:** Running `npm install` can update `package-lock.json` even if no dependencies are added, creating noise in PRs.
 **Action:** Always restore `package-lock.json` if the task does not involve dependency updates, or use `npm ci` (if appropriate for the environment) to avoid modifying the lockfile.
+
+## 2024-05-28 - [Duplicate useEffect Handlers]
+**Learning:** Duplicate `useEffect` handlers that perform the same DOM event binding or uniform assignment can silently degrade performance by running computations multiple times and potentially causing race conditions.
+**Action:** Audit and ensure only a single, optimized `useEffect` hook handles specific logic paths like scroll listeners or WebGL uniform assignments.
