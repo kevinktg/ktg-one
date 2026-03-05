@@ -9,3 +9,7 @@
 ## 2024-05-24 - [Package Lock Noise]
 **Learning:** Running `npm install` can update `package-lock.json` even if no dependencies are added, creating noise in PRs.
 **Action:** Always restore `package-lock.json` if the task does not involve dependency updates, or use `npm ci` (if appropriate for the environment) to avoid modifying the lockfile.
+
+## 2024-05-24 - [Duplicated Hooks]
+**Learning:** Duplicate `useEffect` hooks, particularly those attaching event listeners (like `wheel` events) or updating WebGL uniforms, can easily sneak into components during refactors. This causes layout thrashing, double-firing of events, and redundant GPU/CPU operations.
+**Action:** Always audit components for duplicated logic and hooks, especially when implementing or modifying scroll or WebGL functionality.

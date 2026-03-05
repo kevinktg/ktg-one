@@ -140,14 +140,6 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     })
   }, [topImagePath, bottomImagePath, onLoaded])
 
-  // OPTIMIZATION: Update static uniforms only when they change, not on every frame
-  useEffect(() => {
-    if (materialRef.current) {
-      if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
-      if (textures.bottom) materialRef.current.uniforms.bottomTex.value = textures.bottom
-    }
-  }, [textures])
-  
   // OPTIMIZATION: Update textures only when they change, avoiding per-frame assignment
   useEffect(() => {
     if (materialRef.current) {
