@@ -82,7 +82,7 @@ function AIChatCard() {
         />
         <button
           type="submit"
-          disabled={isLoading || !input.trim()}
+          disabled={isLoading || !input?.trim()}
           className="p-2 rounded-lg border border-white/10 text-white/40 hover:text-purple-400 hover:border-purple-500/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           <Send className="w-3.5 h-3.5" />
