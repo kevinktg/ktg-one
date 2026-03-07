@@ -7,6 +7,7 @@ import { useGSAP } from '@gsap/react'
 export function CursorDot() {
   const containerRef = useRef(null)
   const dotsRef = useRef([])
+  const rafIdRef = useRef(null)
   
   // Configuration: How many dots and how fast they follow
   const DOT_COUNT = 12
@@ -29,7 +30,6 @@ export function CursorDot() {
     const dots = dotsRef.current.map(() => ({ x: -1000, y: -1000 }))
     let isMoving = false
     let timeoutId = null
-    let rafId = null
 
     // 3. The Animation Loop (Using requestAnimationFrame for better sync with browser)
     const render = () => {
@@ -70,7 +70,7 @@ export function CursorDot() {
       
       // Continue animation loop
       if (isMoving) {
-        rafId = requestAnimationFrame(render)
+        rafIdRef.current = requestAnimationFrame(render)
       }
     }
 
@@ -90,7 +90,7 @@ export function CursorDot() {
           dot.y = mouse.y
         })
         isMoving = true
-        rafId = requestAnimationFrame(render)
+        rafIdRef.current = requestAnimationFrame(render)
         // Fade in dots
         gsap.to(dotsRef.current, { 
           opacity: (i) => 1 - (i / DOT_COUNT), // Head is bright, tail fades
@@ -102,7 +102,7 @@ export function CursorDot() {
       // Hide trail when mouse stops moving for a bit
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
-        if (rafId) cancelAnimationFrame(rafId)
+        if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
         isMoving = false
         gsap.to(dotsRef.current, { opacity: 0, scale: 0, duration: 0.5 })
       }, 2000) // Keep visible for 2s after stop
@@ -113,7 +113,7 @@ export function CursorDot() {
     // Cleanup
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
-      if (rafId) cancelAnimationFrame(rafId)
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
       clearTimeout(timeoutId)
     }
   }, { scope: containerRef })
