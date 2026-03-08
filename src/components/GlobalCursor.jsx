@@ -15,17 +15,10 @@ export function GlobalCursor() {
   useEffect(() => {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
-
-    // Mouse move handler
-    const handleMouseMove = (e) => {
-      // Optimization: Mutate existing object to avoid GC churn
-      positionRef.current.x = e.clientX;
-      positionRef.current.y = e.clientY;
-    };
-
     let rafId;
+
     // Animation loop for smooth follower movement
-    const animate = () => {
+    const updateCursor = () => {
       // Update main cursor position immediately
       if (cursor) {
         cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
@@ -37,15 +30,28 @@ export function GlobalCursor() {
          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      rafId = requestAnimationFrame(animate);
+      rafId = null;
+    };
+
+    // Mouse move handler
+    const handleMouseMove = (e) => {
+      // Optimization: Mutate existing object to avoid GC churn
+      positionRef.current.x = e.clientX;
+      positionRef.current.y = e.clientY;
+
+      // Event-driven update: only schedule a frame if one isn't already scheduled
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateCursor);
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
