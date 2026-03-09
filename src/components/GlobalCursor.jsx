@@ -15,37 +15,43 @@ export function GlobalCursor() {
   useEffect(() => {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
+    let rafId;
 
-    // Mouse move handler
+    // ⚡ Bolt Performance Optimization: Event-driven requestAnimationFrame
+    // Previously, this cursor used a continuous, infinite requestAnimationFrame loop
+    // which consumed idle CPU/GPU cycles even when the mouse was not moving.
+    // By refactoring to an event-driven model (triggering RAF only on 'mousemove'),
+    // we eliminate redundant processing, saving battery life and reducing main thread load.
     const handleMouseMove = (e) => {
       // Optimization: Mutate existing object to avoid GC churn
       positionRef.current.x = e.clientX;
       positionRef.current.y = e.clientY;
-    };
 
-    let rafId;
-    // Animation loop for smooth follower movement
-    const animate = () => {
-      // Update main cursor position immediately
-      if (cursor) {
-        cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
       }
 
-      // Update follower with smooth transition
-      // (Simplified to follow strictly to avoid 'massive' scaling bugs if logic was broken)
-      if (follower) {
-         follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
-      }
+      rafId = requestAnimationFrame(() => {
+        // Apply position updates to DOM elements in the next animation frame
+        if (cursor) {
+          cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+        }
 
-      rafId = requestAnimationFrame(animate);
+        // ⚡ Bolt Optimization: Using CSS transition for the follower smoothness
+        // instead of continuous JavaScript lerping within a render loop
+        if (follower) {
+           follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+        }
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
