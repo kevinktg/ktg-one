@@ -103,21 +103,6 @@
     letter-spacing: -0.01em;
   }
 
-  /* Add better spacing for blog content */
-  article p {
-    margin-bottom: 2rem;
-    font-size: 1.125rem;
-  }
-
-  article ul, article ol {
-    margin-bottom: 2rem;
-    padding-left: 1.5rem;
-  }
-
-  article li {
-    margin-bottom: 0.5rem;
-  }
-
   .monospace, code {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   }
