@@ -16,36 +16,39 @@ export function GlobalCursor() {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
 
-    // Mouse move handler
-    const handleMouseMove = (e) => {
-      // Optimization: Mutate existing object to avoid GC churn
-      positionRef.current.x = e.clientX;
-      positionRef.current.y = e.clientY;
-    };
+    let rafId = null;
 
-    let rafId;
-    // Animation loop for smooth follower movement
-    const animate = () => {
-      // Update main cursor position immediately
+    // Animation function that applies current position
+    const updatePosition = () => {
       if (cursor) {
         cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      // Update follower with smooth transition
-      // (Simplified to follow strictly to avoid 'massive' scaling bugs if logic was broken)
       if (follower) {
          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      rafId = requestAnimationFrame(animate);
+      rafId = null; // Clear id so next mousemove can schedule again
+    };
+
+    const handleMouseMove = (e) => {
+      positionRef.current.x = e.clientX;
+      positionRef.current.y = e.clientY;
+
+      // Only schedule a new frame if one isn't already pending
+      // OPTIMIZATION: Event-driven RAF prevents continuous idle CPU usage
+      if (!rafId) {
+        rafId = requestAnimationFrame(updatePosition);
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
