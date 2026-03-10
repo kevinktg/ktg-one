@@ -24,7 +24,13 @@ Be concise. Show your reasoning briefly before calling tools. After tool results
 
 export async function POST(req) {
   const agentApiKey = process.env.AGENT_API_KEY;
-  if (agentApiKey) {
+  if (!agentApiKey) {
+    return new Response(JSON.stringify({ error: "Server misconfigured" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  {
     const authHeader = req.headers.get("authorization") ?? "";
     const token = authHeader.replace(/^Bearer\s+/i, "").trim();
     const keyBuf = Buffer.from(agentApiKey);
