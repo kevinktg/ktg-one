@@ -89,7 +89,7 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     })
   }, [topImagePath, bottomImagePath, onLoaded])
 
-  // Update textures only when they change
+  // OPTIMIZATION: Update textures only when they change, avoiding per-frame assignment
   useEffect(() => {
     if (materialRef.current) {
       if (textures.top) materialRef.current.uniforms.topTex.value = textures.top
