@@ -40,7 +40,7 @@ export function GlobalCursor() {
         // ⚡ Bolt Optimization: Using CSS transition for the follower smoothness
         // instead of continuous JavaScript lerping within a render loop
         if (follower) {
-           follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
         }
       });
     };
