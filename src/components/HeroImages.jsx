@@ -3,93 +3,43 @@
 import { Suspense, useRef, useEffect, useState, useCallback } from 'react'
 import { Canvas, useFrame, useThree, extend } from '@react-three/fiber'
 import { TextureLoader, ShaderMaterial, Vector2 } from 'three'
-import * as THREE from 'three'
 
 // ============================================================================
-// NOISE / DISTORTION SHADER
+// BRUSH REVEAL SHADER (no warping, no noise — clean soft-edge brush)
 // ============================================================================
-
-// Simplex 2D noise function included in the fragment shader
-const simplexNoise2D = `
-vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-
-float snoise(vec2 v){
-  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-           -0.577350269189626, 0.024390243902439);
-  vec2 i  = floor(v + dot(v, C.yy) );
-  vec2 x0 = v -   i + dot(i, C.xx);
-  vec2 i1;
-  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  vec4 x12 = x0.xyxy + C.xxzz;
-  x12.xy -= i1;
-  i = mod(i, 289.0);
-  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-  + i.x + vec3(0.0, i1.x, 1.0 ));
-  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-  m = m*m ;
-  m = m*m ;
-  vec3 x = 2.0 * fract(p * C.www) - 1.0;
-  vec3 h = abs(x) - 0.5;
-  vec3 ox = floor(x + 0.5);
-  vec3 a0 = x - ox;
-  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-  vec3 g;
-  g.x  = a0.x  * x0.x  + h.x  * x0.y;
-  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-  return 130.0 * dot(m, g);
-}
-`
 
 const fluidRevealFragmentShader = `
   uniform sampler2D topTex;
   uniform sampler2D bottomTex;
   uniform vec2 mouse;
   uniform float aspect;
-  uniform float uTime;
-  
+
   varying vec2 vUv;
-  
-  ${simplexNoise2D}
 
   void main() {
-    // 1. Coordinates setup
+    // 1. Aspect-corrected coordinates
     vec2 center = vUv * 2.0 - 1.0;
     center.x *= aspect;
-    
+
     vec2 mousePos = mouse * 2.0 - 1.0;
     mousePos.x *= aspect;
-    
-    // 2. Calculate Distance
+
+    // 2. Distance from cursor
     float dist = distance(center, mousePos);
-    
-    // 3. Generate Noise
-    // We animate the noise with uTime
-    float noiseValue = snoise(vUv * 5.0 + uTime * 0.5);
 
-    // 4. Distortion - distort the texture lookup based on mouse proximity
-    // The closer to the mouse, the more we distort the UVs
-    float influence = smoothstep(0.5, 0.0, dist);
-    vec2 distortedUv = vUv + (noiseValue * 0.03 * influence);
-    
-    // 5. Fetch Textures with distorted UVs
-    vec4 topColor = texture2D(topTex, distortedUv);
-    vec4 bottomColor = texture2D(bottomTex, distortedUv);
+    // 3. Fetch textures with original UVs (no distortion)
+    vec4 topColor = texture2D(topTex, vUv);
+    vec4 bottomColor = texture2D(bottomTex, vUv);
 
-    // 6. Reveal Mask
-    // Base radius + noise influence for irregular edge
+    // 4. Brush reveal — clean soft-edge circle
     float radius = 0.25;
-    float edgeSoftness = 0.15;
+    float edgeSoftness = 0.18;
+    float reveal = 1.0 - smoothstep(radius, radius + edgeSoftness, dist);
 
-    // Add noise to the distance field to make the circle irregular
-    float noisyDist = dist + noiseValue * 0.05;
-
-    // Create the reveal mask
-    float reveal = 1.0 - smoothstep(radius, radius + edgeSoftness, noisyDist);
-
-    // 7. Mix
+    // 5. Mix
     vec3 finalColor = mix(topColor.rgb, bottomColor.rgb, reveal);
     float finalAlpha = mix(topColor.a, bottomColor.a, reveal);
-    
+
     gl_FragColor = vec4(finalColor, finalAlpha);
   }
 `
@@ -109,8 +59,7 @@ class FluidRevealMaterial extends ShaderMaterial {
         topTex: { value: null },
         bottomTex: { value: null },
         mouse: { value: new Vector2(0.5, 0.5) },
-        aspect: { value: 1.0 },
-        uTime: { value: 0.0 }
+        aspect: { value: 1.0 }
       },
       vertexShader: simpleVertexShader,
       fragmentShader: fluidRevealFragmentShader,
@@ -160,16 +109,14 @@ function RevealPlane({ topImagePath, bottomImagePath, onLoaded }) {
     const targetX = (state.pointer.x + 1) / 2
     const targetY = (state.pointer.y + 1) / 2
 
-    // Update uniforms
+    // Lerp mouse position for smooth brush movement
     materialRef.current.uniforms.mouse.value.x += (targetX - materialRef.current.uniforms.mouse.value.x) * 0.1
     materialRef.current.uniforms.mouse.value.y += (targetY - materialRef.current.uniforms.mouse.value.y) * 0.1
-    // Aspect and Textures handled in useEffects
-    materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
   })
 
   return (
     <mesh scale={[viewport.width, viewport.height, 1]}>
-      <planeGeometry args={[1, 1, 32, 32]} />
+      <planeGeometry args={[1, 1, 1, 1]} />
       <fluidRevealMaterial ref={materialRef} />
     </mesh>
   )
@@ -183,6 +130,7 @@ export function HeroImages({ topImage, bottomImage }) {
     // Session check: If previously visited, show immediately
     const hasPlayed = typeof window !== 'undefined' && sessionStorage.getItem('hero-animated') === 'true';
     if (hasPlayed) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsReady(true);
     }
 
@@ -224,8 +172,8 @@ export function HeroImages({ topImage, bottomImage }) {
       <Canvas
         eventSource={typeof document !== 'undefined' ? document.body : undefined}
         eventPrefix="client"
-        dpr={[1, 2]} 
-        gl={{ antialias: false, powerPreference: "high-performance", alpha: true }} 
+        dpr={[1, 1.5]}
+        gl={{ antialias: false, powerPreference: "high-performance", alpha: true }}
         camera={{ position: [0, 0, 1], fov: 75 }}
         style={{ background: 'transparent' }}
       >
