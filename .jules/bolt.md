@@ -9,3 +9,7 @@
 ## 2024-05-24 - [Package Lock Noise]
 **Learning:** Running `npm install` can update `package-lock.json` even if no dependencies are added, creating noise in PRs.
 **Action:** Always restore `package-lock.json` if the task does not involve dependency updates, or use `npm ci` (if appropriate for the environment) to avoid modifying the lockfile.
+
+## 2024-10-26 - [Idle CPU Usage in React Event Loops]
+**Learning:** Using a continuous `requestAnimationFrame` loop in React `useEffect` hooks for DOM updates (like a custom cursor) causes persistent idle CPU usage, even when no user interaction occurs.
+**Action:** Always convert continuous loops into event-driven `requestAnimationFrame` models (e.g., triggered only on `mousemove`), storing the frame ID in a mutable `ref` to ensure proper cancellation and zero idle CPU cost.
