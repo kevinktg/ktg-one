@@ -9,3 +9,7 @@
 ## 2024-05-24 - [Package Lock Noise]
 **Learning:** Running `npm install` can update `package-lock.json` even if no dependencies are added, creating noise in PRs.
 **Action:** Always restore `package-lock.json` if the task does not involve dependency updates, or use `npm ci` (if appropriate for the environment) to avoid modifying the lockfile.
+
+## 2024-05-28 - [Event-Driven RAF for UI Updates]
+**Learning:** Using recursive `requestAnimationFrame` loops for continuously syncing DOM elements (like custom cursors) causes significant idle CPU and GPU usage even when the user is inactive.
+**Action:** When updating DOM state based on user input (like mouse movements), only schedule a single `requestAnimationFrame` call within the event handler to batch the update, avoiding continuous render loops.
