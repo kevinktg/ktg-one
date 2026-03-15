@@ -32,6 +32,7 @@ export function InputBar({ value = "", onChange, onSubmit, onStop, isLoading }) 
           className="absolute right-2 bottom-2 h-8 w-8 bg-violet-600 hover:bg-violet-700"
           onClick={isLoading ? onStop : onSubmit}
           disabled={!isLoading && !value.trim()}
+          aria-label={isLoading ? "Stop generation" : "Send message"}
         >
           {isLoading ? <Square className="w-3 h-3" /> : <ArrowUp className="w-4 h-4" />}
         </Button>
