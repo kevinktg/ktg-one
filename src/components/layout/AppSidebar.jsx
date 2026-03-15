@@ -25,7 +25,7 @@ export function AppSidebar({ conversations, activeId, onSelect, onNew, onDelete 
       {/* Header */}
       <div className="p-3 border-b border-border flex items-center justify-between">
         <span className="font-semibold text-sm tracking-tight">◈ ktg-one</span>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onNew}>
+        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onNew} aria-label="New conversation">
           <Plus className="w-4 h-4" />
         </Button>
       </div>
@@ -54,6 +54,7 @@ export function AppSidebar({ conversations, activeId, onSelect, onNew, onDelete 
                   e.stopPropagation();
                   onDelete(c.id);
                 }}
+                aria-label="Delete conversation"
               >
                 <Trash2 className="w-3 h-3" />
               </Button>
