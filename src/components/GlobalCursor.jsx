@@ -11,6 +11,7 @@ export function GlobalCursor() {
   const cursorRef = useRef(null);
   const followerRef = useRef(null);
   const positionRef = useRef({ x: 0, y: 0 });
+  const rafIdRef = useRef(null);
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -21,9 +22,12 @@ export function GlobalCursor() {
       // Optimization: Mutate existing object to avoid GC churn
       positionRef.current.x = e.clientX;
       positionRef.current.y = e.clientY;
+
+      if (!rafIdRef.current) {
+        rafIdRef.current = requestAnimationFrame(animate);
+      }
     };
 
-    let rafId;
     // Animation loop for smooth follower movement
     const animate = () => {
       // Update main cursor position immediately
@@ -37,15 +41,16 @@ export function GlobalCursor() {
          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      rafId = requestAnimationFrame(animate);
+      rafIdRef.current = null;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
     };
   }, []);
 
