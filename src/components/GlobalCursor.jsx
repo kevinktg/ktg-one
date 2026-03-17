@@ -16,16 +16,22 @@ export function GlobalCursor() {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
 
+    let rafId;
+
     // Mouse move handler
     const handleMouseMove = (e) => {
       // Optimization: Mutate existing object to avoid GC churn
       positionRef.current.x = e.clientX;
       positionRef.current.y = e.clientY;
+
+      // Only schedule an update if one isn't already pending
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateCursor);
+      }
     };
 
-    let rafId;
-    // Animation loop for smooth follower movement
-    const animate = () => {
+    // Update function scheduled by rAF
+    const updateCursor = () => {
       // Update main cursor position immediately
       if (cursor) {
         cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
@@ -37,15 +43,17 @@ export function GlobalCursor() {
          follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
       }
 
-      rafId = requestAnimationFrame(animate);
+      // Reset rafId to allow future updates
+      rafId = null;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
