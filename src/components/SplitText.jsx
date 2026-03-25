@@ -4,8 +4,16 @@ export function SplitText({
   wordClass = "split-word",
   charClass = "split-char"
 }) {
+  let text = "";
+  if (typeof children === "string") {
+    text = children;
+  } else if (Array.isArray(children)) {
+    text = children.map(child => (typeof child === "string" || typeof child === "number") ? child : "").join("");
+  } else if (typeof children === "number") {
+    text = String(children);
+  }
 
-  const words = children.split(" ");
+  const words = text.split(" ");
 
   return (
     <span className={className}>

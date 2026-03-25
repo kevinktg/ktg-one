@@ -15,37 +15,36 @@ export function GlobalCursor() {
   useEffect(() => {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
+    let isMoving = false;
+    let rafId = null;
 
     // Mouse move handler
     const handleMouseMove = (e) => {
       // Optimization: Mutate existing object to avoid GC churn
       positionRef.current.x = e.clientX;
       positionRef.current.y = e.clientY;
-    };
 
-    let rafId;
-    // Animation loop for smooth follower movement
-    const animate = () => {
-      // Update main cursor position immediately
-      if (cursor) {
-        cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+      if (!isMoving) {
+        isMoving = true;
+        rafId = requestAnimationFrame(() => {
+          if (cursor) {
+            cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+          }
+          if (follower) {
+            follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
+          }
+          isMoving = false;
+        });
       }
-
-      // Update follower with smooth transition
-      // (Simplified to follow strictly to avoid 'massive' scaling bugs if logic was broken)
-      if (follower) {
-         follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      rafId = requestAnimationFrame(animate);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    rafId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
