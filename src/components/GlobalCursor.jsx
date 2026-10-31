@@ -15,34 +15,44 @@ export function GlobalCursor() {
   useEffect(() => {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
+    let rafId = null;
 
-    // Mouse move handler
+    // OPTIMIZATION: Eliminate continuous idle rAF loop.
+    // Instead of running 60-120fps indefinitely when cursor is idle,
+    // schedule DOM updates inside an event-driven requestAnimationFrame only when mousemove events fire.
+    // Expected impact: Reduces idle CPU usage from continuous transforms to 0% when mouse is static.
+    const render = () => {
+      const { x, y } = positionRef.current;
+
+      // Update main cursor position
+      if (cursor) {
+        cursor.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      }
+
+      // Update follower position (CSS transition handles smoothing)
+      if (follower) {
+        follower.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      }
+
+      rafId = null;
+    };
+
+    // Mouse move handler schedules next frame if not already queued
     const handleMouseMove = (e) => {
       positionRef.current = { x: e.clientX, y: e.clientY };
+
+      if (!rafId) {
+        rafId = requestAnimationFrame(render);
+      }
     };
 
-    // Animation loop for smooth follower movement
-    const animate = () => {
-      // Update main cursor position immediately
-      if (cursor) {
-        cursor.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      // Update follower with smooth transition
-      // (Simplified to follow strictly to avoid 'massive' scaling bugs if logic was broken)
-      if (follower) {
-         follower.style.transform = `translate3d(${positionRef.current.x}px, ${positionRef.current.y}px, 0) translate(-50%, -50%)`;
-      }
-
-      requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    const rafId = requestAnimationFrame(animate);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
