@@ -12,9 +12,13 @@ export function SnippetViewer({ snippet, content }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy snippet to clipboard:", err);
+    }
   };
 
   return (
@@ -41,15 +45,16 @@ export function SnippetViewer({ snippet, content }) {
           variant="outline"
           size="sm"
           className="shrink-0"
+          aria-label={copied ? "Copied snippet code" : "Copy snippet code"}
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="h-4 w-4 mr-2" aria-hidden="true" />
               Copied
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="h-4 w-4 mr-2" aria-hidden="true" />
               Copy
             </>
           )}
@@ -64,11 +69,13 @@ export function SnippetViewer({ snippet, content }) {
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
+            aria-label={copied ? "Copied snippet code" : "Copy snippet code"}
+            title={copied ? "Copied" : "Copy code"}
           >
             {copied ? (
-              <Check className="h-4 w-4" />
+              <Check className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-4 w-4" aria-hidden="true" />
             )}
           </Button>
         </div>
@@ -82,7 +89,7 @@ export function SnippetViewer({ snippet, content }) {
       </Card>
 
       {copied && (
-        <Card className="px-4 py-2.5">
+        <Card className="px-4 py-2.5" role="status" aria-live="polite">
           <CardContent className="p-0 text-[13px] text-foreground">
             Snippet copied to clipboard
           </CardContent>
