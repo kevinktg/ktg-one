@@ -1,0 +1,75 @@
+[
+  {
+    "id": "skip-button",
+    "component": "src/components/SkipButton.jsx",
+    "type": "micro-interaction",
+    "category": "Micro-interactions / cursor fx",
+    "description": "Floating skip button hover state, icon bounce, and pulse transition",
+    "status": "completed",
+    "note": "Added 1000ms duration GPU-accelerated micro-interactions: subtle glow pulse, hover elevation, smooth downward arrow transition with emerald highlight, bottom animated accent trail, and full prefers-reduced-motion compliance."
+  },
+  {
+    "id": "header-nav-links",
+    "component": "src/components/Header.jsx",
+    "type": "hover/underline",
+    "category": "Hover states / Animated lines",
+    "description": "Navigation links and pill buttons in global fixed header with animated underline indicator and subtle glow transitions",
+    "status": "pending"
+  },
+  {
+    "id": "blog-card-hover",
+    "component": "src/components/BlogPreview.jsx",
+    "type": "hover/card",
+    "category": "Hover states",
+    "description": "Interactive card elevation, border shimmer, and arrow translation on blog preview cards",
+    "status": "pending"
+  },
+  {
+    "id": "tools-card-hover",
+    "component": "src/components/ToolsSection.jsx",
+    "type": "hover/card",
+    "category": "Hover states",
+    "description": "Interactive laboratory cards with gradient reveal, icon lift, and border glow",
+    "status": "pending"
+  },
+  {
+    "id": "philosophy-quote-hover",
+    "component": "src/components/PhilosophySection.jsx",
+    "type": "hover/line",
+    "category": "Animated lines",
+    "description": "Vertical indicator line draw-down and rotating diamond accent on philosophy principle quotes",
+    "status": "pending"
+  },
+  {
+    "id": "expertise-matrix-hover",
+    "component": "src/components/ExpertiseSection.jsx",
+    "type": "hover/micro-interaction",
+    "category": "Hover states",
+    "description": "Subtle hover state on skill list items with diamond accent expansion",
+    "status": "pending"
+  },
+  {
+    "id": "validation-accordion-nav",
+    "component": "src/components/ValidationSection.jsx",
+    "type": "hover/line",
+    "category": "Animated lines",
+    "description": "Interactive indicator line and accent glow on validation audit entries",
+    "status": "pending"
+  },
+  {
+    "id": "snippet-card-hover",
+    "component": "src/components/hub/SnippetCard.jsx",
+    "type": "hover/card",
+    "category": "Hover states",
+    "description": "Interactive border illumination and badge pulse on snippet card hover",
+    "status": "pending"
+  },
+  {
+    "id": "footer-copyright-link",
+    "component": "src/components/Footer.jsx",
+    "type": "hover/underline",
+    "category": "Hover states",
+    "description": "Footer copyright line micro-interaction and subtle highlight",
+    "status": "pending"
+  }
+]
