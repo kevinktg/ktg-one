@@ -24,7 +24,7 @@ export function Header() {
 
         <Button variant="outline" asChild className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:text-white text-white/80 transition-all duration-300 font-syne tracking-widest text-xs h-9 px-4 rounded-full font-bold">
           <Link href="/hub/snippets">
-            hub
+            skills
           </Link>
         </Button>
 

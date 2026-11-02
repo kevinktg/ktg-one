@@ -54,9 +54,9 @@ export default function SnippetsPage() {
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-syne font-bold lowercase mb-4">KTG Snippets</h1>
+          <h1 className="text-4xl font-syne font-bold lowercase mb-4">KTG Skills Hub</h1>
           <p className="text-muted-foreground">
-            Browse KTG v30 framework snippets and techniques
+            Browse KTG v30 skills, snippets, and techniques
           </p>
         </div>
 
