@@ -1,0 +1,47 @@
+[
+  {
+    "id": "header-nav-links",
+    "component": "src/components/Header.jsx",
+    "type": "hover/underline",
+    "category": "Hover states / Animated lines",
+    "description": "Interactive hover states and animated expanding underline indicators for navigation links with reduced motion support.",
+    "status": "completed",
+    "implementation_notes": "Implemented accessible nav links wrapped in semantic <nav aria-label=\"Main navigation\"> with dynamic CSS transform-based expanding underline indicator (scale-x-0 to scale-x-100) and subtle vertical lift (-translate-y-0.5). Adheres to >= 1 second animation duration constraint (1000ms duration) and includes comprehensive prefers-reduced-motion accessibility overrides."
+  },
+  {
+    "id": "tools-cards-interactive",
+    "component": "src/components/ToolsSection.jsx",
+    "type": "hover/card-glow",
+    "category": "Hover states",
+    "description": "Magnetic hover pull and dynamic glow border trails on tool cards.",
+    "status": "pending",
+    "implementation_notes": ""
+  },
+  {
+    "id": "snippet-cards-hover",
+    "component": "src/components/hub/SnippetCard.jsx",
+    "type": "hover/elevation",
+    "category": "Hover states",
+    "description": "Subtle elevation lift and dynamic border illumination on snippet preview cards.",
+    "status": "pending",
+    "implementation_notes": ""
+  },
+  {
+    "id": "footer-divider-draw",
+    "component": "src/components/Footer.jsx",
+    "type": "animated-lines/draw-in",
+    "category": "Animated lines",
+    "description": "Scroll-triggered SVG line draw-in or expanding border separator for the footer section.",
+    "status": "pending",
+    "implementation_notes": ""
+  },
+  {
+    "id": "blog-preview-card-stagger",
+    "component": "src/components/BlogPreview.jsx",
+    "type": "micro-interactions/shimmer",
+    "category": "Micro-interactions / cursor fx",
+    "description": "Interactive pulse/shimmer and magnetic tilt on blog card hover.",
+    "status": "pending",
+    "implementation_notes": ""
+  }
+]
