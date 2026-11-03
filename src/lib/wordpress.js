@@ -161,7 +161,7 @@ export async function getPostBySlug(slug) {
 
 // Get featured image URL
 export function getFeaturedImage(post) {
-  if (post._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+  if (post?._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
     return post._embedded['wp:featuredmedia'][0].source_url;
   }
   return null;
