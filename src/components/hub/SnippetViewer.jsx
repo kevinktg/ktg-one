@@ -82,9 +82,9 @@ export function SnippetViewer({ snippet, content }) {
       </Card>
 
       {copied && (
-        <Card className="px-4 py-2.5">
+        <Card className="px-4 py-2.5" role="status" aria-live="polite">
           <CardContent className="p-0 text-[13px] text-foreground">
-            Snippet copied to clipboard
+            Skill copied to clipboard
           </CardContent>
         </Card>
       )}
