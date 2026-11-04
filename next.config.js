@@ -28,6 +28,21 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  // Security headers to enforce browser-side security controls
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' }, // Clickjacking protection
+          { key: 'X-Content-Type-Options', value: 'nosniff' }, // MIME-sniffing prevention
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }, // Protect referrer privacy
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }, // Restrict sensitive browser features
+          { key: 'X-DNS-Prefetch-Control', value: 'on' }, // Control DNS prefetching
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
