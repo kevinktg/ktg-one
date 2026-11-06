@@ -40,11 +40,12 @@ export function SnippetViewer({ snippet, content }) {
           onClick={handleCopy}
           variant="outline"
           size="sm"
-          className="shrink-0"
+          className={`shrink-0 transition-colors ${copied ? "text-emerald-400 border-emerald-500/50" : ""}`}
+          aria-label={copied ? "Snippet copied" : "Copy snippet to clipboard"}
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="h-4 w-4 mr-2 text-emerald-400" />
               Copied
             </>
           ) : (
@@ -63,7 +64,9 @@ export function SnippetViewer({ snippet, content }) {
             onClick={handleCopy}
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 transition-colors ${copied ? "text-emerald-400" : ""}`}
+            aria-label={copied ? "Snippet copied" : "Copy snippet content"}
+            title={copied ? "Copied" : "Copy to clipboard"}
           >
             {copied ? (
               <Check className="h-4 w-4" />
@@ -82,8 +85,9 @@ export function SnippetViewer({ snippet, content }) {
       </Card>
 
       {copied && (
-        <Card className="px-4 py-2.5">
-          <CardContent className="p-0 text-[13px] text-foreground">
+        <Card className="px-4 py-2.5 border-emerald-500/20 bg-emerald-950/10" role="status" aria-live="polite">
+          <CardContent className="p-0 text-[13px] text-emerald-400 flex items-center gap-2">
+            <Check className="h-3.5 w-3.5" />
             Snippet copied to clipboard
           </CardContent>
         </Card>
