@@ -40,7 +40,9 @@ export async function getPosts(page = 1, perPage = 10) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?_embed&per_page=${perPage}&page=${page}`;
     
-    const response = await fetch(url, {
+    // OPTIMIZATION: Route request through fetchWithTimeout (enforcing 10s timeout)
+    // Prevents hanging WordPress requests from blocking SSR and ISR page generation indefinitely.
+    const response = await fetchWithTimeout(url, {
       next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
@@ -105,7 +107,9 @@ export async function getPostBySlug(slug) {
   try {
     const url = `${WORDPRESS_URL}/wp-json/wp/v2/posts?slug=${slug}&_embed`;
     
-    const response = await fetch(url, {
+    // OPTIMIZATION: Route request through fetchWithTimeout (enforcing 10s timeout)
+    // Prevents hanging WordPress requests from blocking SSR and ISR page generation indefinitely.
+    const response = await fetchWithTimeout(url, {
       next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds for dynamic pages
       headers: {
         'User-Agent': 'Next.js WordPress Client',
@@ -161,7 +165,7 @@ export async function getPostBySlug(slug) {
 
 // Get featured image URL
 export function getFeaturedImage(post) {
-  if (post._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+  if (post?._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
     return post._embedded['wp:featuredmedia'][0].source_url;
   }
   return null;
