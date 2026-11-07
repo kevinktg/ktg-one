@@ -47,7 +47,7 @@ export function BlogPreview({ posts = [] }) {
 
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
+      <section id="blog-section" ref={sectionRef} data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
         <div className="max-w-7xl mx-auto w-full">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
           <p className="text-muted-foreground">No posts available at the moment.</p>
@@ -61,6 +61,7 @@ export function BlogPreview({ posts = [] }) {
 
   return (
     <section
+      id="blog-section"
       ref={sectionRef}
       data-blog-section
       className="relative py-24 md:py-32 px-6 md:px-12 text-white z-[60]"
@@ -76,9 +77,10 @@ export function BlogPreview({ posts = [] }) {
           </div>
           <Link
             href="/blog"
-            className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+            className="group hidden md:inline-flex items-center gap-1 text-xs md:text-sm text-white/50 hover:text-white transition-colors duration-1000 ease-out border-b border-transparent hover:border-white/50 pb-1 tracking-widest uppercase motion-reduce:transition-none"
           >
-            view all &rarr;
+            <span>view all</span>
+            <span className="inline-block transition-transform duration-1000 ease-out group-hover:translate-x-1 motion-reduce:transform-none">&rarr;</span>
           </Link>
         </div>
 
@@ -102,20 +104,26 @@ export function BlogPreview({ posts = [] }) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className={`blog-card group ${colSpan}`}
+                className={`blog-card group relative block ${colSpan}`}
               >
-                <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/5">
+                <article className="relative h-full flex flex-col border border-white/10 group-hover:border-white/30 backdrop-blur-sm rounded-xl overflow-hidden bg-transparent group-hover:bg-white/[0.04] transition-all duration-1000 ease-out group-hover:-translate-y-1.5 shadow-[0_0_0_rgba(255,255,255,0)] group-hover:shadow-[0_12px_30px_rgba(0,0,0,0.5)] motion-reduce:transform-none motion-reduce:transition-none">
+                  {/* Subtle top/border illumination line on hover */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-1000 ease-out origin-center pointer-events-none motion-reduce:transition-none"
+                  />
+
                   {featuredImage && (
                     <div className={`relative w-full ${imgHeight} shrink-0 overflow-hidden bg-white/5`}>
                       <Image
                         src={featuredImage}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out motion-reduce:transform-none"
                         sizes={tier === 'lg' ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                         loading={index < 3 ? "eager" : "lazy"}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-1000 ease-out motion-reduce:transition-none" />
                     </div>
                   )}
 
@@ -123,32 +131,38 @@ export function BlogPreview({ posts = [] }) {
                     <div className="flex justify-between items-start mb-3">
                       {post.date && (
                         <time
-                          className="text-white/40 text-xs font-mono tracking-widest"
+                          className="text-white/40 text-xs font-mono tracking-widest group-hover:text-white/60 transition-colors duration-1000 ease-out motion-reduce:transition-none"
                           dateTime={new Date(post.date).toISOString()}
                         >
                           {formatDate(post.date)}
                         </time>
                       )}
-                      <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 transition-colors" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 group-hover:shadow-[0_0_8px_rgba(52,211,153,0.7)] transition-all duration-1000 ease-out motion-reduce:transition-none" />
                     </div>
 
-                    <h3 className={`font-syne font-bold mb-3 lowercase group-hover:text-white/80 transition-colors leading-tight ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
+                    <h3 className={`font-syne font-bold mb-3 lowercase group-hover:text-white transition-colors duration-1000 ease-out leading-tight motion-reduce:transition-none ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
                       {title}
                     </h3>
 
                     {tier !== 'sm' && excerpt && (
-                      <p className="text-white/50 text-sm mb-4 line-clamp-3 leading-relaxed">
+                      <p className="text-white/50 group-hover:text-white/70 transition-colors duration-1000 ease-out text-sm mb-4 line-clamp-3 leading-relaxed motion-reduce:transition-none">
                         {excerpt}
                       </p>
                     )}
 
                     <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/70 transition-colors">
+                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/80 transition-colors duration-1000 ease-out motion-reduce:transition-none">
                         read entry
                       </span>
-                      <span className="text-white/30 group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
+                      <span className="text-white/30 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-1000 ease-out motion-reduce:transform-none motion-reduce:transition-none">&rarr;</span>
                     </div>
                   </div>
+
+                  {/* Subtle animated border trail at the bottom */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-emerald-500/0 via-emerald-400/70 to-emerald-500/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-1000 ease-out origin-left pointer-events-none motion-reduce:transition-none"
+                  />
                 </article>
               </Link>
             );
@@ -159,9 +173,10 @@ export function BlogPreview({ posts = [] }) {
         <div className="mt-12 text-center md:hidden">
           <Link
             href="/blog"
-            className="inline-block text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white/30"
+            className="group inline-flex items-center gap-1 text-sm text-white/50 hover:text-white transition-colors duration-1000 ease-out border-b border-transparent hover:border-white/30 motion-reduce:transition-none"
           >
-            view all posts &rarr;
+            <span>view all posts</span>
+            <span className="inline-block transition-transform duration-1000 ease-out group-hover:translate-x-1 motion-reduce:transform-none">&rarr;</span>
           </Link>
         </div>
       </div>

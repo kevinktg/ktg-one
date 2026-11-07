@@ -14,7 +14,8 @@
     "type": "hover/card",
     "category": "Hover states",
     "description": "Interactive card elevation, border shimmer, and arrow translation on blog preview cards",
-    "status": "pending"
+    "status": "completed",
+    "note": "Implemented 1000ms GPU-accelerated card lift (translate-y-1.5), top edge illumination shimmer, smooth 105% image zoom, emerald indicator dot glow, arrow translation (translate-x-1.5), bottom border trail, and prefers-reduced-motion compliance."
   },
   {
     "id": "tools-card-hover",
