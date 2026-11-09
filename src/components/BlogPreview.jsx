@@ -47,7 +47,7 @@ export function BlogPreview({ posts = [] }) {
 
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
+      <section ref={sectionRef} id="blog-section" data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
         <div className="max-w-7xl mx-auto w-full">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
           <p className="text-muted-foreground">No posts available at the moment.</p>
@@ -62,6 +62,7 @@ export function BlogPreview({ posts = [] }) {
   return (
     <section
       ref={sectionRef}
+      id="blog-section"
       data-blog-section
       className="relative py-24 md:py-32 px-6 md:px-12 text-white z-[60]"
       suppressHydrationWarning
@@ -102,16 +103,22 @@ export function BlogPreview({ posts = [] }) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className={`blog-card group ${colSpan}`}
+                className={`blog-card group ${colSpan} transition-transform duration-1000 ease-out hover:-translate-y-1 motion-reduce:transform-none`}
               >
-                <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/5">
+                <article className="relative h-full flex flex-col border border-white/10 hover:border-white/30 transition-all duration-1000 ease-out backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/5 hover:shadow-[0_0_25px_rgba(255,255,255,0.06)] motion-reduce:transition-none">
+                  {/* Subtle top shimmer/glow indicator line on hover */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100 transition-all duration-1000 ease-out motion-reduce:transition-none pointer-events-none"
+                  />
+
                   {featuredImage && (
                     <div className={`relative w-full ${imgHeight} shrink-0 overflow-hidden bg-white/5`}>
                       <Image
                         src={featuredImage}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out motion-reduce:transform-none"
                         sizes={tier === 'lg' ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                         loading={index < 3 ? "eager" : "lazy"}
                       />
@@ -129,10 +136,10 @@ export function BlogPreview({ posts = [] }) {
                           {formatDate(post.date)}
                         </time>
                       )}
-                      <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 transition-colors" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 group-hover:scale-125 transition-all duration-1000 ease-out motion-reduce:transform-none" />
                     </div>
 
-                    <h3 className={`font-syne font-bold mb-3 lowercase group-hover:text-white/80 transition-colors leading-tight ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
+                    <h3 className={`font-syne font-bold mb-3 lowercase group-hover:text-white/80 transition-colors duration-1000 ease-out leading-tight ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
                       {title}
                     </h3>
 
@@ -143,10 +150,10 @@ export function BlogPreview({ posts = [] }) {
                     )}
 
                     <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/70 transition-colors">
+                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/70 transition-colors duration-1000 ease-out">
                         read entry
                       </span>
-                      <span className="text-white/30 group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
+                      <span className="text-white/30 group-hover:translate-x-1.5 transition-transform duration-1000 ease-out motion-reduce:transform-none">&rarr;</span>
                     </div>
                   </div>
                 </article>
