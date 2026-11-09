@@ -14,7 +14,8 @@
     "type": "hover/card",
     "category": "Hover states",
     "description": "Interactive card elevation, border shimmer, and arrow translation on blog preview cards",
-    "status": "pending"
+    "status": "completed",
+    "note": "Implemented 1000ms duration transform & opacity card elevation (-translate-y-1 with ambient glow), animated gradient top border trail (scale-x draw-in), surface light wash, arrow translation, indicator dot scaling, and full prefers-reduced-motion compliance."
   },
   {
     "id": "tools-card-hover",
