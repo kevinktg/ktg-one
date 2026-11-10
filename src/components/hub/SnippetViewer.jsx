@@ -41,6 +41,7 @@ export function SnippetViewer({ snippet, content }) {
           variant="outline"
           size="sm"
           className="shrink-0"
+          aria-label={copied ? "Copied snippet to clipboard" : "Copy snippet code"}
         >
           {copied ? (
             <>
@@ -64,6 +65,7 @@ export function SnippetViewer({ snippet, content }) {
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
+            aria-label={copied ? "Copied snippet to clipboard" : "Copy snippet code"}
           >
             {copied ? (
               <Check className="h-4 w-4" />
@@ -82,8 +84,13 @@ export function SnippetViewer({ snippet, content }) {
       </Card>
 
       {copied && (
-        <Card className="px-4 py-2.5">
-          <CardContent className="p-0 text-[13px] text-foreground">
+        <Card
+          role="status"
+          aria-live="polite"
+          className="px-4 py-2.5 transition-opacity duration-200"
+        >
+          <CardContent className="p-0 text-[13px] text-foreground flex items-center gap-2">
+            <Check className="h-4 w-4 text-emerald-400" />
             Snippet copied to clipboard
           </CardContent>
         </Card>
