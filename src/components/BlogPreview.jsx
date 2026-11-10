@@ -47,7 +47,7 @@ export function BlogPreview({ posts = [] }) {
 
   if (!posts || posts.length === 0) {
     return (
-      <section ref={sectionRef} data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
+      <section id="blog-section" ref={sectionRef} data-blog-section className="relative py-24 px-6 text-white z-[60]" suppressHydrationWarning>
         <div className="max-w-7xl mx-auto w-full">
           <h2 className="font-syne text-4xl md:text-5xl font-bold mb-6 lowercase">blog</h2>
           <p className="text-muted-foreground">No posts available at the moment.</p>
@@ -61,6 +61,7 @@ export function BlogPreview({ posts = [] }) {
 
   return (
     <section
+      id="blog-section"
       ref={sectionRef}
       data-blog-section
       className="relative py-24 md:py-32 px-6 md:px-12 text-white z-[60]"
@@ -76,9 +77,19 @@ export function BlogPreview({ posts = [] }) {
           </div>
           <Link
             href="/blog"
-            className="hidden md:inline-block text-xs md:text-sm text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 tracking-widest uppercase"
+            className="group/all relative hidden md:inline-flex items-center gap-1.5 text-xs md:text-sm text-white/50 hover:text-white transition-colors duration-1000 ease-out pb-1 tracking-widest uppercase motion-reduce:transition-none"
           >
-            view all &rarr;
+            <span>view all</span>
+            <span
+              aria-hidden="true"
+              className="inline-block transition-transform duration-1000 ease-out group-hover/all:translate-x-1 motion-reduce:transform-none"
+            >
+              &rarr;
+            </span>
+            <span
+              aria-hidden="true"
+              className="absolute bottom-0 left-0 w-full h-[1px] bg-white/70 origin-left scale-x-0 group-hover/all:scale-x-100 transition-transform duration-1000 ease-out motion-reduce:transition-none"
+            />
           </Link>
         </div>
 
@@ -102,51 +113,66 @@ export function BlogPreview({ posts = [] }) {
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className={`blog-card group ${colSpan}`}
+                className={`blog-card group ${colSpan} block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 rounded-xl`}
               >
-                <article className="h-full flex flex-col border border-white/10 hover:border-white/30 transition-all duration-300 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/5">
+                <article className="relative h-full flex flex-col border border-white/10 hover:border-white/30 backdrop-blur-sm rounded-xl overflow-hidden bg-black/40 hover:bg-white/[0.06] transition-all duration-1000 ease-out hover:-translate-y-1.5 hover:shadow-[0_12px_40px_-15px_rgba(0,0,0,0.7),0_0_25px_rgba(255,255,255,0.06)] motion-reduce:transform-none motion-reduce:transition-none">
+                  {/* Subtle ambient gradient shimmer border-glow on hover */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 ease-out bg-gradient-to-br from-white/10 via-transparent to-emerald-500/10 motion-reduce:transition-none"
+                  />
+
                   {featuredImage && (
                     <div className={`relative w-full ${imgHeight} shrink-0 overflow-hidden bg-white/5`}>
                       <Image
                         src={featuredImage}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="object-cover group-hover:scale-105 transition-transform duration-1000 ease-out motion-reduce:transform-none"
                         sizes={tier === 'lg' ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                         loading={index < 3 ? "eager" : "lazy"}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-1000 ease-out motion-reduce:transition-none" />
                     </div>
                   )}
 
-                  <div className="p-5 md:p-6 flex-1 flex flex-col">
+                  <div className="relative z-10 p-5 md:p-6 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-3">
                       {post.date && (
                         <time
-                          className="text-white/40 text-xs font-mono tracking-widest"
+                          className="text-white/40 text-xs font-mono tracking-widest group-hover:text-white/60 transition-colors duration-1000 ease-out motion-reduce:transition-none"
                           dateTime={new Date(post.date).toISOString()}
                         >
                           {formatDate(post.date)}
                         </time>
                       )}
-                      <span className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 transition-colors" />
+                      <span
+                        aria-hidden="true"
+                        className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 group-hover:shadow-[0_0_8px_rgba(52,211,153,0.8)] transition-all duration-1000 ease-out motion-reduce:transition-none"
+                      />
                     </div>
 
-                    <h3 className={`font-syne font-bold mb-3 lowercase group-hover:text-white/80 transition-colors leading-tight ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
+                    <h3 className={`font-syne font-bold mb-3 lowercase text-white group-hover:text-white/95 transition-colors duration-1000 ease-out leading-tight ${tier === 'lg' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
                       {title}
                     </h3>
 
                     {tier !== 'sm' && excerpt && (
-                      <p className="text-white/50 text-sm mb-4 line-clamp-3 leading-relaxed">
+                      <p className="text-white/50 group-hover:text-white/70 transition-colors duration-1000 ease-out text-sm mb-4 line-clamp-3 leading-relaxed motion-reduce:transition-none">
                         {excerpt}
                       </p>
                     )}
 
-                    <div className="mt-auto pt-4 border-t border-white/5 flex justify-between items-center">
-                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/70 transition-colors">
+                    <div className="mt-auto pt-4 border-t border-white/5 group-hover:border-white/15 transition-colors duration-1000 ease-out flex justify-between items-center motion-reduce:transition-none">
+                      <span className="text-white/30 text-xs tracking-wider group-hover:text-white/80 transition-colors duration-1000 ease-out motion-reduce:transition-none flex items-center gap-1.5">
+                        <span aria-hidden="true" className="inline-block w-1 h-1 rounded-full bg-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 ease-out motion-reduce:transition-none" />
                         read entry
                       </span>
-                      <span className="text-white/30 group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
+                      <span
+                        aria-hidden="true"
+                        className="text-white/30 group-hover:text-white/90 group-hover:translate-x-1.5 transition-all duration-1000 ease-out motion-reduce:transform-none motion-reduce:transition-none"
+                      >
+                        &rarr;
+                      </span>
                     </div>
                   </div>
                 </article>
