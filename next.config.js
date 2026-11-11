@@ -28,6 +28,24 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  // Security headers to enforce browser protections and defense-in-depth
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // Prevent clickjacking by disallowing embedding in iframes
+          { key: "X-Frame-Options", value: "DENY" },
+          // Prevent MIME-sniffing vulnerabilities
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          // Control referrer information leakage on cross-origin requests
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          // Restrict access to sensitive browser features/APIs
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
