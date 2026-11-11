@@ -41,10 +41,11 @@ export function SnippetViewer({ snippet, content }) {
           variant="outline"
           size="sm"
           className="shrink-0"
+          aria-label={copied ? "Snippet copied to clipboard" : "Copy snippet to clipboard"}
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="h-4 w-4 mr-2 text-emerald-400" />
               Copied
             </>
           ) : (
@@ -64,9 +65,10 @@ export function SnippetViewer({ snippet, content }) {
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
+            aria-label={copied ? "Snippet copied to clipboard" : "Copy snippet to clipboard"}
           >
             {copied ? (
-              <Check className="h-4 w-4" />
+              <Check className="h-4 w-4 text-emerald-400" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
@@ -81,13 +83,19 @@ export function SnippetViewer({ snippet, content }) {
         </CardContent>
       </Card>
 
-      {copied && (
-        <Card className="px-4 py-2.5">
-          <CardContent className="p-0 text-[13px] text-foreground">
-            Snippet copied to clipboard
-          </CardContent>
-        </Card>
-      )}
+      {/* Toast Notification */}
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-6 right-6 z-50 pointer-events-none"
+      >
+        {copied && (
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#0a0a0a]/90 px-4 py-2.5 text-xs font-mono text-white shadow-lg backdrop-blur-md transition-all">
+            <Check className="h-3.5 w-3.5 text-emerald-400" />
+            <span>Snippet copied to clipboard</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
