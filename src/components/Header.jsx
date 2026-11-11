@@ -53,7 +53,7 @@ export function Header() {
           </Link>
         </Button>
 
-        {/* Hub Pill Button with subtle glow and expanding border indicator */}
+        {/* Skills Hub Pill Button with subtle glow and expanding border indicator */}
         <Button
           variant="outline"
           asChild
@@ -66,7 +66,7 @@ export function Header() {
               className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 ease-out pointer-events-none motion-reduce:transition-none"
             />
             <span className="relative z-10 transition-transform duration-1000 ease-out group-hover:translate-x-0.5 motion-reduce:transform-none">
-              hub
+              skills
             </span>
             {/* Subtle animated border trail at bottom */}
             <span
