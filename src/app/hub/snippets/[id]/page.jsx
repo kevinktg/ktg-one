@@ -67,7 +67,7 @@ export default function SnippetDetailPage() {
           className="mb-8 inline-flex items-center gap-2 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Back to snippets
+          Back to skills
         </Link>
         <SnippetViewer snippet={snippet} content={content} />
       </div>
