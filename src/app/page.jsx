@@ -7,7 +7,6 @@ import { PhilosophySection } from "@/components/PhilosophySection";
 import { Footer } from "@/components/Footer";
 import { ValidationSection } from "@/components/ValidationSection";
 import { BlogPreview } from "@/components/BlogPreview";
-import { GeometricBackground } from "@/components/GeometricBackground";
 import { getPosts } from "@/lib/wordpress";
 
 // Force dynamic rendering if you want new blog posts to appear instantly on refresh
@@ -30,11 +29,12 @@ export default async function Home() {
   // For now, we rely on the default props inside the components,
   // but this is where you would pass "heroData", "expertiseData", etc.
 
+  // OPTIMIZATION: Removed duplicate GeometricBackground and set container to bg-transparent.
+  // GeometricBackground is mounted globally at root level in layout.jsx. Double-rendering
+  // created 12 redundant CSS-animated square elements, duplicate tech-grids, and caused
+  // Z-fighting/GPU overdraw. Using bg-transparent allows the global instance to show through.
   return (
-    <div className="bg-background min-h-screen flex flex-col relative" suppressHydrationWarning>
-      {/* Global background with gradient glow and grid - reactive to cursor */}
-      <GeometricBackground fixed />
-      
+    <div className="bg-transparent min-h-screen flex flex-col relative" suppressHydrationWarning>
       {/* Header is usually fixed/sticky.
         Ensure it has z-50 to sit above the Hero canvas
       */}
