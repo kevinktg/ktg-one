@@ -41,6 +41,7 @@ export function SnippetViewer({ snippet, content }) {
           variant="outline"
           size="sm"
           className="shrink-0"
+          aria-label={copied ? "Copied snippet code" : "Copy snippet code"}
         >
           {copied ? (
             <>
@@ -64,7 +65,8 @@ export function SnippetViewer({ snippet, content }) {
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0"
-            aria-label="Copy skill content"
+            aria-label={copied ? "Copied skill content" : "Copy skill content"}
+            title={copied ? "Copied" : "Copy to clipboard"}
           >
             {copied ? (
               <Check className="h-4 w-4" />
