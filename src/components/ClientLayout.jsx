@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactLenis } from "@/libs/lenis";
-import { GeometricBackground } from "./GeometricBackground";
 import { GlobalCursor } from "./GlobalCursor";
 
 export function ClientLayout({ children }) {
